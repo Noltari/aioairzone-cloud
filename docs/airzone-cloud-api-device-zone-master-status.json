@@ -1,0 +1,123 @@
+{
+  "eco_conf": "off",
+  "range_sp_hot_air_max": {
+    "celsius": 30,
+    "fah": 86
+  },
+  "range_sp_emerheat_air_max": {
+    "celsius": 30,
+    "fah": 86
+  },
+  "range_sp_cool_air_min": {
+    "celsius": 18,
+    "fah": 64
+  },
+  "range_sp_dry_air_min": {
+    "celsius": 18,
+    "fah": 64
+  },
+  "mode": 3,
+  "auto_mode": null,
+  "setpoint_air_stop": {
+    "celsius": 15.5,
+    "fah": 60
+  },
+  "setpoint_air_heat": {
+    "celsius": 15.5,
+    "fah": 60
+  },
+  "mode_available": [
+    2,
+    3,
+    4,
+    5,
+    0
+  ],
+  "usermode_conf": null,
+  "active": false,
+  "speed_values": [],
+  "speed_conf": null,
+  "speed_type": null,
+  "aq_active": null,
+  "aq_mode_conf": null,
+  "aq_mode_values": [],
+  "aqpm1_0": null,
+  "aqpm10": null,
+  "aqpm2_5": null,
+  "aq_quality": null,
+  "isConnected": true,
+  "humidity": 40,
+  "eco_values": [
+    "off",
+    "manual",
+    "a",
+    "a_p",
+    "a_pp"
+  ],
+  "name": "Salon",
+  "sleep": 0,
+  "sleep_values": [
+    0,
+    30,
+    60,
+    90
+  ],
+  "power": false,
+  "local_temp": {
+    "celsius": 20.9,
+    "fah": 70
+  },
+  "warnings": [],
+  "connection_date": "2022-02-28T15:37:45.000Z",
+  "step": {
+    "fah": 1,
+    "celsius": 0.5
+  },
+  "range_sp_cool_air_max": {
+    "fah": 86,
+    "celsius": 30
+  },
+  "range_sp_dry_air_max": {
+    "fah": 86,
+    "celsius": 30
+  },
+  "range_sp_vent_air_max": {
+    "fah": 86,
+    "celsius": 30
+  },
+  "range_sp_stop_air_max": {
+    "fah": 86,
+    "celsius": 30
+  },
+  "range_sp_hot_air_min": {
+    "fah": 59,
+    "celsius": 15
+  },
+  "range_sp_emerheat_air_min": {
+    "fah": 59,
+    "celsius": 15
+  },
+  "range_sp_vent_air_min": {
+    "fah": 59,
+    "celsius": 15
+  },
+  "range_sp_stop_air_min": {
+    "fah": 59,
+    "celsius": 15
+  },
+  "zone_sched_available": true,
+  "setpoint_air_cool": {
+    "celsius": 15.5,
+    "fah": 60
+  },
+  "setpoint_air_dry": {
+    "celsius": 15.5,
+    "fah": 60
+  },
+  "setpoint_air_vent": {
+    "celsius": 15.5,
+    "fah": 60
+  },
+  "autochange_diff_temp_conf": null,
+  "ws_connected": true
+}

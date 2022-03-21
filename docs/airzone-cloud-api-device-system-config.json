@@ -1,0 +1,174 @@
+{
+  "system_number": 1,
+  "aq_high_conf": null,
+  "range_aq_high_max": [],
+  "range_aq_high_min": [],
+  "aq_low_conf": null,
+  "range_aq_low_max": [],
+  "range_aq_low_min": [],
+  "temp_auto_mode_active": null,
+  "bf_num": 1,
+  "combined_cool_available": null,
+  "cool_hist_conf": null,
+  "cool_hist_values": [],
+  "protection_temp_cooling_conf": null,
+  "protection_temp_cooling_values": [],
+  "cold_standby": null,
+  "cool_standby_hist_conf": null,
+  "cool_standby_hist_values": [],
+  "gw_drymode_available": true,
+  "dehum_function_active": null,
+  "dehum_function_humidity_conf": null,
+  "dehum_function_humidity_values": [],
+  "prop_opening": true,
+  "minimum_air": null,
+  "gw_duplex_mode": false,
+  "combined_heat_available": true,
+  "heat_hist_conf": null,
+  "heat_hist_values": [],
+  "protection_temp_heating_conf": null,
+  "protection_temp_heating_values": [],
+  "heat_standby": null,
+  "heat_standby_hist_conf": null,
+  "heat_standby_hist_values": [],
+  "heating_available": true,
+  "max_heat_setpoint": {
+    "celsius": 30,
+    "fah": 86
+  },
+  "max_heat_setpoint_values": [
+    {
+      "celsius": 19,
+      "fah": 66
+    },
+    {
+      "celsius": 20,
+      "fah": 68
+    },
+    {
+      "celsius": 21,
+      "fah": 70
+    },
+    {
+      "celsius": 22,
+      "fah": 72
+    },
+    {
+      "celsius": 23,
+      "fah": 74
+    },
+    {
+      "celsius": 24,
+      "fah": 75
+    },
+    {
+      "celsius": 25,
+      "fah": 77
+    },
+    {
+      "celsius": 26,
+      "fah": 79
+    },
+    {
+      "celsius": 27,
+      "fah": 81
+    },
+    {
+      "celsius": 28,
+      "fah": 83
+    },
+    {
+      "celsius": 29,
+      "fah": 84
+    },
+    {
+      "celsius": 30,
+      "fah": 86
+    }
+  ],
+  "cooling_available_readonly": null,
+  "cooling_available": true,
+  "min_cold_setpoint": {
+    "celsius": 18,
+    "fah": 64
+  },
+  "min_cold_setpoint_values": [
+    {
+      "celsius": 18,
+      "fah": 64
+    },
+    {
+      "celsius": 19,
+      "fah": 66
+    },
+    {
+      "celsius": 20,
+      "fah": 68
+    },
+    {
+      "celsius": 21,
+      "fah": 70
+    },
+    {
+      "celsius": 22,
+      "fah": 72
+    },
+    {
+      "celsius": 23,
+      "fah": 74
+    },
+    {
+      "celsius": 24,
+      "fah": 75
+    },
+    {
+      "celsius": 25,
+      "fah": 77
+    },
+    {
+      "celsius": 26,
+      "fah": 79
+    }
+  ],
+  "heating_available_readonly": null,
+  "plenum_mode": false,
+  "qadapt_conf": "standard",
+  "qadapt_values": [
+    "standard",
+    "silence",
+    "min",
+    "max",
+    "power"
+  ],
+  "think_r_num": 4,
+  "relay_conf": "vmc",
+  "relay_conf_values": [
+    "radiant",
+    "vmc"
+  ],
+  "system_type": "zone",
+  "system_fw": "3.31",
+  "radio_enabled": null,
+  "m010_max_voltage_conf": null,
+  "m010_max_voltage_values": [],
+  "m010_min_voltage_conf": null,
+  "m010_min_voltage_values": [],
+  "VMC_relay_mode_conf": "auto",
+  "VMC_relay_mode_values": [
+    "auto",
+    "manual_on",
+    "manual_off"
+  ],
+  "warnings": [],
+  "errors": [],
+  "step": {
+    "fah": 1,
+    "celsius": 0.5
+  },
+  "think_w_num": 1,
+  "lite_step_conf": null,
+  "lite_step_conf_values": [],
+  "autochange_diff_temp_conf": null,
+  "autochange_diff_temp_values": [],
+  "ws_connected": true
+}

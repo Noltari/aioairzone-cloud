@@ -1,0 +1,112 @@
+{
+  "VMC_relay_mode_values": [
+    "auto",
+    "manual_on",
+    "manual_off"
+  ],
+  "warnings": [],
+  "errors": [],
+  "aq_present": null,
+  "aq_mode_values": [],
+  "user_device_cooling_stages_values": [],
+  "user_device_heat_stages_values": [],
+  "aqpm1_0": null,
+  "aqpm10": null,
+  "aqpm2_5": null,
+  "aq_quality": null,
+  "mode": 3,
+  "auto_mode": null,
+  "mode_available": [
+    2,
+    3,
+    4,
+    5,
+    0
+  ],
+  "isConnected": true,
+  "connection_date": "2022-02-28T15:37:45.000Z",
+  "step": {
+    "fah": 1,
+    "celsius": 0.5
+  },
+  "ws_sched_available": true,
+  "ws_sched_calendar_available": true,
+  "range_sp_cool_air_max": {
+    "celsius": 30,
+    "fah": 86
+  },
+  "range_sp_cool_air_min": {
+    "celsius": 18,
+    "fah": 64
+  },
+  "range_sp_hot_air_max": {
+    "celsius": 30,
+    "fah": 86
+  },
+  "range_sp_hot_air_min": {
+    "celsius": 15,
+    "fah": 59
+  },
+  "range_sp_emerheat_air_max": {
+    "celsius": 30,
+    "fah": 86
+  },
+  "range_sp_emerheat_air_min": {
+    "celsius": 15,
+    "fah": 59
+  },
+  "range_sp_auto_air_max": {
+    "celsius": 30,
+    "fah": 86
+  },
+  "range_sp_auto_air_min": {
+    "celsius": 15,
+    "fah": 59
+  },
+  "range_sp_dry_air_max": {
+    "celsius": 30,
+    "fah": 86
+  },
+  "range_sp_dry_air_min": {
+    "celsius": 15,
+    "fah": 59
+  },
+  "range_sp_vent_air_max": {
+    "celsius": 30,
+    "fah": 86
+  },
+  "range_sp_vent_air_min": {
+    "celsius": 15,
+    "fah": 59
+  },
+  "range_sp_stop_air_min": {
+    "celsius": 15,
+    "fah": 59
+  },
+  "range_sp_stop_air_max": {
+    "celsius": 30,
+    "fah": 86
+  },
+  "range_air_min": {
+    "celsius": 15,
+    "fah": 59
+  },
+  "range_air_max": {
+    "celsius": 30,
+    "fah": 86
+  },
+  "sleep_values": [
+    0,
+    30,
+    60,
+    90
+  ],
+  "eco_values": [
+    "off",
+    "manual",
+    "a",
+    "a_p",
+    "a_pp"
+  ],
+  "ws_connected": true
+}

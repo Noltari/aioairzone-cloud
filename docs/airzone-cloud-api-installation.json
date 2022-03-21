@@ -1,0 +1,102 @@
+{
+  "_id": "DUMMY-ID",
+  "plugins": {
+    "schedules": {
+      "calendar_ws_ids": [
+        "DUMMY-WS-MAC"
+      ],
+      "activated": false,
+      "week_ws_ids": [
+        "DUMMY-WS-MAC"
+      ],
+      "acs_ws_ids": []
+    }
+  },
+  "installation_id": "DUMMY-INSTALLATION-ID",
+  "location_id": "DUMMY-LOCATION-ID",
+  "name": "Casa",
+  "icon": 15,
+  "color": 1,
+  "groups": [
+    {
+      "group_id": "DUMMY-GROUP-ID",
+      "name": "Casa",
+      "devices": [
+        {
+          "device_id": "DUMMY-DEVICE-ID-SYSTEM",
+          "type": "az_system",
+          "ws_id": "DUMMY-WS-MAC",
+          "meta": {
+            "system_number": 1,
+            "units": 0,
+            "ss_type": "ssl"
+          }
+        },
+        {
+          "device_id": "DUMMY-DEVICE-ID-ZONE-1",
+          "type": "az_zone",
+          "ws_id": "DUMMY-WS-MAC",
+          "meta": {
+            "system_number": 1,
+            "zone_number": 1,
+            "units": 0,
+            "ss_type": "ssl"
+          },
+          "name": "Salon"
+        },
+        {
+          "device_id": "DUMMY-DEVICE-ID-ZONE-2",
+          "type": "az_zone",
+          "ws_id": "DUMMY-WS-MAC",
+          "meta": {
+            "system_number": 1,
+            "zone_number": 2,
+            "units": 0,
+            "ss_type": "ssl"
+          },
+          "name": "Dorm Ppal"
+        },
+        {
+          "device_id": "DUMMY-DEVICE-ID-ZONE-3",
+          "type": "az_zone",
+          "ws_id": "DUMMY-WS-MAC",
+          "meta": {
+            "system_number": 1,
+            "zone_number": 3,
+            "units": 0,
+            "ss_type": "ssl"
+          },
+          "name": "Dorm #1"
+        },
+        {
+          "device_id": "DUMMY-DEVICE-ID-ZONE-4",
+          "type": "az_zone",
+          "ws_id": "DUMMY-WS-MAC",
+          "meta": {
+            "system_number": 1,
+            "zone_number": 4,
+            "units": 0,
+            "ss_type": "ssl"
+          },
+          "name": "Despacho"
+        },
+        {
+          "device_id": "DUMMY-DEVICE-ID-ZONE-5",
+          "type": "az_zone",
+          "ws_id": "DUMMY-WS-MAC",
+          "meta": {
+            "system_number": 1,
+            "zone_number": 5,
+            "units": 0,
+            "ss_type": "ssl"
+          },
+          "name": "Dorm #2"
+        }
+      ]
+    }
+  ],
+  "scenes": [],
+  "added_at": "2022-02-28T15:38:11.984Z",
+  "access_type": "admin",
+  "user_id": "DUMMY-USER-ID"
+}

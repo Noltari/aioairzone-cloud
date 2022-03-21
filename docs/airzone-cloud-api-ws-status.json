@@ -1,0 +1,96 @@
+{
+  "ws_type": "ws_az",
+  "status": {
+    "isConnected": true,
+    "pending_ws_schedules_update": false,
+    "connection_date": "2022-03-18T01:01:50.000Z",
+    "stat_quality": 4,
+    "disconnection_date": "2022-03-18T01:00:18.333Z"
+  },
+  "config": {
+    "mac": "DUMMY-WS-MAC",
+    "pin": 1234,
+    "units": 0,
+    "ws_sched_available": true,
+    "ss_type": "ssl",
+    "tunnel": true,
+    "ws_fw": "3.38",
+    "ota": true,
+    "server_sched_active": false,
+    "stat_channel": 3,
+    "stat_ap_mac": "DUMMY-AP-MAC",
+    "stat_ssid": "DUMMY-AP-SSID"
+  },
+  "devices": [
+    {
+      "config": {
+        "system_number": 1,
+        "units": 0,
+        "ss_type": "ssl"
+      },
+      "device_type": "az_system",
+      "device_id": "DUMMY-DEVICE-ID-SYSTEM",
+      "isConnected": true
+    },
+    {
+      "config": {
+        "system_number": 1,
+        "zone_number": 1,
+        "units": 0,
+        "ss_type": "ssl"
+      },
+      "device_type": "az_zone",
+      "name": "Salon",
+      "device_id": "DUMMY-DEVICE-ID-ZONE-1",
+      "isConnected": true
+    },
+    {
+      "config": {
+        "system_number": 1,
+        "zone_number": 2,
+        "units": 0,
+        "ss_type": "ssl"
+      },
+      "device_type": "az_zone",
+      "name": "Dorm Ppal",
+      "device_id": "DUMMY-DEVICE-ID-ZONE-2",
+      "isConnected": true
+    },
+    {
+      "config": {
+        "system_number": 1,
+        "zone_number": 3,
+        "units": 0,
+        "ss_type": "ssl"
+      },
+      "device_type": "az_zone",
+      "name": "Dorm #1",
+      "device_id": "DUMMY-DEVICE-ID-ZONE-3",
+      "isConnected": true
+    },
+    {
+      "config": {
+        "system_number": 1,
+        "zone_number": 4,
+        "units": 0,
+        "ss_type": "ssl"
+      },
+      "device_type": "az_zone",
+      "name": "Despacho",
+      "device_id": "DUMMY-DEVICE-ID-ZONE-4",
+      "isConnected": true
+    },
+    {
+      "config": {
+        "system_number": 1,
+        "zone_number": 5,
+        "units": 0,
+        "ss_type": "ssl"
+      },
+      "device_type": "az_zone",
+      "name": "Dorm #2",
+      "device_id": "DUMMY-DEVICE-ID-ZONE-5",
+      "isConnected": true
+    }
+  ]
+}

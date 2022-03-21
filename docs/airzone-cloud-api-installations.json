@@ -1,0 +1,35 @@
+{
+  "total": 1,
+  "installations": [
+    {
+      "_id": "DUMMY-ID",
+      "installation_id": "DUMMY-INSTALLATION-ID",
+      "location_id": "DUMMY-LOCATION-ID",
+      "location_text": {
+        "city": {
+          "de": "Getafe, Madrid",
+          "en": "Getafe, Madrid",
+          "es": "Getafe, Madrid",
+          "fr": "Getafe, Madrid",
+          "it": "Getafe, Madrid",
+          "pt": "Getafe, Madri"
+        },
+        "country": {
+          "de": "Spanien",
+          "en": "Spain",
+          "es": "España",
+          "fr": "Espagne",
+          "it": "Spagna",
+          "pt": "Espanha"
+        }
+      },
+      "name": "Casa",
+      "ws_ids": [
+        "DUMMY-WS-MAC"
+      ],
+      "access_type": "admin",
+      "icon": 15,
+      "color": 1
+    }
+  ]
+}

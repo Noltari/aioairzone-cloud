@@ -1,0 +1,76 @@
+{
+  "system_number": 1,
+  "zone_number": 1,
+  "device_cooling_stages_values": [
+    "off",
+    "air"
+  ],
+  "device_cooling_stages_conf": "air",
+  "device_heat_stages_values": [
+    "off",
+    "air"
+  ],
+  "device_heat_stages_conf": "air",
+  "basic_mode": false,
+  "cool_battery_temp": {
+    "celsius": null,
+    "fah": null
+  },
+  "heat_battery_temp": {
+    "celsius": null,
+    "fah": null
+  },
+  "master_addr": null,
+  "master_addr_values": [],
+  "master_conf": true,
+  "replicated_zones": [],
+  "thermostat_fw": "3.51",
+  "window_sensor_conf": "closed",
+  "window_sensor_values": [
+    "deactivate",
+    "open",
+    "closed"
+  ],
+  "range_sp_hot_air_max": {
+    "celsius": 30,
+    "fah": 86
+  },
+  "range_sp_emerheat_air_max": {
+    "celsius": 30,
+    "fah": 86
+  },
+  "range_sp_cool_air_min": {
+    "celsius": 18,
+    "fah": 64
+  },
+  "range_sp_dry_air_min": {
+    "celsius": 18,
+    "fah": 64
+  },
+  "name": "Salon",
+  "local_temp": {
+    "celsius": 20.9,
+    "fah": 70
+  },
+  "warnings": [],
+  "system_type": null,
+  "autochange_diff_temp_conf": null,
+  "antifreeze": false,
+  "grille_cooling_angle": null,
+  "grille_cooling_angle_values": [],
+  "user_device_cooling_stages_conf": null,
+  "user_device_cooling_stages_values": [],
+  "grille_heating_angle": null,
+  "grille_heating_angle_values": [],
+  "user_device_heat_stages_conf": null,
+  "user_device_heat_stages_values": [],
+  "supply_heat_conf": null,
+  "dehumidifier_conf": null,
+  "sleep": 0,
+  "sleep_values": [
+    0,
+    30,
+    60,
+    90
+  ]
+}
