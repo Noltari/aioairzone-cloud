@@ -278,6 +278,23 @@ class AirzoneCloudApi:
                 ws = WebServer(inst.get_id(), ws_id)
                 self.webservers.append(ws)
 
+    def set_system_zones_data(self, system: System):
+        """Set slave zones modes from master zone."""
+        modes = system.get_modes()
+        installation_id = system.get_installation()
+        system_id = system.get_id()
+        system_num = system.get_system()
+        for zone in self.zones:
+            zone.set_system_id(system_id)
+            is_slave = zone.get_master() is False
+            if (
+                is_slave
+                and modes
+                and zone.get_installation() == installation_id
+                and zone.get_system() == system_num
+            ):
+                zone.set_modes(modes)
+
     async def update_installations(self) -> None:
         """Update Airzone Cloud installations from API."""
         installations_data = await self.api_get_installations()
@@ -350,3 +367,6 @@ class AirzoneCloudApi:
         """Update all Airzone Cloud Zones."""
         for zone in self.zones:
             await self.update_zone(zone)
+
+        for system in self.systems:
+            self.set_system_zones_data(system)
