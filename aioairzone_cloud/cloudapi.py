@@ -260,6 +260,24 @@ class AirzoneCloudApi:
                 return zone
         return None
 
+    async def list_installations(self) -> list[Installation]:
+        """Return Airzone Cloud installations list."""
+        inst_list: list[Installation] = []
+
+        inst_data = await self.api_get_installations()
+        for inst in inst_data[API_INSTALLATIONS]:
+            inst_list.append(Installation(inst))
+
+        return inst_list
+
+    def select_installation(self, inst: Installation) -> None:
+        """Select single Airzone Cloud installation."""
+        self.installations = [inst]
+        for ws_id in inst.get_webservers():
+            if not self.get_webserver_id(ws_id):
+                ws = WebServer(inst.get_id(), ws_id)
+                self.webservers.append(ws)
+
     async def update_installations(self) -> None:
         """Update Airzone Cloud installations from API."""
         installations_data = await self.api_get_installations()

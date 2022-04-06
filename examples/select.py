@@ -19,7 +19,12 @@ async def main():
         print(json.dumps(user_data, indent=4, sort_keys=True))
         print("***")
 
-        await client.update_installations()
+        inst_list = await client.list_installations()
+        for inst in inst_list:
+            print(json.dumps(inst.data(), indent=4, sort_keys=True))
+        client.select_installation(inst_list[0])
+        print("***")
+
         await client.update_webservers()
         await client.update_systems()
         await client.update_zones()
