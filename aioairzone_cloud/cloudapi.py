@@ -157,7 +157,7 @@ class AirzoneCloudApi:
     async def login(self) -> None:
         """Perform Airzone Cloud API login."""
         if self.token:
-            self.logout()
+            await self.logout()
         resp = await self.api_request(
             "POST",
             f"{API_V1}/{API_AUTH_LOGIN}",
