@@ -1,0 +1,36 @@
+[project]
+name = "aioairzone-cloud"
+version = "0.0.2"
+description = "Library to control Airzone Cloud devices"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+keywords = ["airzone", "cloud", "hvac", "home"] 
+authors = [
+  {name = "Álvaro Fernández Rojas", email = "noltari@gmail.com" }
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Natural Language :: English",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Topic :: Home Automation",
+]
+dependencies = [
+  "aiohttp"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/Noltari/aioairzone-cloud"
+"Bug Tracker" = "https://github.com/Noltari/aioairzone-cloud/issues"
+
+[tool.setuptools]
+platforms = ["any"]
+zip-safe = false
+include-package-data = true
+
+[build-system]
+requires = ["setuptools>=43.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
