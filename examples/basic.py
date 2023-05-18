@@ -3,7 +3,7 @@ import asyncio
 import json
 
 import _secrets
-from aiohttp import ClientSession
+import aiohttp
 
 from aioairzone_cloud.cloudapi import AirzoneCloudApi
 
@@ -11,7 +11,7 @@ from aioairzone_cloud.cloudapi import AirzoneCloudApi
 async def main():
     """Basic Airzone client example."""
 
-    async with ClientSession() as aiohttp_session:
+    async with aiohttp.ClientSession() as aiohttp_session:
         client = AirzoneCloudApi(aiohttp_session, _secrets.AIRZONE_OPTIONS)
         await client.login()
 
