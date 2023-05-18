@@ -24,3 +24,7 @@ class InvalidParam(AirzoneCloudError):
 
 class ParamUpdateFailure(AirzoneCloudError):
     """Exception raised when parameter isn't updated."""
+
+
+class TooManyRequests(AirzoneCloudError):
+    """Exception raised when max API requests are exceeded."""

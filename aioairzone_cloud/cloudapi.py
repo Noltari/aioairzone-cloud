@@ -5,7 +5,7 @@ import logging
 import urllib.parse
 from typing import Any, cast
 
-from aiohttp import ClientConnectorError, ClientSession
+from aiohttp import ClientConnectorError, ClientResponseError, ClientSession
 from aiohttp.client_reqrep import ClientResponse
 
 from .common import ConnectionOptions
@@ -39,7 +39,13 @@ from .const import (
     HTTP_CALL_TIMEOUT,
 )
 from .device import Device
-from .exceptions import LoginError, TokenRefreshError
+from .exceptions import (
+    AirzoneCloudError,
+    APIError,
+    LoginError,
+    TokenRefreshError,
+    TooManyRequests,
+)
 from .installation import Installation
 from .system import System
 from .webserver import WebServer
@@ -71,19 +77,33 @@ class AirzoneCloudApi:
     ) -> dict[str, Any]:
         """Airzone Cloud API request."""
         _LOGGER.debug("aiohttp request: /%s (params=%s)", path, json)
+
         headers: dict[str, str] = {}
         if self.token:
             headers[HEADER_AUTHORIZATION] = f"{HEADER_BEARER} {self.token}"
-        resp: ClientResponse = await self.aiohttp_session.request(
-            method,
-            f"{API_URL}/{path}",
-            headers=headers,
-            json=json,
-            raise_for_status=True,
-            timeout=HTTP_CALL_TIMEOUT,
-        )
+
+        try:
+            resp: ClientResponse = await self.aiohttp_session.request(
+                method,
+                f"{API_URL}/{path}",
+                headers=headers,
+                json=json,
+                raise_for_status=True,
+                timeout=HTTP_CALL_TIMEOUT,
+            )
+        except ClientResponseError as err:
+            if path.endswith(API_AUTH_LOGIN):
+                raise LoginError from err
+
+            if err.status == 400:
+                raise APIError from err
+            if err.status == 429:
+                raise TooManyRequests from err
+            raise AirzoneCloudError from err
+
         resp_json = await resp.json(content_type=None)
         _LOGGER.debug("aiohttp response: %s", resp_json)
+
         return cast(dict, resp_json)
 
     async def api_get_device_config(self, device: Device) -> dict[str, Any]:
