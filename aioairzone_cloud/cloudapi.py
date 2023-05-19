@@ -96,11 +96,14 @@ class AirzoneCloudApi:
         except ClientResponseError as err:
             if path.endswith(API_AUTH_LOGIN):
                 raise LoginError from err
+            if path.endswith(API_AUTH_REFRESH_TOKEN):
+                raise TokenRefreshError from err
 
             if err.status == 400:
                 raise APIError from err
             if err.status == 429:
                 raise TooManyRequests from err
+
             raise AirzoneCloudError from err
 
         resp_json = await resp.json(content_type=None)
@@ -211,12 +214,10 @@ class AirzoneCloudApi:
     async def token_refresh(self) -> None:
         """Perform Airzone Cloud API token refresh."""
         if self.token and self.refresh_token:
+            refresh_token = urllib.parse.quote(self.refresh_token)
             resp = await self.api_request(
-                "POST",
-                f"{API_V1}/{API_AUTH_REFRESH_TOKEN}",
-                {
-                    API_REFRESH_TOKEN: self.refresh_token,
-                },
+                "GET",
+                f"{API_V1}/{API_AUTH_REFRESH_TOKEN}/{refresh_token}",
             )
             _LOGGER.debug("refresh resp: %s", resp)
             if resp.keys() < {API_TOKEN, API_REFRESH_TOKEN}:

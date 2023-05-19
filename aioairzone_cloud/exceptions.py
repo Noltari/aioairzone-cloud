@@ -14,7 +14,7 @@ class LoginError(AirzoneCloudError):
     """Exception raised when login fails."""
 
 
-class TokenRefreshError(AirzoneCloudError):
+class TokenRefreshError(LoginError):
     """Exception raised when token refresh fails."""
 
 
