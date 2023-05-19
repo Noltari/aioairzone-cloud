@@ -190,7 +190,7 @@ class AirzoneCloudApi:
         )
         _LOGGER.debug("login resp: %s", resp)
         if resp.keys() < {API_TOKEN, API_REFRESH_TOKEN}:
-            raise LoginError
+            raise LoginError("Invalid API response")
         self.token = resp[API_TOKEN]
         self.refresh_token = resp[API_REFRESH_TOKEN]
 
@@ -220,7 +220,7 @@ class AirzoneCloudApi:
             )
             _LOGGER.debug("refresh resp: %s", resp)
             if resp.keys() < {API_TOKEN, API_REFRESH_TOKEN}:
-                raise TokenRefreshError
+                raise TokenRefreshError("Invalid API response")
             self.token = resp[API_TOKEN]
             self.refresh_token = resp[API_REFRESH_TOKEN]
 
