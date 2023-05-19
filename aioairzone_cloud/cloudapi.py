@@ -356,7 +356,7 @@ class AirzoneCloudApi:
                         if zone:
                             self.zones.append(zone)
                 elif API_AZ_SYSTEM == device_data[API_DEVICE_TYPE]:
-                    if not self.get_zone_id(device_data[API_DEVICE_ID]):
+                    if not self.get_system_id(device_data[API_DEVICE_ID]):
                         system = System(ws.get_installation(), ws.get_id(), device_data)
                         if system:
                             self.systems.append(system)
