@@ -91,6 +91,8 @@ class AirzoneCloudApi:
                 raise_for_status=True,
                 timeout=HTTP_CALL_TIMEOUT,
             )
+        except ClientConnectorError as err:
+            raise AirzoneCloudError from err
         except ClientResponseError as err:
             if path.endswith(API_AUTH_LOGIN):
                 raise LoginError from err
@@ -200,7 +202,7 @@ class AirzoneCloudApi:
                     "GET",
                     f"{API_V1}/{API_USER_LOGOUT}",
                 )
-        except ClientConnectorError:
+        except AirzoneCloudError:
             pass
         finally:
             self.refresh_token = None
