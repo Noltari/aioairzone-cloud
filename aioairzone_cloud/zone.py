@@ -362,7 +362,7 @@ class Zone(Device):
         """Return Zone number."""
         return self.zone_number
 
-    def set_modes(self, modes: list[OperationMode]):
+    def set_modes(self, modes: list[OperationMode]) -> None:
         """Set slave zone modes."""
         self.modes = modes
 

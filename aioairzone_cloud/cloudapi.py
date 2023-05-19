@@ -104,7 +104,7 @@ class AirzoneCloudApi:
         resp_json = await resp.json(content_type=None)
         _LOGGER.debug("aiohttp response: %s", resp_json)
 
-        return cast(dict, resp_json)
+        return cast(dict[str, Any], resp_json)
 
     async def api_get_device_config(self, device: Device) -> dict[str, Any]:
         """Request API device config data."""
@@ -298,7 +298,7 @@ class AirzoneCloudApi:
                 ws = WebServer(inst.get_id(), ws_id)
                 self.webservers.append(ws)
 
-    def set_system_zones_data(self, system: System):
+    def set_system_zones_data(self, system: System) -> None:
         """Set slave zones modes from master zone."""
         modes = system.get_modes()
         installation_id = system.get_installation()

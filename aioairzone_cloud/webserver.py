@@ -47,7 +47,7 @@ class WebServer:
         self.wifi_quality: int | None = None
         self.wifi_ssid: str | None = None
 
-    def update(self, data) -> None:
+    def update(self, data: dict[str, Any]) -> None:
         """Update WebServer data."""
         self.connected = bool(data[API_STATUS][API_IS_CONNECTED])
         self.connection_date = str(data[API_STATUS][API_CONNECTION_DATE])

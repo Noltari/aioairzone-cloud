@@ -136,7 +136,7 @@ jobs:
 
       - name: Run Mypy
         run: |
-          mypy aioairzone_cloud
+          mypy --strict aioairzone_cloud
 
       - name: Install aioairzone_cloud
         run: |

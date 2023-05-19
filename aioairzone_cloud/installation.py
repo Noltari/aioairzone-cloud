@@ -16,7 +16,7 @@ from .const import (
 class Installation:
     """Airzone Cloud Installation."""
 
-    def __init__(self, inst_data):
+    def __init__(self, inst_data: dict[str, Any]):
         """Airzone Cloud Installation init."""
         self.id = str(inst_data[API_INSTALLATION_ID])
         self.name = str(inst_data[API_NAME])
