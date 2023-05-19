@@ -23,7 +23,7 @@ async def main():
             print("***")
 
             await client.update_installations()
-            await client.update_webservers()
+            await client.update_webservers(True)
             await client.update_systems()
             await client.update_zones()
             print(json.dumps(client.data(), indent=4, sort_keys=True))

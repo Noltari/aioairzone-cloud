@@ -361,13 +361,13 @@ class AirzoneCloudApi:
                         if system:
                             self.systems.append(system)
 
-    async def update_webserver_id(self, ws_id: str, devices: bool = False) -> None:
+    async def update_webserver_id(self, ws_id: str, devices: bool) -> None:
         """Update Airzone Cloud WebServer by ID."""
         ws = self.get_webserver_id(ws_id)
         if ws:
             await self.update_webserver(ws, devices)
 
-    async def update_webservers(self, devices: bool = True) -> None:
+    async def update_webservers(self, devices: bool) -> None:
         """Update all Airzone Cloud WebServers."""
         for ws in self.webservers:
             await self.update_webserver(ws, devices)
