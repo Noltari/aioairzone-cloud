@@ -11,6 +11,7 @@ from .const import (
     API_DEFAULT_TEMP_STEP,
     API_HUMIDITY,
     API_LOCAL_TEMP,
+    API_META,
     API_MODE_AVAIL,
     API_NAME,
     API_POWER,
@@ -95,7 +96,11 @@ class Zone(Device):
         self.temp_set_vent_air: float | None = None
         self.temp: float | None = None
         self.temp_step: float | None = None
-        self.zone_number = int(device_data[API_CONFIG][API_ZONE_NUMBER])
+
+        if API_CONFIG in device_data:
+            self.zone_number = int(device_data[API_CONFIG][API_ZONE_NUMBER])
+        else:
+            self.zone_number = int(device_data[API_META][API_ZONE_NUMBER])
 
     def data(self) -> dict[str, Any]:
         """Return Zone data."""

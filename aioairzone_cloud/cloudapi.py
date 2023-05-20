@@ -19,17 +19,20 @@ from .const import (
     API_DEVICE_TYPE,
     API_DEVICES,
     API_EMAIL,
+    API_GROUPS,
     API_INSTALLATION_ID,
     API_INSTALLATIONS,
     API_PASSWORD,
     API_REFRESH_TOKEN,
     API_STATUS,
     API_TOKEN,
+    API_TYPE,
     API_URL,
     API_USER,
     API_USER_LOGOUT,
     API_V1,
     API_WS,
+    API_WS_ID,
     AZD_INSTALLATIONS,
     AZD_SYSTEMS,
     AZD_WEBSERVERS,
@@ -317,6 +320,24 @@ class AirzoneCloudApi:
                 and zone.get_system() == system_num
             ):
                 zone.set_modes(modes)
+
+    async def update_installation(self, inst: Installation) -> None:
+        """Update Airzone Cloud installation from API."""
+        installation_data = await self.api_get_installation(inst)
+        for group in installation_data[API_GROUPS]:
+            for device_data in group[API_DEVICES]:
+                if API_AZ_ZONE == device_data[API_TYPE]:
+                    if not self.get_zone_id(device_data[API_DEVICE_ID]):
+                        zone = Zone(inst.get_id(), device_data[API_WS_ID], device_data)
+                        if zone:
+                            self.zones.append(zone)
+                elif API_AZ_SYSTEM == device_data[API_TYPE]:
+                    if not self.get_system_id(device_data[API_DEVICE_ID]):
+                        system = System(
+                            inst.get_id(), device_data[API_WS_ID], device_data
+                        )
+                        if system:
+                            self.systems.append(system)
 
     async def update_installations(self) -> None:
         """Update Airzone Cloud installations from API."""

@@ -8,6 +8,7 @@ from .const import (
     API_CONFIG,
     API_DEVICE_ID,
     API_IS_CONNECTED,
+    API_META,
     API_MODE,
     API_MODE_AVAIL,
     API_SYSTEM_NUMBER,
@@ -34,8 +35,12 @@ class Device:
         self.installation_id = inst_id
         self.mode: OperationMode | None = None
         self.modes: list[OperationMode] = []
-        self.system_number = int(device_data[API_CONFIG][API_SYSTEM_NUMBER])
         self.webserver_id = ws_id
+
+        if API_CONFIG in device_data:
+            self.system_number = int(device_data[API_CONFIG][API_SYSTEM_NUMBER])
+        else:
+            self.system_number = int(device_data[API_META][API_SYSTEM_NUMBER])
 
         if API_IS_CONNECTED in device_data:
             self.connected = bool(device_data[API_IS_CONNECTED])
