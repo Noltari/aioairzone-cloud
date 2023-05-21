@@ -47,6 +47,7 @@ from .device import Device
 from .exceptions import (
     AirzoneCloudError,
     APIError,
+    AuthError,
     LoginError,
     TokenRefreshError,
     TooManyRequests,
@@ -107,6 +108,8 @@ class AirzoneCloudApi:
 
             if err.status == 400:
                 raise APIError from err
+            if err.status == 401:
+                raise AuthError from err
             if err.status == 429:
                 raise TooManyRequests from err
 

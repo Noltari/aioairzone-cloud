@@ -14,6 +14,10 @@ class LoginError(AirzoneCloudError):
     """Exception raised when login fails."""
 
 
+class AuthError(LoginError):
+    """Exception raised when API denies access."""
+
+
 class TokenRefreshError(LoginError):
     """Exception raised when token refresh fails."""
 
