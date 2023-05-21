@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import logging
 import urllib.parse
+from datetime import datetime
 from typing import Any, cast
 
 from aiohttp import ClientConnectorError, ClientResponseError, ClientSession
@@ -40,6 +41,7 @@ from .const import (
     HEADER_AUTHORIZATION,
     HEADER_BEARER,
     HTTP_CALL_TIMEOUT,
+    TOKEN_REFRESH_PERIOD,
 )
 from .device import Device
 from .exceptions import (
@@ -69,6 +71,7 @@ class AirzoneCloudApi:
         self.aiohttp_session = aiohttp_session
         self.installations: list[Installation] = []
         self.options = options
+        self.refresh_time: datetime
         self.refresh_token: str | None = None
         self.systems: list[System] = []
         self.token: str | None = None
@@ -198,6 +201,7 @@ class AirzoneCloudApi:
         if resp.keys() < {API_TOKEN, API_REFRESH_TOKEN}:
             raise LoginError("Invalid API response")
         self.token = resp[API_TOKEN]
+        self.refresh_time = datetime.now()
         self.refresh_token = resp[API_REFRESH_TOKEN]
 
     async def logout(self) -> None:
@@ -414,3 +418,28 @@ class AirzoneCloudApi:
 
         for system in self.systems:
             self.set_system_zones_data(system)
+
+    async def _update(self) -> None:
+        tasks = [
+            self.update_webservers(False),
+            self.update_systems(),
+            self.update_zones(),
+        ]
+
+        for task in tasks:
+            await task
+
+    async def update(self) -> None:
+        """Update all Airzone Cloud data."""
+
+        if (datetime.now() - self.refresh_time) > TOKEN_REFRESH_PERIOD:
+            try:
+                await self.token_refresh()
+            except TokenRefreshError:
+                await self.login()
+
+        try:
+            await self._update()
+        except LoginError:
+            await self.login()
+            await self._update()

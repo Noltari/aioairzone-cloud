@@ -1,5 +1,6 @@
 """Airzone Cloud API constants."""
 
+from datetime import timedelta
 from typing import Final
 
 API_AUTH_LOGIN: Final[str] = "auth/login"
@@ -129,3 +130,5 @@ HEADER_AUTHORIZATION: Final[str] = "Authorization"
 HEADER_BEARER: Final[str] = "Bearer"
 
 HTTP_CALL_TIMEOUT: Final[int] = 10
+
+TOKEN_REFRESH_PERIOD: Final[timedelta] = timedelta(hours=12)

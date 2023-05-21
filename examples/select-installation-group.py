@@ -29,9 +29,7 @@ async def main():
             await client.update_installation(inst_list[0])
             print("***")
 
-            await client.update_webservers(False)
-            await client.update_systems()
-            await client.update_zones()
+            await client.update()
             print(json.dumps(client.data(), indent=4, sort_keys=True))
 
             await client.logout()
