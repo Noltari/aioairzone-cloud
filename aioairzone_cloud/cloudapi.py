@@ -372,8 +372,13 @@ class AirzoneCloudApi:
 
     async def update_systems(self) -> None:
         """Update all Airzone Cloud Systems."""
+        tasks = []
+
         for system in self.systems:
-            await self.update_system(system)
+            tasks += [self.update_system(system)]
+
+        for task in tasks:
+            await task
 
     async def update_webserver(self, ws: WebServer, devices: bool) -> None:
         """Update Airzone Cloud WebServer from API."""
@@ -400,8 +405,13 @@ class AirzoneCloudApi:
 
     async def update_webservers(self, devices: bool) -> None:
         """Update all Airzone Cloud WebServers."""
+        tasks = []
+
         for ws in self.webservers:
-            await self.update_webserver(ws, devices)
+            tasks += [self.update_webserver(ws, devices)]
+
+        for task in tasks:
+            await task
 
     async def update_zone(self, zone: Zone) -> None:
         """Update Airzone Cloud Zone from API."""
@@ -416,8 +426,13 @@ class AirzoneCloudApi:
 
     async def update_zones(self) -> None:
         """Update all Airzone Cloud Zones."""
+        tasks = []
+
         for zone in self.zones:
-            await self.update_zone(zone)
+            tasks += [self.update_zone(zone)]
+
+        for task in tasks:
+            await task
 
         for system in self.systems:
             self.set_system_zones_data(system)
