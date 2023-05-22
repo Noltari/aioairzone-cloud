@@ -26,6 +26,8 @@ from .const import (
     API_GROUPS,
     API_INSTALLATION_ID,
     API_INSTALLATIONS,
+    API_OPTS,
+    API_PARAM,
     API_PASSWORD,
     API_REFRESH_TOKEN,
     API_STATUS,
@@ -35,6 +37,7 @@ from .const import (
     API_USER,
     API_USER_LOGOUT,
     API_V1,
+    API_VALUE,
     API_WS,
     API_WS_ID,
     AZD_AIDOOS,
@@ -228,6 +231,83 @@ class AirzoneCloudApi:
 
         return res
 
+    async def api_patch_device(
+        self, device: Device, json: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Perform a PATCH request to update device parameters."""
+        dev_id = device.get_id()
+        url_id = urllib.parse.quote(dev_id)
+
+        return await self.api_request(
+            "PATCH",
+            f"{API_V1}/{API_DEVICES}/{url_id}",
+            json,
+        )
+
+    async def api_set_device_param(
+        self, device: Device, param: str, data: dict[str, Any]
+    ) -> None:
+        """Set device parameter."""
+        json = {
+            API_PARAM: param,
+            API_VALUE: data[API_VALUE],
+            API_INSTALLATION_ID: device.get_installation(),
+        }
+
+        if API_OPTS in data:
+            json[API_OPTS] = data[API_OPTS]
+
+        await self.api_patch_device(device, json)
+
+        device.set_param(param, data)
+
+    async def api_set_device_params(
+        self, device: Device, params: dict[str, Any]
+    ) -> None:
+        """Set device parameters."""
+        tasks = []
+
+        for param, data in params.items():
+            tasks += [self.api_set_device_param(device, param, data)]
+
+        await asyncio.gather(*tasks)
+
+    async def api_set_aidoo_id_params(
+        self, aidoo_id: str, params: dict[str, Any]
+    ) -> None:
+        """Set aidoo parameters."""
+        aidoo = self.get_aidoo_id(aidoo_id)
+        if aidoo is not None:
+            await self.api_set_device_params(aidoo, params)
+
+    async def api_set_device_id_params(
+        self, device_id: str, params: dict[str, Any]
+    ) -> None:
+        """Set device parameters."""
+        device = (
+            self.get_aidoo_id(device_id)
+            or self.get_system_id(device_id)
+            or self.get_zone_id(device_id)
+        )
+        if device is not None:
+            await self.api_set_device_params(device, params)
+
+    async def api_set_system_id_params(
+        self, system_id: str, params: dict[str, Any]
+    ) -> None:
+        """Set system parameters."""
+        system = self.get_system_id(system_id)
+        if system is not None:
+            await self.api_set_device_params(system, params)
+
+    async def api_set_zone_id_params(
+        self, zone_id: str, params: dict[str, Any]
+    ) -> None:
+        """Set zone parameters."""
+        zone = self.get_zone_id(zone_id)
+        if zone is not None:
+            await self.api_set_device_params(zone, params)
+
     async def login(self) -> None:
         """Perform Airzone Cloud API login."""
         if self.token is not None:
@@ -360,16 +440,18 @@ class AirzoneCloudApi:
         """Set slave zones modes from master zone."""
         modes = system.get_modes()
         installation_id = system.get_installation()
-        system_id = system.get_id()
-        system_num = system.get_system()
+        system_num = system.get_system_num()
+        system_ws = system.get_webserver()
         for zone in self.zones.values():
             if (
                 zone.get_installation() != installation_id
-                or zone.get_system() != system_num
+                or zone.get_system_num() != system_num
+                or zone.get_webserver() != system_ws
             ):
                 continue
 
-            zone.set_system_id(system_id)
+            system.add_zone(zone)
+            zone.set_system(system)
             if zone.get_master() is False and modes:
                 zone.set_modes(modes)
 

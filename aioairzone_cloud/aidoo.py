@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from .const import API_NAME
+from .const import API_MODE, API_NAME, API_POWER, API_SETPOINT, API_VALUE
 from .hvac import HVAC
 
 
@@ -18,3 +18,13 @@ class Aidoo(HVAC):
             self.name = str(device_data[API_NAME])
         else:
             self.name = f"Aidoo {ws_id}"
+
+    def set_param(self, param: str, data: dict[str, Any]) -> None:
+        """Update device parameter from API request."""
+
+        if param == API_MODE:
+            self.set_mode(data[API_VALUE])
+        elif param == API_POWER:
+            self.set_power(data[API_VALUE])
+        elif param == API_SETPOINT:
+            self.set_setpoint(data[API_VALUE])

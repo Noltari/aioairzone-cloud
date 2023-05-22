@@ -1,6 +1,8 @@
 """Airzone Cloud API Device."""
 from __future__ import annotations
 
+import logging
+from abc import ABC, abstractmethod
 from typing import Any
 
 from .common import OperationMode
@@ -26,8 +28,10 @@ from .const import (
     AZD_WS_CONNECTED,
 )
 
+_LOGGER = logging.getLogger(__name__)
 
-class Device:
+
+class Device(ABC):
     """Airzone Cloud Device."""
 
     name: str
@@ -126,6 +130,18 @@ class Device:
     def get_ws_connected(self) -> bool:
         """Return WebServer connection status."""
         return self.ws_connected
+
+    def set_mode(self, mode: int | OperationMode) -> None:
+        """Set device operation mode."""
+        _mode = OperationMode(mode)
+        if _mode in self.modes:
+            self.mode = _mode
+        else:
+            _LOGGER.error("%s: mode %s not in %s", self.id, _mode, self.modes)
+
+    @abstractmethod
+    def set_param(self, param: str, data: dict[str, Any]) -> None:
+        """Update device parameter from API request."""
 
     def update(self, data: dict[str, Any]) -> None:
         """Update Device data."""

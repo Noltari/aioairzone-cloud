@@ -1,16 +1,20 @@
 """Airzone Cloud API Zone device."""
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from aioairzone_cloud.common import OperationMode
 
 from .const import (
     API_CONFIG,
     API_META,
+    API_MODE,
     API_MODE_AVAIL,
     API_NAME,
+    API_POWER,
+    API_SETPOINT,
     API_SYSTEM_NUMBER,
+    API_VALUE,
     API_ZONE_NUMBER,
     AZD_MASTER,
     AZD_SYSTEM,
@@ -18,6 +22,9 @@ from .const import (
     AZD_ZONE,
 )
 from .hvac import HVAC
+
+if TYPE_CHECKING:
+    from .system import System
 
 
 class Zone(HVAC):
@@ -28,7 +35,7 @@ class Zone(HVAC):
         super().__init__(inst_id, ws_id, device_data)
 
         self.master: bool | None = None
-        self.system_id: str | None = None
+        self.system: System | None = None
 
         if API_CONFIG in device_data:
             sub_data = device_data[API_CONFIG]
@@ -48,7 +55,7 @@ class Zone(HVAC):
         data = super().data()
 
         data[AZD_MASTER] = self.get_master()
-        data[AZD_SYSTEM] = self.get_system()
+        data[AZD_SYSTEM] = self.get_system_num()
         data[AZD_ZONE] = self.get_zone()
 
         system_id = self.get_system_id()
@@ -61,13 +68,15 @@ class Zone(HVAC):
         """Return Zone device master/slave."""
         return self.master
 
-    def get_system(self) -> int:
-        """Return System number."""
-        return self.system_number
-
     def get_system_id(self) -> str | None:
         """Return Zone device System ID."""
-        return self.system_id
+        if self.system is not None:
+            return self.system.get_id()
+        return None
+
+    def get_system_num(self) -> int:
+        """Return System number."""
+        return self.system_number
 
     def get_zone(self) -> int:
         """Return Zone number."""
@@ -77,9 +86,22 @@ class Zone(HVAC):
         """Set slave zone modes."""
         self.modes = modes
 
-    def set_system_id(self, system_id: str) -> None:
-        """Set System ID."""
-        self.system_id = system_id
+    def set_param(self, param: str, data: dict[str, Any]) -> None:
+        """Update device parameter from API request."""
+
+        if param == API_MODE:
+            if self.system is not None:
+                self.system.set_param(param, data)
+            else:
+                self.set_mode(data[API_VALUE])
+        elif param == API_POWER:
+            self.set_power(data[API_VALUE])
+        elif param == API_SETPOINT:
+            self.set_setpoint(data[API_VALUE])
+
+    def set_system(self, system: System) -> None:
+        """Set System."""
+        self.system = system
 
     def update(self, data: dict[str, Any]) -> None:
         """Update Zone data."""

@@ -453,6 +453,25 @@ class HVAC(Device):
             return round(self.temp_step, 1)
         return API_DEFAULT_TEMP_STEP
 
+    def set_power(self, power: bool) -> None:
+        """Set HVAC power."""
+        self.power = power
+
+    def set_setpoint(self, setpoint: float) -> None:
+        """Set HVAC setpoint."""
+        if self.temp_set_auto_air is not None:
+            self.temp_set_auto_air = setpoint
+        if self.temp_set_cool_air is not None:
+            self.temp_set_cool_air = setpoint
+        if self.temp_set_dry_air is not None:
+            self.temp_set_dry_air = setpoint
+        if self.temp_set_hot_air is not None:
+            self.temp_set_hot_air = setpoint
+        if self.temp_set_stop_air is not None:
+            self.temp_set_stop_air = setpoint
+        if self.temp_set_vent_air is not None:
+            self.temp_set_vent_air = setpoint
+
     def update(self, data: dict[str, Any]) -> None:
         """Update HVAC device data."""
         super().update(data)
