@@ -41,6 +41,12 @@ from .const import (
     HEADER_AUTHORIZATION,
     HEADER_BEARER,
     HTTP_CALL_TIMEOUT,
+    RAW_DEVICES_CONFIG,
+    RAW_DEVICES_STATUS,
+    RAW_INSTALLATIONS,
+    RAW_INSTALLATIONS_LIST,
+    RAW_USER,
+    RAW_WEBSERVERS,
     TOKEN_REFRESH_PERIOD,
 )
 from .device import Device
@@ -69,6 +75,12 @@ class AirzoneCloudApi:
         options: ConnectionOptions,
     ):
         """Airzone Cloud API init."""
+        self._api_raw_data: dict[str, Any] = {
+            RAW_DEVICES_CONFIG: {},
+            RAW_DEVICES_STATUS: {},
+            RAW_INSTALLATIONS: {},
+            RAW_WEBSERVERS: {},
+        }
         self.aiohttp_session = aiohttp_session
         self.installations: list[Installation] = []
         self.options = options
@@ -122,59 +134,79 @@ class AirzoneCloudApi:
 
     async def api_get_device_config(self, device: Device) -> dict[str, Any]:
         """Request API device config data."""
-        dev_id = urllib.parse.quote(device.get_id())
+        dev_id = device.get_id()
+        url_id = urllib.parse.quote(dev_id)
 
         params = {
             API_INSTALLATION_ID: device.get_installation(),
         }
         dev_params = urllib.parse.urlencode(params)
 
-        return await self.api_request(
+        res = await self.api_request(
             "GET",
-            f"{API_V1}/{API_DEVICES}/{dev_id}/{API_CONFIG}?{dev_params}",
+            f"{API_V1}/{API_DEVICES}/{url_id}/{API_CONFIG}?{dev_params}",
         )
+        self._api_raw_data[RAW_DEVICES_CONFIG][dev_id] = res
+
+        return res
 
     async def api_get_device_status(self, device: Device) -> dict[str, Any]:
         """Request API device status data."""
-        dev_id = urllib.parse.quote(device.get_id())
+        dev_id = device.get_id()
+        url_id = urllib.parse.quote(dev_id)
 
         params = {
             API_INSTALLATION_ID: device.get_installation(),
         }
         dev_params = urllib.parse.urlencode(params)
 
-        return await self.api_request(
+        res = await self.api_request(
             "GET",
-            f"{API_V1}/{API_DEVICES}/{dev_id}/{API_STATUS}?{dev_params}",
+            f"{API_V1}/{API_DEVICES}/{url_id}/{API_STATUS}?{dev_params}",
         )
+        self._api_raw_data[RAW_DEVICES_STATUS][dev_id] = res
+
+        return res
 
     async def api_get_installation(self, installation: Installation) -> dict[str, Any]:
         """Request API installation data."""
-        inst_id = urllib.parse.quote(installation.get_id())
-        return await self.api_request(
+        inst_id = installation.get_id()
+        url_id = urllib.parse.quote(inst_id)
+
+        res = await self.api_request(
             "GET",
-            f"{API_V1}/{API_INSTALLATIONS}/{inst_id}",
+            f"{API_V1}/{API_INSTALLATIONS}/{url_id}",
         )
+        self._api_raw_data[RAW_INSTALLATIONS][inst_id] = res
+
+        return res
 
     async def api_get_installations(self) -> dict[str, Any]:
         """Request API installations data."""
-        return await self.api_request(
+        res = await self.api_request(
             "GET",
             f"{API_V1}/{API_INSTALLATIONS}",
         )
+        self._api_raw_data[RAW_INSTALLATIONS_LIST] = res
+
+        return res
 
     async def api_get_user(self) -> dict[str, Any]:
         """Request API user data."""
-        return await self.api_request(
+        res = await self.api_request(
             "GET",
             f"{API_V1}/{API_USER}",
         )
+        self._api_raw_data[RAW_USER] = res
+
+        return res
 
     async def api_get_webserver(
         self, webserver: WebServer, devices: bool
     ) -> dict[str, Any]:
         """Request API webserver data."""
-        ws_id = urllib.parse.quote(webserver.get_id())
+        ws_id = webserver.get_id()
+        url_id = urllib.parse.quote(ws_id)
 
         params: dict[str, Any] = {
             API_INSTALLATION_ID: webserver.get_installation(),
@@ -183,10 +215,13 @@ class AirzoneCloudApi:
             params[API_DEVICES] = 1
         ws_params = urllib.parse.urlencode(params)
 
-        return await self.api_request(
+        res = await self.api_request(
             "GET",
-            f"{API_V1}/{API_DEVICES}/{API_WS}/{ws_id}/{API_STATUS}?{ws_params}",
+            f"{API_V1}/{API_DEVICES}/{API_WS}/{url_id}/{API_STATUS}?{ws_params}",
         )
+        self._api_raw_data[RAW_WEBSERVERS][ws_id] = res
+
+        return res
 
     async def login(self) -> None:
         """Perform Airzone Cloud API login."""
@@ -234,6 +269,10 @@ class AirzoneCloudApi:
                 raise TokenRefreshError("Invalid API response")
             self.token = resp[API_TOKEN]
             self.refresh_token = resp[API_REFRESH_TOKEN]
+
+    def raw_data(self) -> dict[str, Any]:
+        """Return raw Airzone Cloud API data."""
+        return self._api_raw_data
 
     def data(self) -> dict[str, Any]:
         """Return Airzone Cloud data."""

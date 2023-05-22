@@ -131,4 +131,11 @@ HEADER_BEARER: Final[str] = "Bearer"
 
 HTTP_CALL_TIMEOUT: Final[int] = 10
 
+RAW_DEVICES_CONFIG: Final[str] = "devices-config"
+RAW_DEVICES_STATUS: Final[str] = "devices-status"
+RAW_INSTALLATIONS: Final[str] = "installations"
+RAW_INSTALLATIONS_LIST: Final[str] = "installations-list"
+RAW_USER: Final[str] = "user"
+RAW_WEBSERVERS: Final[str] = "webservers"
+
 TOKEN_REFRESH_PERIOD: Final[timedelta] = timedelta(hours=12)
