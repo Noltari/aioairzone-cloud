@@ -1,6 +1,7 @@
 """Airzone Cloud API."""
 from __future__ import annotations
 
+import asyncio
 import logging
 import urllib.parse
 from datetime import datetime
@@ -416,8 +417,7 @@ class AirzoneCloudApi:
         for system in self.systems:
             tasks += [self.update_system(system)]
 
-        for task in tasks:
-            await task
+        await asyncio.gather(*tasks)
 
     async def update_webserver(self, ws: WebServer, devices: bool) -> None:
         """Update Airzone Cloud WebServer from API."""
@@ -449,8 +449,7 @@ class AirzoneCloudApi:
         for ws in self.webservers:
             tasks += [self.update_webserver(ws, devices)]
 
-        for task in tasks:
-            await task
+        await asyncio.gather(*tasks)
 
     async def update_zone(self, zone: Zone) -> None:
         """Update Airzone Cloud Zone from API."""
@@ -470,8 +469,7 @@ class AirzoneCloudApi:
         for zone in self.zones:
             tasks += [self.update_zone(zone)]
 
-        for task in tasks:
-            await task
+        await asyncio.gather(*tasks)
 
         for system in self.systems:
             self.set_system_zones_data(system)
@@ -483,8 +481,7 @@ class AirzoneCloudApi:
             self.update_zones(),
         ]
 
-        for task in tasks:
-            await task
+        await asyncio.gather(*tasks)
 
     async def update(self) -> None:
         """Update all Airzone Cloud data."""
