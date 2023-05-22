@@ -85,7 +85,7 @@ class AirzoneCloudApi:
         self.aiohttp_session = aiohttp_session
         self.installations: list[Installation] = []
         self.options = options
-        self.refresh_time: datetime
+        self.refresh_time: datetime | None = None
         self.refresh_token: str | None = None
         self.systems: list[System] = []
         self.token: str | None = None
@@ -486,7 +486,9 @@ class AirzoneCloudApi:
     async def update(self) -> None:
         """Update all Airzone Cloud data."""
 
-        if (datetime.now() - self.refresh_time) > TOKEN_REFRESH_PERIOD:
+        if (self.refresh_time is not None) and (
+            datetime.now() - self.refresh_time
+        ) > TOKEN_REFRESH_PERIOD:
             try:
                 await self.token_refresh()
             except TokenRefreshError:
