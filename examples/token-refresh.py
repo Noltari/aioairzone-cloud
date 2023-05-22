@@ -1,6 +1,7 @@
 """Airzone Cloud token refresh example."""
 import asyncio
 import json
+import timeit
 
 import _secrets
 import aiohttp
@@ -26,20 +27,25 @@ async def main():
             for inst in inst_list:
                 print(json.dumps(inst.data(), indent=4, sort_keys=True))
             client.select_installation(inst_list[0])
+            await client.update_webservers(True)
             print("***")
 
-            await client.update_webservers(True)
-            await client.update_systems()
-            await client.update_zones()
+            update_start = timeit.default_timer()
+            await client.update()
+            update_end = timeit.default_timer()
             print(json.dumps(client.data(), indent=4, sort_keys=True))
+            print(f"Update time: {update_end - update_start}")
             print("***")
 
             await client.token_refresh()
+            print("Token refreshed")
+            print("***")
 
-            await client.update_webservers(False)
-            await client.update_systems()
-            await client.update_zones()
+            update_start = timeit.default_timer()
+            await client.update()
+            update_end = timeit.default_timer()
             print(json.dumps(client.data(), indent=4, sort_keys=True))
+            print(f"Update time: {update_end - update_start}")
 
             await client.logout()
         except TokenRefreshError:

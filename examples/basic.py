@@ -1,6 +1,7 @@
 """Basic Airzone Cloud client example."""
 import asyncio
 import json
+import timeit
 
 import _secrets
 import aiohttp
@@ -22,11 +23,18 @@ async def main():
             print(json.dumps(user_data, indent=4, sort_keys=True))
             print("***")
 
+            inst_list = await client.list_installations()
+            for inst in inst_list:
+                print(json.dumps(inst.data(), indent=4, sort_keys=True))
             await client.update_installations()
             await client.update_webservers(True)
-            await client.update_systems()
-            await client.update_zones()
+            print("***")
+
+            update_start = timeit.default_timer()
+            await client.update()
+            update_end = timeit.default_timer()
             print(json.dumps(client.data(), indent=4, sort_keys=True))
+            print(f"Update time: {update_end - update_start}")
 
             await client.logout()
         except LoginError:
