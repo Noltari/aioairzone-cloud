@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import Enum
+from enum import IntEnum
 
 
 @dataclass
@@ -13,7 +13,7 @@ class ConnectionOptions:
     password: str
 
 
-class OperationMode(int, Enum):
+class OperationMode(IntEnum):
     """Airzone Cloud operation modes."""
 
     STOP = 0
@@ -62,7 +62,7 @@ class OperationMode(int, Enum):
         return self.value in [self.VENTILATION]
 
 
-class TemperatureUnit(int, Enum):
+class TemperatureUnit(IntEnum):
     """Airzone Cloud temperature units."""
 
     CELSIUS = 0
