@@ -112,21 +112,21 @@ class AirzoneCloudApi:
                 timeout=HTTP_CALL_TIMEOUT,
             )
         except ClientConnectorError as err:
-            raise AirzoneCloudError from err
+            raise AirzoneCloudError(err) from err
         except ClientResponseError as err:
             if path.endswith(API_AUTH_LOGIN):
-                raise LoginError from err
+                raise LoginError(err) from err
             if path.endswith(API_AUTH_REFRESH_TOKEN):
-                raise TokenRefreshError from err
+                raise TokenRefreshError(err) from err
 
             if err.status == 400:
-                raise APIError from err
+                raise APIError(err) from err
             if err.status == 401:
-                raise AuthError from err
+                raise AuthError(err) from err
             if err.status == 429:
-                raise TooManyRequests from err
+                raise TooManyRequests(err) from err
 
-            raise AirzoneCloudError from err
+            raise AirzoneCloudError(err) from err
 
         resp_json = await resp.json(content_type=None)
         _LOGGER.debug("aiohttp response: %s", resp_json)
