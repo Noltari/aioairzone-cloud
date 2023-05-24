@@ -10,10 +10,12 @@ from typing import Any, cast
 from aiohttp import ClientConnectorError, ClientResponseError, ClientSession
 from aiohttp.client_reqrep import ClientResponse
 
+from .aidoo import Aidoo
 from .common import ConnectionOptions
 from .const import (
     API_AUTH_LOGIN,
     API_AUTH_REFRESH_TOKEN,
+    API_AZ_AIDOO,
     API_AZ_SYSTEM,
     API_AZ_ZONE,
     API_CONFIG,
@@ -35,6 +37,7 @@ from .const import (
     API_V1,
     API_WS,
     API_WS_ID,
+    AZD_AIDOOS,
     AZD_INSTALLATIONS,
     AZD_SYSTEMS,
     AZD_WEBSERVERS,
@@ -82,6 +85,7 @@ class AirzoneCloudApi:
             RAW_INSTALLATIONS: {},
             RAW_WEBSERVERS: {},
         }
+        self.aidoos: dict[str, Aidoo] = {}
         self.aiohttp_session = aiohttp_session
         self.installations: dict[str, Installation] = {}
         self.options = options
@@ -281,6 +285,12 @@ class AirzoneCloudApi:
         """Return Airzone Cloud data."""
         data: dict[str, Any] = {}
 
+        if len(self.aidoos):
+            aidoos: dict[str, Any] = {}
+            for key, aidoo in self.aidoos.items():
+                aidoos[key] = aidoo.data()
+            data[AZD_AIDOOS] = aidoos
+
         if len(self.installations):
             installations: dict[str, Any] = {}
             for key, installation in self.installations.items():
@@ -306,6 +316,10 @@ class AirzoneCloudApi:
             data[AZD_ZONES] = zones
 
         return data
+
+    def get_aidoo_id(self, aidoo_id: str) -> Aidoo | None:
+        """Return Airzone Cloud Aidoo by ID."""
+        return self.aidoos.get(aidoo_id)
 
     def get_installation_id(self, inst_id: str) -> Installation | None:
         """Return Airzone Cloud Installation by ID."""
@@ -359,6 +373,20 @@ class AirzoneCloudApi:
             if zone.get_master() is False and modes:
                 zone.set_modes(modes)
 
+    async def update_aidoo(self, aidoo: Aidoo) -> None:
+        """Update Airzone Cloud Zone from API."""
+        device_data = await self.api_get_device_status(aidoo)
+        aidoo.update(device_data)
+
+    async def update_aidoos(self) -> None:
+        """Update all Airzone Cloud Aidoos."""
+        tasks = []
+
+        for aidoo in self.aidoos.values():
+            tasks += [self.update_aidoo(aidoo)]
+
+        await asyncio.gather(*tasks)
+
     async def update_installation(self, inst: Installation) -> None:
         """Update Airzone Cloud installation from API."""
         installation_data = await self.api_get_installation(inst)
@@ -376,6 +404,13 @@ class AirzoneCloudApi:
                         )
                         if system:
                             self.systems[system.get_id()] = system
+                elif API_AZ_AIDOO == device_data[API_TYPE]:
+                    if not self.get_aidoo_id(device_data[API_DEVICE_ID]):
+                        aidoo = Aidoo(
+                            inst.get_id(), device_data[API_WS_ID], device_data
+                        )
+                        if aidoo:
+                            self.aidoos[aidoo.get_id()] = aidoo
 
     async def update_installations(self) -> None:
         """Update Airzone Cloud installations from API."""
@@ -426,6 +461,11 @@ class AirzoneCloudApi:
                         system = System(ws.get_installation(), ws.get_id(), device_data)
                         if system:
                             self.systems[system.get_id()] = system
+                elif API_AZ_AIDOO == device_data[API_DEVICE_TYPE]:
+                    if not self.get_aidoo_id(device_data[API_DEVICE_ID]):
+                        aidoo = Aidoo(ws.get_installation(), ws.get_id(), device_data)
+                        if aidoo:
+                            self.aidoos[aidoo.get_id()] = aidoo
 
     async def update_webserver_id(self, ws_id: str, devices: bool) -> None:
         """Update Airzone Cloud WebServer by ID."""
@@ -470,6 +510,7 @@ class AirzoneCloudApi:
             self.update_webservers(False),
             self.update_systems(),
             self.update_zones(),
+            self.update_aidoos(),
         ]
 
         await asyncio.gather(*tasks)

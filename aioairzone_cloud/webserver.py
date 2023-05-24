@@ -55,9 +55,11 @@ class WebServer:
         self.firmware = str(data[API_CONFIG][API_WS_FW])
         self.type = str(data[API_WS_TYPE])
         self.wifi_channel = int(data[API_CONFIG][API_STAT_CHANNEL])
-        self.wifi_mac = str(data[API_CONFIG][API_STAT_AP_MAC])
         self.wifi_quality = int(data[API_STATUS][API_STAT_QUALITY])
         self.wifi_ssid = str(data[API_CONFIG][API_STAT_SSID])
+
+        if API_STAT_AP_MAC in data[API_CONFIG]:
+            self.wifi_mac = str(data[API_CONFIG][API_STAT_AP_MAC])
 
     def data(self) -> dict[str, Any]:
         """Return WebServer data."""

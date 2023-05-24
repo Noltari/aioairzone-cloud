@@ -5,20 +5,16 @@ from typing import Any
 
 from .common import OperationMode
 from .const import (
-    API_CONFIG,
     API_DEVICE_ID,
     API_IS_CONNECTED,
-    API_META,
     API_MODE,
     API_MODE_AVAIL,
-    API_SYSTEM_NUMBER,
     AZD_CONNECTED,
     AZD_ID,
     AZD_INSTALLATION,
     AZD_MODE,
     AZD_MODES,
     AZD_NAME,
-    AZD_SYSTEM,
     AZD_WEBSERVER,
 )
 
@@ -37,11 +33,6 @@ class Device:
         self.modes: list[OperationMode] = []
         self.webserver_id = ws_id
 
-        if API_CONFIG in device_data:
-            self.system_number = int(device_data[API_CONFIG][API_SYSTEM_NUMBER])
-        else:
-            self.system_number = int(device_data[API_META][API_SYSTEM_NUMBER])
-
         if API_IS_CONNECTED in device_data:
             self.connected = bool(device_data[API_IS_CONNECTED])
 
@@ -53,7 +44,6 @@ class Device:
             AZD_INSTALLATION: self.get_installation(),
             AZD_MODE: self.get_mode(),
             AZD_NAME: self.get_name(),
-            AZD_SYSTEM: self.get_system(),
             AZD_WEBSERVER: self.get_webserver(),
         }
 
@@ -88,10 +78,6 @@ class Device:
     def get_name(self) -> str:
         """Return Device name."""
         return self.name
-
-    def get_system(self) -> int:
-        """Return System number."""
-        return self.system_number
 
     def get_webserver(self) -> str:
         """Return WebServer ID."""

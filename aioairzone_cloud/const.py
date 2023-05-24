@@ -73,11 +73,13 @@ API_WS_IDS: Final[str] = "ws_ids"
 API_WS_TYPE: Final[str] = "ws_type"
 API_ZONE_NUMBER: Final[str] = "zone_number"
 
+API_AZ_AIDOO: Final[str] = "aidoo"
 API_AZ_SYSTEM: Final[str] = "az_system"
 API_AZ_ZONE: Final[str] = "az_zone"
 
 API_DEFAULT_TEMP_STEP: Final[float] = 0.5
 
+AZD_AIDOOS: Final[str] = "aidoos"
 AZD_CONNECTED: Final[str] = "connected"
 AZD_CONNECTION_DATE: Final[str] = "connection-date"
 AZD_DISCONNECTION_DATE: Final[str] = "disconnection-date"
