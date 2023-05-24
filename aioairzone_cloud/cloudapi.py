@@ -239,9 +239,9 @@ class AirzoneCloudApi:
         _LOGGER.debug("login resp: %s", resp)
         if resp.keys() < {API_TOKEN, API_REFRESH_TOKEN}:
             raise LoginError("Invalid API response")
-        self.token = resp[API_TOKEN]
         self.refresh_time = datetime.now()
         self.refresh_token = resp[API_REFRESH_TOKEN]
+        self.token = resp[API_TOKEN]
 
     async def logout(self) -> None:
         """Perform Airzone Cloud API logout."""
@@ -254,6 +254,7 @@ class AirzoneCloudApi:
         except AirzoneCloudError:
             pass
         finally:
+            self.refresh_time = None
             self.refresh_token = None
             self.token = None
 
@@ -268,8 +269,9 @@ class AirzoneCloudApi:
             _LOGGER.debug("refresh resp: %s", resp)
             if resp.keys() < {API_TOKEN, API_REFRESH_TOKEN}:
                 raise TokenRefreshError("Invalid API response")
-            self.token = resp[API_TOKEN]
+            self.refresh_time = datetime.now()
             self.refresh_token = resp[API_REFRESH_TOKEN]
+            self.token = resp[API_TOKEN]
 
     def raw_data(self) -> dict[str, Any]:
         """Return raw Airzone Cloud API data."""
@@ -488,7 +490,7 @@ class AirzoneCloudApi:
 
         if (self.refresh_time is not None) and (
             datetime.now() - self.refresh_time
-        ) > TOKEN_REFRESH_PERIOD:
+        ) >= TOKEN_REFRESH_PERIOD:
             try:
                 await self.token_refresh()
             except TokenRefreshError:
