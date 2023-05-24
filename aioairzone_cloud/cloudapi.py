@@ -83,14 +83,14 @@ class AirzoneCloudApi:
             RAW_WEBSERVERS: {},
         }
         self.aiohttp_session = aiohttp_session
-        self.installations: list[Installation] = []
+        self.installations: dict[str, Installation] = {}
         self.options = options
         self.refresh_time: datetime | None = None
         self.refresh_token: str | None = None
-        self.systems: list[System] = []
+        self.systems: dict[str, System] = {}
         self.token: str | None = None
-        self.webservers: list[WebServer] = []
-        self.zones: list[Zone] = []
+        self.webservers: dict[str, WebServer] = {}
+        self.zones: dict[str, Zone] = {}
 
     async def api_request(
         self, method: str, path: str, json: Any | None = None
@@ -281,59 +281,47 @@ class AirzoneCloudApi:
         """Return Airzone Cloud data."""
         data: dict[str, Any] = {}
 
-        if self.installations:
+        if len(self.installations):
             installations: dict[str, Any] = {}
-            for installation in self.installations:
-                installations[installation.get_id()] = installation.data()
+            for key, installation in self.installations.items():
+                installations[key] = installation.data()
             data[AZD_INSTALLATIONS] = installations
 
-        if self.systems:
+        if len(self.systems):
             systems: dict[str, Any] = {}
-            for system in self.systems:
-                systems[system.get_id()] = system.data()
+            for key, system in self.systems.items():
+                systems[key] = system.data()
             data[AZD_SYSTEMS] = systems
 
-        if self.webservers:
+        if len(self.webservers):
             webservers: dict[str, Any] = {}
-            for webserver in self.webservers:
-                webservers[webserver.get_id()] = webserver.data()
+            for key, webserver in self.webservers.items():
+                webservers[key] = webserver.data()
             data[AZD_WEBSERVERS] = webservers
 
-        if self.zones:
+        if len(self.zones):
             zones: dict[str, Any] = {}
-            for zone in self.zones:
-                zones[zone.get_id()] = zone.data()
+            for key, zone in self.zones.items():
+                zones[key] = zone.data()
             data[AZD_ZONES] = zones
 
         return data
 
     def get_installation_id(self, inst_id: str) -> Installation | None:
         """Return Airzone Cloud Installation by ID."""
-        for inst in self.installations:
-            if inst_id == inst.get_id():
-                return inst
-        return None
+        return self.installations.get(inst_id)
 
     def get_system_id(self, sys_id: str) -> System | None:
         """Return Airzone Cloud System by ID."""
-        for system in self.systems:
-            if sys_id == system.get_id():
-                return system
-        return None
+        return self.systems.get(sys_id)
 
     def get_webserver_id(self, ws_id: str) -> WebServer | None:
         """Return Airzone Cloud WebServer by ID."""
-        for ws in self.webservers:
-            if ws_id == ws.get_id():
-                return ws
-        return None
+        return self.webservers.get(ws_id)
 
     def get_zone_id(self, zone_id: str) -> Zone | None:
         """Return Airzone Cloud Zone by ID."""
-        for zone in self.zones:
-            if zone_id == zone.get_id():
-                return zone
-        return None
+        return self.zones.get(zone_id)
 
     async def list_installations(self) -> list[Installation]:
         """Return Airzone Cloud installations list."""
@@ -341,17 +329,18 @@ class AirzoneCloudApi:
 
         inst_data = await self.api_get_installations()
         for inst in inst_data[API_INSTALLATIONS]:
-            inst_list.append(Installation(inst))
+            inst_list += [Installation(inst)]
 
         return inst_list
 
     def select_installation(self, inst: Installation) -> None:
         """Select single Airzone Cloud installation."""
-        self.installations = [inst]
+        self.installations = {
+            inst.get_id(): inst,
+        }
         for ws_id in inst.get_webservers():
             if not self.get_webserver_id(ws_id):
-                ws = WebServer(inst.get_id(), ws_id)
-                self.webservers.append(ws)
+                self.webservers[ws_id] = WebServer(inst.get_id(), ws_id)
 
     def set_system_zones_data(self, system: System) -> None:
         """Set slave zones modes from master zone."""
@@ -359,15 +348,15 @@ class AirzoneCloudApi:
         installation_id = system.get_installation()
         system_id = system.get_id()
         system_num = system.get_system()
-        for zone in self.zones:
-            zone.set_system_id(system_id)
-            is_slave = zone.get_master() is False
+        for zone in self.zones.values():
             if (
-                is_slave
-                and modes
-                and zone.get_installation() == installation_id
-                and zone.get_system() == system_num
+                zone.get_installation() != installation_id
+                or zone.get_system() != system_num
             ):
+                continue
+
+            zone.set_system_id(system_id)
+            if zone.get_master() is False and modes:
                 zone.set_modes(modes)
 
     async def update_installation(self, inst: Installation) -> None:
@@ -379,14 +368,14 @@ class AirzoneCloudApi:
                     if not self.get_zone_id(device_data[API_DEVICE_ID]):
                         zone = Zone(inst.get_id(), device_data[API_WS_ID], device_data)
                         if zone:
-                            self.zones.append(zone)
+                            self.zones[zone.get_id()] = zone
                 elif API_AZ_SYSTEM == device_data[API_TYPE]:
                     if not self.get_system_id(device_data[API_DEVICE_ID]):
                         system = System(
                             inst.get_id(), device_data[API_WS_ID], device_data
                         )
                         if system:
-                            self.systems.append(system)
+                            self.systems[system.get_id()] = system
 
     async def update_installations(self) -> None:
         """Update Airzone Cloud installations from API."""
@@ -395,11 +384,11 @@ class AirzoneCloudApi:
             if not self.get_installation_id(installation_data[API_INSTALLATION_ID]):
                 installation = Installation(installation_data)
                 if installation:
-                    self.installations.append(installation)
+                    self.installations[installation.get_id()] = installation
                     for ws_id in installation.get_webservers():
                         if not self.get_webserver_id(ws_id):
                             ws = WebServer(installation.get_id(), ws_id)
-                            self.webservers.append(ws)
+                            self.webservers[ws_id] = ws
 
     async def update_system(self, system: System) -> None:
         """Update Airzone Cloud System from API."""
@@ -416,7 +405,7 @@ class AirzoneCloudApi:
         """Update all Airzone Cloud Systems."""
         tasks = []
 
-        for system in self.systems:
+        for system in self.systems.values():
             tasks += [self.update_system(system)]
 
         await asyncio.gather(*tasks)
@@ -431,12 +420,12 @@ class AirzoneCloudApi:
                     if not self.get_zone_id(device_data[API_DEVICE_ID]):
                         zone = Zone(ws.get_installation(), ws.get_id(), device_data)
                         if zone:
-                            self.zones.append(zone)
+                            self.zones[zone.get_id()] = zone
                 elif API_AZ_SYSTEM == device_data[API_DEVICE_TYPE]:
                     if not self.get_system_id(device_data[API_DEVICE_ID]):
                         system = System(ws.get_installation(), ws.get_id(), device_data)
                         if system:
-                            self.systems.append(system)
+                            self.systems[system.get_id()] = system
 
     async def update_webserver_id(self, ws_id: str, devices: bool) -> None:
         """Update Airzone Cloud WebServer by ID."""
@@ -448,7 +437,7 @@ class AirzoneCloudApi:
         """Update all Airzone Cloud WebServers."""
         tasks = []
 
-        for ws in self.webservers:
+        for ws in self.webservers.values():
             tasks += [self.update_webserver(ws, devices)]
 
         await asyncio.gather(*tasks)
@@ -468,12 +457,12 @@ class AirzoneCloudApi:
         """Update all Airzone Cloud Zones."""
         tasks = []
 
-        for zone in self.zones:
+        for zone in self.zones.values():
             tasks += [self.update_zone(zone)]
 
         await asyncio.gather(*tasks)
 
-        for system in self.systems:
+        for system in self.systems.values():
             self.set_system_zones_data(system)
 
     async def _update(self) -> None:

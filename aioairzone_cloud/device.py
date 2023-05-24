@@ -107,5 +107,5 @@ class Device:
         if API_MODE_AVAIL in data and len(data[API_MODE_AVAIL]) > 0:
             modes = []
             for mode in data[API_MODE_AVAIL]:
-                modes.append(OperationMode(mode))
+                modes += [OperationMode(mode)]
             self.modes = modes

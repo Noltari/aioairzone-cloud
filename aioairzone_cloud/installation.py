@@ -23,7 +23,7 @@ class Installation:
         self.webservers: list[str] = []
 
         for ws_id in inst_data[API_WS_IDS]:
-            self.webservers.append(ws_id)
+            self.webservers += [ws_id]
 
     def data(self) -> dict[str, Any]:
         """Return Installation data."""
