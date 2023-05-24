@@ -1,0 +1,838 @@
+{
+  "devices-config": {},
+  "devices-status": {
+    "device1": {
+      "isConnected": true,
+      "connection_date": "2023-01-01T22:24:12.000Z",
+      "disconnection_date": "2023-01-01T22:26:55.376Z",
+      "ws_connected": true,
+      "eco_conf": "manual",
+      "range_sp_hot_air_max": {
+        "celsius": 30,
+        "fah": 86
+      },
+      "range_sp_emerheat_air_max": {
+        "celsius": 30,
+        "fah": 86
+      },
+      "range_sp_cool_air_min": {
+        "celsius": 18,
+        "fah": 64
+      },
+      "range_sp_dry_air_min": {
+        "celsius": 18,
+        "fah": 64
+      },
+      "mode": 0,
+      "auto_mode": null,
+      "setpoint_air_stop": {
+        "celsius": 24,
+        "fah": 75
+      },
+      "setpoint_air_cool": {
+        "celsius": 24,
+        "fah": 75
+      },
+      "setpoint_air_dry": {
+        "celsius": 24,
+        "fah": 75
+      },
+      "setpoint_air_vent": {
+        "celsius": 24,
+        "fah": 75
+      },
+      "mode_available": [],
+      "usermode_conf": null,
+      "eco_values": [],
+      "active": false,
+      "speed_values": [],
+      "speed_conf": null,
+      "speed_type": null,
+      "aq_active": null,
+      "aq_mode_conf": null,
+      "aq_mode_values": [],
+      "aqpm1_0": null,
+      "aqpm10": null,
+      "aqpm2_5": null,
+      "aq_quality": null,
+      "humidity": 31,
+      "name": "Dorm #1",
+      "sleep": 0,
+      "sleep_values": [
+        0,
+        30,
+        60,
+        90
+      ],
+      "power": false,
+      "local_temp": {
+        "celsius": 23,
+        "fah": 73
+      },
+      "warnings": [],
+      "autochange_diff_temp_conf": null,
+      "step": {
+        "fah": 1,
+        "celsius": 0.5
+      },
+      "range_sp_cool_air_max": {
+        "fah": 86,
+        "celsius": 30
+      },
+      "range_sp_dry_air_max": {
+        "fah": 86,
+        "celsius": 30
+      },
+      "range_sp_vent_air_max": {
+        "fah": 86,
+        "celsius": 30
+      },
+      "range_sp_stop_air_max": {
+        "fah": 86,
+        "celsius": 30
+      },
+      "range_sp_hot_air_min": {
+        "fah": 59,
+        "celsius": 15
+      },
+      "range_sp_emerheat_air_min": {
+        "fah": 59,
+        "celsius": 15
+      },
+      "range_sp_vent_air_min": {
+        "fah": 59,
+        "celsius": 15
+      },
+      "range_sp_stop_air_min": {
+        "fah": 59,
+        "celsius": 15
+      },
+      "zone_sched_available": true
+    },
+    "device2": {
+      "isConnected": true,
+      "connection_date": "2023-01-01T22:24:12.000Z",
+      "disconnection_date": "2023-01-01T22:26:55.376Z",
+      "ws_connected": true,
+      "warnings": [],
+      "errors": [],
+      "VMC_relay_mode_values": [
+        "auto",
+        "manual_on",
+        "manual_off"
+      ],
+      "aq_present": null,
+      "aq_mode_values": [],
+      "user_device_cooling_stages_values": [],
+      "user_device_heat_stages_values": [],
+      "aqpm1_0": null,
+      "aqpm10": null,
+      "aqpm2_5": null,
+      "aq_quality": null,
+      "mode": 0,
+      "auto_mode": null,
+      "mode_available": [
+        2,
+        3,
+        4,
+        5,
+        0
+      ],
+      "step": {
+        "fah": 1,
+        "celsius": 0.5
+      },
+      "ws_sched_available": true,
+      "ws_sched_calendar_available": true,
+      "range_sp_cool_air_max": {
+        "celsius": 30,
+        "fah": 86
+      },
+      "range_sp_cool_air_min": {
+        "celsius": 18,
+        "fah": 64
+      },
+      "range_sp_hot_air_max": {
+        "celsius": 30,
+        "fah": 86
+      },
+      "range_sp_hot_air_min": {
+        "celsius": 15,
+        "fah": 59
+      },
+      "range_sp_emerheat_air_max": {
+        "celsius": 30,
+        "fah": 86
+      },
+      "range_sp_emerheat_air_min": {
+        "celsius": 15,
+        "fah": 59
+      },
+      "range_sp_auto_air_max": {
+        "celsius": 30,
+        "fah": 86
+      },
+      "range_sp_auto_air_min": {
+        "celsius": 15,
+        "fah": 59
+      },
+      "range_sp_dry_air_max": {
+        "celsius": 30,
+        "fah": 86
+      },
+      "range_sp_dry_air_min": {
+        "celsius": 15,
+        "fah": 59
+      },
+      "range_sp_vent_air_max": {
+        "celsius": 30,
+        "fah": 86
+      },
+      "range_sp_vent_air_min": {
+        "celsius": 15,
+        "fah": 59
+      },
+      "range_sp_stop_air_min": {
+        "celsius": 15,
+        "fah": 59
+      },
+      "range_sp_stop_air_max": {
+        "celsius": 30,
+        "fah": 86
+      },
+      "range_air_min": {
+        "celsius": 15,
+        "fah": 59
+      },
+      "range_air_max": {
+        "celsius": 30,
+        "fah": 86
+      },
+      "sleep_values": [
+        0,
+        30,
+        60,
+        90
+      ],
+      "eco_values": [
+        "off",
+        "manual",
+        "a",
+        "a_p",
+        "a_pp"
+      ]
+    },
+    "device3": {
+      "isConnected": true,
+      "connection_date": "2023-01-01T22:24:12.000Z",
+      "disconnection_date": "2023-01-01T22:26:55.376Z",
+      "ws_connected": true,
+      "eco_conf": "manual",
+      "range_sp_hot_air_max": {
+        "celsius": 30,
+        "fah": 86
+      },
+      "range_sp_emerheat_air_max": {
+        "celsius": 30,
+        "fah": 86
+      },
+      "range_sp_cool_air_min": {
+        "celsius": 18,
+        "fah": 64
+      },
+      "range_sp_dry_air_min": {
+        "celsius": 18,
+        "fah": 64
+      },
+      "mode": 0,
+      "auto_mode": null,
+      "setpoint_air_stop": {
+        "celsius": 23.5,
+        "fah": 74
+      },
+      "setpoint_air_cool": {
+        "celsius": 23.5,
+        "fah": 74
+      },
+      "setpoint_air_dry": {
+        "celsius": 23.5,
+        "fah": 74
+      },
+      "setpoint_air_vent": {
+        "celsius": 23.5,
+        "fah": 74
+      },
+      "mode_available": [],
+      "usermode_conf": null,
+      "eco_values": [],
+      "active": false,
+      "speed_values": [],
+      "speed_conf": null,
+      "speed_type": null,
+      "aq_active": null,
+      "aq_mode_conf": null,
+      "aq_mode_values": [],
+      "aqpm1_0": null,
+      "aqpm10": null,
+      "aqpm2_5": null,
+      "aq_quality": null,
+      "humidity": 33,
+      "name": "Despacho",
+      "sleep": 0,
+      "sleep_values": [
+        0,
+        30,
+        60,
+        90
+      ],
+      "power": false,
+      "local_temp": {
+        "celsius": 23,
+        "fah": 73
+      },
+      "warnings": [],
+      "autochange_diff_temp_conf": null,
+      "step": {
+        "fah": 1,
+        "celsius": 0.5
+      },
+      "range_sp_cool_air_max": {
+        "fah": 86,
+        "celsius": 30
+      },
+      "range_sp_dry_air_max": {
+        "fah": 86,
+        "celsius": 30
+      },
+      "range_sp_vent_air_max": {
+        "fah": 86,
+        "celsius": 30
+      },
+      "range_sp_stop_air_max": {
+        "fah": 86,
+        "celsius": 30
+      },
+      "range_sp_hot_air_min": {
+        "fah": 59,
+        "celsius": 15
+      },
+      "range_sp_emerheat_air_min": {
+        "fah": 59,
+        "celsius": 15
+      },
+      "range_sp_vent_air_min": {
+        "fah": 59,
+        "celsius": 15
+      },
+      "range_sp_stop_air_min": {
+        "fah": 59,
+        "celsius": 15
+      },
+      "zone_sched_available": true
+    },
+    "device4": {
+      "isConnected": true,
+      "connection_date": "2023-01-01T22:24:12.000Z",
+      "disconnection_date": "2023-01-01T22:26:55.376Z",
+      "ws_connected": true,
+      "eco_conf": "manual",
+      "range_sp_hot_air_max": {
+        "celsius": 30,
+        "fah": 86
+      },
+      "range_sp_emerheat_air_max": {
+        "celsius": 30,
+        "fah": 86
+      },
+      "range_sp_cool_air_min": {
+        "celsius": 18,
+        "fah": 64
+      },
+      "range_sp_dry_air_min": {
+        "celsius": 18,
+        "fah": 64
+      },
+      "mode": 0,
+      "auto_mode": null,
+      "setpoint_air_stop": {
+        "celsius": 21,
+        "fah": 70
+      },
+      "setpoint_air_cool": {
+        "celsius": 21,
+        "fah": 70
+      },
+      "setpoint_air_dry": {
+        "celsius": 21,
+        "fah": 70
+      },
+      "setpoint_air_vent": {
+        "celsius": 21,
+        "fah": 70
+      },
+      "mode_available": [],
+      "usermode_conf": null,
+      "eco_values": [],
+      "active": false,
+      "speed_values": [],
+      "speed_conf": null,
+      "speed_type": null,
+      "aq_active": null,
+      "aq_mode_conf": null,
+      "aq_mode_values": [],
+      "aqpm1_0": null,
+      "aqpm10": null,
+      "aqpm2_5": null,
+      "aq_quality": null,
+      "humidity": 35,
+      "name": "Dorm Ppal",
+      "sleep": 0,
+      "sleep_values": [
+        0,
+        30,
+        60,
+        90
+      ],
+      "power": false,
+      "local_temp": {
+        "celsius": 22.8,
+        "fah": 73
+      },
+      "warnings": [],
+      "autochange_diff_temp_conf": null,
+      "step": {
+        "fah": 1,
+        "celsius": 0.5
+      },
+      "range_sp_cool_air_max": {
+        "fah": 86,
+        "celsius": 30
+      },
+      "range_sp_dry_air_max": {
+        "fah": 86,
+        "celsius": 30
+      },
+      "range_sp_vent_air_max": {
+        "fah": 86,
+        "celsius": 30
+      },
+      "range_sp_stop_air_max": {
+        "fah": 86,
+        "celsius": 30
+      },
+      "range_sp_hot_air_min": {
+        "fah": 59,
+        "celsius": 15
+      },
+      "range_sp_emerheat_air_min": {
+        "fah": 59,
+        "celsius": 15
+      },
+      "range_sp_vent_air_min": {
+        "fah": 59,
+        "celsius": 15
+      },
+      "range_sp_stop_air_min": {
+        "fah": 59,
+        "celsius": 15
+      },
+      "zone_sched_available": true
+    },
+    "device5": {
+      "isConnected": true,
+      "connection_date": "2023-01-01T22:24:12.000Z",
+      "disconnection_date": "2023-01-01T22:26:55.376Z",
+      "ws_connected": true,
+      "eco_conf": "manual",
+      "range_sp_hot_air_max": {
+        "celsius": 30,
+        "fah": 86
+      },
+      "range_sp_emerheat_air_max": {
+        "celsius": 30,
+        "fah": 86
+      },
+      "range_sp_cool_air_min": {
+        "celsius": 18,
+        "fah": 64
+      },
+      "range_sp_dry_air_min": {
+        "celsius": 18,
+        "fah": 64
+      },
+      "mode": 0,
+      "auto_mode": null,
+      "setpoint_air_stop": {
+        "celsius": 25,
+        "fah": 77
+      },
+      "setpoint_air_cool": {
+        "celsius": 25,
+        "fah": 77
+      },
+      "setpoint_air_dry": {
+        "celsius": 25,
+        "fah": 77
+      },
+      "setpoint_air_vent": {
+        "celsius": 25,
+        "fah": 77
+      },
+      "mode_available": [],
+      "usermode_conf": null,
+      "eco_values": [],
+      "active": false,
+      "speed_values": [],
+      "speed_conf": null,
+      "speed_type": null,
+      "aq_active": null,
+      "aq_mode_conf": null,
+      "aq_mode_values": [],
+      "aqpm1_0": null,
+      "aqpm10": null,
+      "aqpm2_5": null,
+      "aq_quality": null,
+      "humidity": 31,
+      "name": "Dorm #2",
+      "sleep": 0,
+      "sleep_values": [
+        0,
+        30,
+        60,
+        90
+      ],
+      "power": false,
+      "local_temp": {
+        "celsius": 22.9,
+        "fah": 73
+      },
+      "warnings": [],
+      "autochange_diff_temp_conf": null,
+      "step": {
+        "fah": 1,
+        "celsius": 0.5
+      },
+      "range_sp_cool_air_max": {
+        "fah": 86,
+        "celsius": 30
+      },
+      "range_sp_dry_air_max": {
+        "fah": 86,
+        "celsius": 30
+      },
+      "range_sp_vent_air_max": {
+        "fah": 86,
+        "celsius": 30
+      },
+      "range_sp_stop_air_max": {
+        "fah": 86,
+        "celsius": 30
+      },
+      "range_sp_hot_air_min": {
+        "fah": 59,
+        "celsius": 15
+      },
+      "range_sp_emerheat_air_min": {
+        "fah": 59,
+        "celsius": 15
+      },
+      "range_sp_vent_air_min": {
+        "fah": 59,
+        "celsius": 15
+      },
+      "range_sp_stop_air_min": {
+        "fah": 59,
+        "celsius": 15
+      },
+      "zone_sched_available": true
+    },
+    "device6": {
+      "isConnected": true,
+      "connection_date": "2023-01-01T22:24:12.000Z",
+      "disconnection_date": "2023-01-01T22:26:55.376Z",
+      "ws_connected": true,
+      "eco_conf": "off",
+      "range_sp_hot_air_max": {
+        "celsius": 30,
+        "fah": 86
+      },
+      "range_sp_emerheat_air_max": {
+        "celsius": 30,
+        "fah": 86
+      },
+      "range_sp_cool_air_min": {
+        "celsius": 18,
+        "fah": 64
+      },
+      "range_sp_dry_air_min": {
+        "celsius": 18,
+        "fah": 64
+      },
+      "mode": 0,
+      "auto_mode": null,
+      "setpoint_air_stop": {
+        "celsius": 24,
+        "fah": 75
+      },
+      "setpoint_air_cool": {
+        "celsius": 24,
+        "fah": 75
+      },
+      "setpoint_air_dry": {
+        "celsius": 24,
+        "fah": 75
+      },
+      "setpoint_air_vent": {
+        "celsius": 24,
+        "fah": 75
+      },
+      "mode_available": [
+        2,
+        3,
+        4,
+        5,
+        0
+      ],
+      "usermode_conf": null,
+      "eco_values": [
+        "off",
+        "manual",
+        "a",
+        "a_p",
+        "a_pp"
+      ],
+      "active": false,
+      "speed_values": [],
+      "speed_conf": null,
+      "speed_type": null,
+      "aq_active": null,
+      "aq_mode_conf": null,
+      "aq_mode_values": [],
+      "aqpm1_0": null,
+      "aqpm10": null,
+      "aqpm2_5": null,
+      "aq_quality": null,
+      "humidity": 41,
+      "name": "Salon",
+      "sleep": 0,
+      "sleep_values": [
+        0,
+        30,
+        60,
+        90
+      ],
+      "power": false,
+      "local_temp": {
+        "celsius": 21.8,
+        "fah": 71
+      },
+      "warnings": [],
+      "autochange_diff_temp_conf": null,
+      "step": {
+        "fah": 1,
+        "celsius": 0.5
+      },
+      "range_sp_cool_air_max": {
+        "fah": 86,
+        "celsius": 30
+      },
+      "range_sp_dry_air_max": {
+        "fah": 86,
+        "celsius": 30
+      },
+      "range_sp_vent_air_max": {
+        "fah": 86,
+        "celsius": 30
+      },
+      "range_sp_stop_air_max": {
+        "fah": 86,
+        "celsius": 30
+      },
+      "range_sp_hot_air_min": {
+        "fah": 59,
+        "celsius": 15
+      },
+      "range_sp_emerheat_air_min": {
+        "fah": 59,
+        "celsius": 15
+      },
+      "range_sp_vent_air_min": {
+        "fah": 59,
+        "celsius": 15
+      },
+      "range_sp_stop_air_min": {
+        "fah": 59,
+        "celsius": 15
+      },
+      "zone_sched_available": true
+    }
+  },
+  "installations": {
+    "installation1": {
+      "_id": "**REDACTED**",
+      "plugins": {
+        "schedules": {
+          "calendar_ws_ids": [
+            "webserver1"
+          ],
+          "activated": false,
+          "week_ws_ids": [
+            "webserver1"
+          ],
+          "acs_ws_ids": []
+        }
+      },
+      "installation_id": "installation1",
+      "location_id": "location1",
+      "name": "Casa",
+      "icon": 15,
+      "color": 1,
+      "groups": [
+        {
+          "name": "Sistema",
+          "devices": [
+            {
+              "device_id": "device2",
+              "type": "az_system",
+              "ws_id": "webserver1",
+              "meta": {
+                "system_number": 1,
+                "units": 0,
+                "ss_type": "ssl"
+              }
+            },
+            {
+              "device_id": "device6",
+              "type": "az_zone",
+              "ws_id": "webserver1",
+              "meta": {
+                "system_number": 1,
+                "zone_number": 1,
+                "units": 0,
+                "ss_type": "ssl"
+              },
+              "name": "Salon"
+            },
+            {
+              "device_id": "device1",
+              "type": "az_zone",
+              "ws_id": "webserver1",
+              "meta": {
+                "system_number": 1,
+                "zone_number": 3,
+                "units": 0,
+                "ss_type": "ssl"
+              },
+              "name": "Dorm #1"
+            },
+            {
+              "device_id": "device4",
+              "type": "az_zone",
+              "ws_id": "webserver1",
+              "meta": {
+                "system_number": 1,
+                "zone_number": 2,
+                "units": 0,
+                "ss_type": "ssl"
+              },
+              "name": "Dorm Ppal"
+            },
+            {
+              "device_id": "device3",
+              "type": "az_zone",
+              "ws_id": "webserver1",
+              "meta": {
+                "system_number": 1,
+                "zone_number": 4,
+                "units": 0,
+                "ss_type": "ssl"
+              },
+              "name": "Despacho"
+            },
+            {
+              "device_id": "device5",
+              "type": "az_zone",
+              "ws_id": "webserver1",
+              "meta": {
+                "system_number": 1,
+                "zone_number": 5,
+                "units": 0,
+                "ss_type": "ssl"
+              },
+              "name": "Dorm #2"
+            }
+          ],
+          "group_id": "group1"
+        }
+      ],
+      "scenes": [],
+      "added_at": "2022-12-30T19:16:49.747Z",
+      "access_type": "admin",
+      "user_id": "**REDACTED**"
+    }
+  },
+  "webservers": {
+    "webserver1": {
+      "ws_type": "ws_az",
+      "status": {
+        "isConnected": true,
+        "pending_ws_schedules_update": false,
+        "connection_date": "2023-05-07T12:55:51.000Z",
+        "stat_quality": 3,
+        "disconnection_date": "2023-01-01T22:26:55.376Z",
+        "stat_channel": 36,
+        "stat_rssi": -54,
+        "link_process_active": null
+      },
+      "config": {
+        "mac": "webserver1",
+        "pin": "**REDACTED**",
+        "units": 0,
+        "ws_sched_available": true,
+        "ss_type": "ssl",
+        "tunnel": true,
+        "ws_fw": "3.44",
+        "ota": true,
+        "server_sched_active": false,
+        "stat_channel": 36,
+        "stat_ap_mac": "**REDACTED**",
+        "stat_ssid": "**REDACTED**",
+        "conn_type": "wifi",
+        "arch": "imx6",
+        "ws_hw": "wifi5G",
+        "country_code": "ES"
+      }
+    }
+  },
+  "installations-list": {
+    "total": 1,
+    "installations": [
+      {
+        "_id": "**REDACTED**",
+        "installation_id": "installation1",
+        "location_id": "location1",
+        "location_text": {
+          "city": "**REDACTED**",
+          "country": {
+            "de": "Spanien",
+            "en": "Spain",
+            "es": "Espa\u00f1a",
+            "fr": "Espagne",
+            "it": "Spagna",
+            "pt": "Espanha",
+            "el": "\u0399\u03c3\u03c0\u03b1\u03bd\u03af\u03b1",
+            "pl": "Hiszpania",
+            "tr": "\u0130spanya"
+          }
+        },
+        "name": "Casa",
+        "ws_ids": [
+          "webserver1"
+        ],
+        "access_type": "admin",
+        "icon": 15,
+        "color": 1
+      }
+    ]
+  }
+}
