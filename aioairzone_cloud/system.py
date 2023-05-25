@@ -14,14 +14,14 @@ class System(Device):
         """Airzone Cloud System device init."""
         super().__init__(inst_id, ws_id, device_data)
 
-        self.name = f"System {self.get_system()}"
-
         if API_CONFIG in device_data:
             sub_data = device_data[API_CONFIG]
         else:
             sub_data = device_data[API_META]
 
         self.system_number = int(sub_data[API_SYSTEM_NUMBER])
+
+        self.name = f"System {self.system_number}"
 
     def data(self) -> dict[str, Any]:
         """Return System device data."""
