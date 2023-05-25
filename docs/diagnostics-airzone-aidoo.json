@@ -1,0 +1,381 @@
+{
+  "devices-config": {},
+  "devices-status": {
+    "device1": {
+      "machineready": true,
+      "errors": [],
+      "timer": {
+        "value": 0,
+        "count": 0,
+        "action": {}
+      },
+      "timer_values": [
+        0,
+        30,
+        60,
+        90
+      ],
+      "manufacturer": {
+        "_id": "**REDACTED**",
+        "text": "LG"
+      },
+      "power": false,
+      "aq_quality": null,
+      "aqpm1_0": null,
+      "aqpm2_5": null,
+      "aqpm10": null,
+      "active": false,
+      "step": {
+        "fah": 1,
+        "celsius": 1
+      },
+      "tt_units": 0,
+      "mode": 3,
+      "mode_available": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "setpoint_air_cool": {
+        "celsius": 22,
+        "fah": 72
+      },
+      "setpoint_air_heat": {
+        "celsius": 22,
+        "fah": 72
+      },
+      "speed_values": [
+        2,
+        4,
+        6
+      ],
+      "speed_type": 0,
+      "speed_conf": 6,
+      "tai_temp": {
+        "celsius": null,
+        "fah": null
+      },
+      "local_temp": {
+        "celsius": 21,
+        "fah": 70
+      },
+      "setpoint_air_auto": {
+        "celsius": 22,
+        "fah": 72
+      },
+      "range_sp_cool_air_max": {
+        "celsius": 30,
+        "fah": 86
+      },
+      "range_sp_cool_air_min": {
+        "celsius": 18,
+        "fah": 64
+      },
+      "range_sp_hot_air_max": {
+        "celsius": 30,
+        "fah": 86
+      },
+      "range_sp_hot_air_min": {
+        "celsius": 16,
+        "fah": 61
+      },
+      "range_sp_auto_air_max": {
+        "celsius": 30,
+        "fah": 86
+      },
+      "range_sp_auto_air_min": {
+        "celsius": 18,
+        "fah": 64
+      },
+      "pspeed": 100,
+      "block_autospeed": false,
+      "block_autotemp": false,
+      "block_dryspeed": false,
+      "block_drytemp": true,
+      "block_fantemp": true,
+      "name": "Sal\u00f3n",
+      "isConnected": true,
+      "connection_date": "2022-06-29T16:00:55.311Z",
+      "ws_connected": true,
+      "ws_sched_calendar_available": false,
+      "ws_sched_available": true,
+      "range_air_max": {
+        "celsius": 30,
+        "fah": 86
+      },
+      "range_air_min": {
+        "celsius": 15,
+        "fah": 59
+      },
+      "auto_mode": null,
+      "warnings": [],
+      "fallback_active": false
+    },
+    "device2": {
+      "machineready": true,
+      "errors": [],
+      "timer": {
+        "value": 0,
+        "count": 0,
+        "action": {}
+      },
+      "timer_values": [
+        0,
+        30,
+        60,
+        90
+      ],
+      "manufacturer": {
+        "_id": "**REDACTED**",
+        "text": "LG"
+      },
+      "power": false,
+      "aq_quality": null,
+      "aqpm1_0": null,
+      "aqpm2_5": null,
+      "aqpm10": null,
+      "active": false,
+      "step": {
+        "fah": 1,
+        "celsius": 1
+      },
+      "tt_units": 0,
+      "mode": 3,
+      "mode_available": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "setpoint_air_cool": {
+        "celsius": 22,
+        "fah": 72
+      },
+      "setpoint_air_heat": {
+        "celsius": 22,
+        "fah": 72
+      },
+      "speed_values": [
+        2,
+        4,
+        6
+      ],
+      "speed_type": 0,
+      "speed_conf": 6,
+      "tai_temp": {
+        "celsius": null,
+        "fah": null
+      },
+      "local_temp": {
+        "celsius": 21.5,
+        "fah": 71
+      },
+      "setpoint_air_auto": {
+        "celsius": 22,
+        "fah": 72
+      },
+      "range_sp_cool_air_max": {
+        "celsius": 30,
+        "fah": 86
+      },
+      "range_sp_cool_air_min": {
+        "celsius": 18,
+        "fah": 64
+      },
+      "range_sp_hot_air_max": {
+        "celsius": 30,
+        "fah": 86
+      },
+      "range_sp_hot_air_min": {
+        "celsius": 16,
+        "fah": 61
+      },
+      "range_sp_auto_air_max": {
+        "celsius": 30,
+        "fah": 86
+      },
+      "range_sp_auto_air_min": {
+        "celsius": 18,
+        "fah": 64
+      },
+      "pspeed": 100,
+      "block_autospeed": false,
+      "block_autotemp": false,
+      "block_dryspeed": false,
+      "block_drytemp": true,
+      "block_fantemp": true,
+      "name": "Habitaciones",
+      "isConnected": true,
+      "connection_date": "2022-06-29T15:59:21.423Z",
+      "disconnection_date": "2022-06-29T15:53:10.510Z",
+      "ws_connected": true,
+      "ws_sched_calendar_available": false,
+      "ws_sched_available": true,
+      "range_air_max": {
+        "celsius": 30,
+        "fah": 86
+      },
+      "range_air_min": {
+        "celsius": 15,
+        "fah": 59
+      },
+      "auto_mode": null,
+      "warnings": [],
+      "fallback_active": false
+    }
+  },
+  "installations": {
+    "installation1": {
+      "_id": "**REDACTED**",
+      "plugins": {
+        "schedules": {
+          "calendar_ws_ids": [],
+          "activated": true,
+          "week_ws_ids": [
+            "webserver1",
+            "webserver2"
+          ],
+          "acs_ws_ids": []
+        }
+      },
+      "installation_id": "installation1",
+      "location_id": "**REDACTED**",
+      "name": "Casa",
+      "icon": 1,
+      "color": 4,
+      "groups": [
+        {
+          "name": "",
+          "devices": [
+            {
+              "device_id": "device2",
+              "type": "aidoo",
+              "ws_id": "webserver1",
+              "meta": {
+                "units": 0
+              },
+              "name": "Habitaciones"
+            }
+          ],
+          "group_id": "**REDACTED**"
+        },
+        {
+          "name": "",
+          "devices": [
+            {
+              "device_id": "device1",
+              "type": "aidoo",
+              "ws_id": "webserver2",
+              "meta": {
+                "units": 0
+              },
+              "name": "Sal\u00f3n"
+            }
+          ],
+          "group_id": "**REDACTED**"
+        }
+      ],
+      "scenes": [],
+      "added_at": "2022-06-29T16:15:47.291Z",
+      "access_type": "admin",
+      "user_id": "**REDACTED**"
+    }
+  },
+  "webservers": {
+    "webserver1": {
+      "ws_type": "ws_aidoo",
+      "status": {
+        "sshost": "skaidoo5.airzonecloud.com",
+        "ssport": "443",
+        "stat_rssi": -55,
+        "stat_quality": 3,
+        "stat_channel": 1,
+        "first_connection_date": "2022-06-29T15:46:48.457Z",
+        "isConnected": true,
+        "connection_date": "2023-05-25 07:52:40 +0200",
+        "disconnection_date": "2023-05-25 07:52:25 +0200",
+        "pending_ws_schedules_update": false,
+        "link_process_active": null
+      },
+      "config": {
+        "wsmmgroup": "WSMM4",
+        "ws_fw": "3.13",
+        "stat_channel": 1,
+        "conn_type": "wifi",
+        "stat_ssid": "**REDACTED**",
+        "pin": "**REDACTED**",
+        "mac": "webserver1",
+        "units": 0,
+        "ws_sched_available": true,
+        "server_sched_active": true,
+        "tunnel": false,
+        "country_code": "ES"
+      }
+    },
+    "webserver2": {
+      "ws_type": "ws_aidoo",
+      "status": {
+        "sshost": "skaidoo4.airzonecloud.com",
+        "ssport": "443",
+        "stat_rssi": -69,
+        "stat_quality": 2,
+        "stat_channel": 1,
+        "first_connection_date": "2022-06-29T16:00:55.312Z",
+        "isConnected": true,
+        "connection_date": "2023-05-25 07:52:39 +0200",
+        "disconnection_date": "2023-05-25 07:52:24 +0200",
+        "pending_ws_schedules_update": false,
+        "link_process_active": null
+      },
+      "config": {
+        "wsmmgroup": "WSMM4",
+        "ws_fw": "3.13",
+        "stat_channel": 1,
+        "conn_type": "wifi",
+        "stat_ssid": "**REDACTED**",
+        "pin": "**REDACTED**",
+        "mac": "webserver2",
+        "units": 0,
+        "ws_sched_available": true,
+        "server_sched_active": true,
+        "tunnel": false,
+        "country_code": "ES"
+      }
+    }
+  },
+  "installations-list": {
+    "total": 1,
+    "installations": [
+      {
+        "_id": "**REDACTED**",
+        "installation_id": "installation1",
+        "location_id": "**REDACTED**",
+        "location_text": {
+          "city": "**REDACTED**",
+          "country": {
+            "de": "Spanien",
+            "en": "Spain",
+            "es": "Espa\u00f1a",
+            "fr": "Espagne",
+            "it": "Spagna",
+            "pt": "Espanha",
+            "el": "\u0399\u03c3\u03c0\u03b1\u03bd\u03af\u03b1",
+            "pl": "Hiszpania",
+            "tr": "\u0130spanya"
+          }
+        },
+        "name": "Casa",
+        "ws_ids": [
+          "webserver1",
+          "webserver2"
+        ],
+        "access_type": "admin",
+        "icon": 1,
+        "color": 4
+      }
+    ]
+  }
+}
