@@ -27,7 +27,6 @@ from .const import (
 class Device:
     """Airzone Cloud Device."""
 
-    connected: bool
     name: str
 
     def __init__(self, inst_id: str, ws_id: str, device_data: dict[str, Any]):
@@ -42,6 +41,8 @@ class Device:
 
         if API_IS_CONNECTED in device_data:
             self.connected = bool(device_data[API_IS_CONNECTED])
+        else:
+            self.connected = True
 
     def data(self) -> dict[str, Any]:
         """Return Device data."""
@@ -70,7 +71,7 @@ class Device:
         return data
 
     def get_connected(self) -> bool:
-        """Return connected status."""
+        """Return Device connection status."""
         return self.connected
 
     def get_errors(self) -> list[str]:
