@@ -16,7 +16,7 @@ from .const import (
     API_STATUS,
     API_WS_FW,
     API_WS_TYPE,
-    AZD_CONNECTED,
+    AZD_AVAILABLE,
     AZD_CONNECTION_DATE,
     AZD_DISCONNECTION_DATE,
     AZD_FIRMWARE,
@@ -36,12 +36,12 @@ class WebServer:
 
     def __init__(self, inst_id: str, ws_id: str):
         """Airzone Cloud WebServer init."""
-        self.connected: bool | None = None
         self.connection_date: str | None = None
         self.disconnection_date: str | None = None
         self.firmware: str | None = None
         self.id = ws_id
         self.installation_id = inst_id
+        self.is_connected: bool = False
         self.stat_quality: int | None = None
         self.type: str | None = None
         self.wifi_channel: int | None = None
@@ -52,10 +52,10 @@ class WebServer:
 
     def update(self, data: dict[str, Any]) -> None:
         """Update WebServer data."""
-        self.connected = bool(data[API_STATUS][API_IS_CONNECTED])
         self.connection_date = str(data[API_STATUS][API_CONNECTION_DATE])
         self.disconnection_date = str(data[API_STATUS][API_DISCONNECTION_DATE])
         self.firmware = str(data[API_CONFIG][API_WS_FW])
+        self.is_connected = bool(data[API_STATUS][API_IS_CONNECTED])
         self.type = str(data[API_WS_TYPE])
         self.wifi_channel = int(data[API_CONFIG][API_STAT_CHANNEL])
         self.wifi_quality = int(data[API_STATUS][API_STAT_QUALITY])
@@ -68,7 +68,7 @@ class WebServer:
     def data(self) -> dict[str, Any]:
         """Return WebServer data."""
         return {
-            AZD_CONNECTED: self.get_connected(),
+            AZD_AVAILABLE: self.get_available(),
             AZD_CONNECTION_DATE: self.get_connection_date(),
             AZD_DISCONNECTION_DATE: self.get_disconnection_date(),
             AZD_FIRMWARE: self.get_firmware(),
@@ -82,9 +82,9 @@ class WebServer:
             AZD_WIFI_SSID: self.get_wifi_ssid(),
         }
 
-    def get_connected(self) -> bool | None:
-        """Return connected status."""
-        return self.connected
+    def get_available(self) -> bool:
+        """Return availability status."""
+        return self.is_connected
 
     def get_connection_date(self) -> str | None:
         """Return connection date."""

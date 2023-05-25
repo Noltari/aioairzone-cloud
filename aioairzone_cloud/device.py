@@ -11,16 +11,19 @@ from .const import (
     API_MODE,
     API_MODE_AVAIL,
     API_WARNINGS,
-    AZD_CONNECTED,
+    API_WS_CONNECTED,
+    AZD_AVAILABLE,
     AZD_ERRORS,
     AZD_ID,
     AZD_INSTALLATION,
+    AZD_IS_CONNECTED,
     AZD_MODE,
     AZD_MODES,
     AZD_NAME,
     AZD_PROBLEMS,
     AZD_WARNINGS,
     AZD_WEBSERVER,
+    AZD_WS_CONNECTED,
 )
 
 
@@ -38,22 +41,25 @@ class Device:
         self.modes: list[OperationMode] = []
         self.warnings: list[str] = []
         self.webserver_id = ws_id
+        self.ws_connected: bool = True
 
         if API_IS_CONNECTED in device_data:
-            self.connected = bool(device_data[API_IS_CONNECTED])
+            self.is_connected = bool(device_data[API_IS_CONNECTED])
         else:
-            self.connected = True
+            self.is_connected = True
 
     def data(self) -> dict[str, Any]:
         """Return Device data."""
         data = {
-            AZD_CONNECTED: self.get_connected(),
+            AZD_AVAILABLE: self.get_available(),
             AZD_ID: self.get_id(),
             AZD_INSTALLATION: self.get_installation(),
+            AZD_IS_CONNECTED: self.get_is_connected(),
             AZD_MODE: self.get_mode(),
             AZD_NAME: self.get_name(),
             AZD_PROBLEMS: self.get_problems(),
             AZD_WEBSERVER: self.get_webserver(),
+            AZD_WS_CONNECTED: self.get_ws_connected(),
         }
 
         errors = self.get_errors()
@@ -70,9 +76,9 @@ class Device:
 
         return data
 
-    def get_connected(self) -> bool:
-        """Return Device connection status."""
-        return self.connected
+    def get_available(self) -> bool:
+        """Return availability status."""
+        return self.is_connected and self.ws_connected
 
     def get_errors(self) -> list[str]:
         """Return Device errors."""
@@ -85,6 +91,10 @@ class Device:
     def get_installation(self) -> str:
         """Return Installation ID."""
         return self.installation_id
+
+    def get_is_connected(self) -> bool:
+        """Return Device connection status."""
+        return self.is_connected
 
     def get_mode(self) -> OperationMode | None:
         """Return Device mode."""
@@ -112,10 +122,16 @@ class Device:
         """Return WebServer ID."""
         return self.webserver_id
 
+    def get_ws_connected(self) -> bool:
+        """Return WebServer connection status."""
+        return self.ws_connected
+
     def update(self, data: dict[str, Any]) -> None:
         """Update Device data."""
         if API_IS_CONNECTED in data:
-            self.connected = bool(data[API_IS_CONNECTED])
+            self.is_connected = bool(data[API_IS_CONNECTED])
+        if API_WS_CONNECTED in data:
+            self.ws_connected = bool(data[API_WS_CONNECTED])
 
         if API_ERRORS in data:
             self.errors = []
