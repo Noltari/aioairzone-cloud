@@ -11,6 +11,7 @@ from .const import (
     API_STAT_AP_MAC,
     API_STAT_CHANNEL,
     API_STAT_QUALITY,
+    API_STAT_RSSI,
     API_STAT_SSID,
     API_STATUS,
     API_WS_FW,
@@ -25,6 +26,7 @@ from .const import (
     AZD_WIFI_CHANNEL,
     AZD_WIFI_MAC,
     AZD_WIFI_QUALITY,
+    AZD_WIFI_RSSI,
     AZD_WIFI_SSID,
 )
 
@@ -45,6 +47,7 @@ class WebServer:
         self.wifi_channel: int | None = None
         self.wifi_mac: str | None = None
         self.wifi_quality: int | None = None
+        self.wifi_rssi: int | None = None
         self.wifi_ssid: str | None = None
 
     def update(self, data: dict[str, Any]) -> None:
@@ -56,6 +59,7 @@ class WebServer:
         self.type = str(data[API_WS_TYPE])
         self.wifi_channel = int(data[API_CONFIG][API_STAT_CHANNEL])
         self.wifi_quality = int(data[API_STATUS][API_STAT_QUALITY])
+        self.wifi_rssi = int(data[API_STATUS][API_STAT_RSSI])
         self.wifi_ssid = str(data[API_CONFIG][API_STAT_SSID])
 
         if API_STAT_AP_MAC in data[API_CONFIG]:
@@ -74,6 +78,7 @@ class WebServer:
             AZD_WIFI_CHANNEL: self.get_wifi_channel(),
             AZD_WIFI_MAC: self.get_wifi_mac(),
             AZD_WIFI_QUALITY: self.get_wifi_quality(),
+            AZD_WIFI_RSSI: self.get_wifi_rssi(),
             AZD_WIFI_SSID: self.get_wifi_ssid(),
         }
 
@@ -116,6 +121,10 @@ class WebServer:
     def get_wifi_quality(self) -> int | None:
         """Return WiFi signal quality."""
         return self.wifi_quality
+
+    def get_wifi_rssi(self) -> int | None:
+        """Return WiFi RSSI."""
+        return self.wifi_rssi
 
     def get_wifi_ssid(self) -> str | None:
         """Return WiFi SSID."""
