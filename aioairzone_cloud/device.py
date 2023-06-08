@@ -50,7 +50,7 @@ class Device:
 
     def data(self) -> dict[str, Any]:
         """Return Device data."""
-        data = {
+        data: dict[str, Any] = {
             AZD_AVAILABLE: self.get_available(),
             AZD_ID: self.get_id(),
             AZD_INSTALLATION: self.get_installation(),
