@@ -90,72 +90,75 @@ class HVAC(Device):
         """Return HVAC device data."""
         data = super().data()
 
-        data[AZD_HUMIDITY] = self.get_humidity()
         data[AZD_POWER] = self.get_power()
         data[AZD_TEMP] = self.get_temperature()
         data[AZD_TEMP_STEP] = self.get_temp_step()
 
+        humidity = self.get_humidity()
+        if humidity is not None:
+            data[AZD_HUMIDITY] = humidity
+
         temp_set_max = self.get_temp_set_max()
-        if temp_set_max:
+        if temp_set_max is not None:
             data[AZD_TEMP_SET_MAX] = temp_set_max
         temp_set_max_cool_air = self.get_temp_set_max_cool_air()
-        if temp_set_max_cool_air:
+        if temp_set_max_cool_air is not None:
             data[AZD_TEMP_SET_MAX_COOL_AIR] = temp_set_max_cool_air
         temp_set_max_dry_air = self.get_temp_set_max_dry_air()
-        if temp_set_max_dry_air:
+        if temp_set_max_dry_air is not None:
             data[AZD_TEMP_SET_MAX_DRY_AIR] = temp_set_max_dry_air
         temp_set_max_emerheat_air = self.get_temp_set_max_emerheat_air()
-        if temp_set_max_emerheat_air:
+        if temp_set_max_emerheat_air is not None:
             data[AZD_TEMP_SET_MAX_EMERHEAT_AIR] = temp_set_max_emerheat_air
         temp_set_max_hot_air = self.get_temp_set_max_hot_air()
-        if temp_set_max_hot_air:
+        if temp_set_max_hot_air is not None:
             data[AZD_TEMP_SET_MAX_HOT_AIR] = temp_set_max_hot_air
         temp_set_max_stop_air = self.get_temp_set_max_stop_air()
-        if temp_set_max_stop_air:
+        if temp_set_max_stop_air is not None:
             data[AZD_TEMP_SET_MAX_STOP_AIR] = temp_set_max_stop_air
         temp_set_max_vent_air = self.get_temp_set_max_vent_air()
-        if temp_set_max_vent_air:
+        if temp_set_max_vent_air is not None:
             data[AZD_TEMP_SET_MAX_VENT_AIR] = temp_set_max_vent_air
 
         temp_set_min = self.get_temp_set_min()
-        if temp_set_min:
+        if temp_set_min is not None:
             data[AZD_TEMP_SET_MIN] = temp_set_min
         temp_set_min_cool_air = self.get_temp_set_min_cool_air()
-        if temp_set_min_cool_air:
+        if temp_set_min_cool_air is not None:
             data[AZD_TEMP_SET_MIN_COOL_AIR] = temp_set_min_cool_air
         temp_set_min_dry_air = self.get_temp_set_min_dry_air()
-        if temp_set_min_dry_air:
+        if temp_set_min_dry_air is not None:
             data[AZD_TEMP_SET_MIN_DRY_AIR] = temp_set_min_dry_air
         temp_set_min_emerheat_air = self.get_temp_set_min_emerheat_air()
-        if temp_set_min_emerheat_air:
+        if temp_set_min_emerheat_air is not None:
             data[AZD_TEMP_SET_MIN_EMERHEAT_AIR] = temp_set_min_emerheat_air
         temp_set_min_hot_air = self.get_temp_set_min_hot_air()
-        if temp_set_min_hot_air:
+        if temp_set_min_hot_air is not None:
             data[AZD_TEMP_SET_MIN_HOT_AIR] = temp_set_min_hot_air
         temp_set_min_stop_air = self.get_temp_set_min_stop_air()
-        if temp_set_min_stop_air:
+        if temp_set_min_stop_air is not None:
             data[AZD_TEMP_SET_MIN_STOP_AIR] = temp_set_min_stop_air
         temp_set_min_vent_air = self.get_temp_set_min_vent_air()
-        if temp_set_min_vent_air:
+        if temp_set_min_vent_air is not None:
             data[AZD_TEMP_SET_MIN_VENT_AIR] = temp_set_min_vent_air
 
         temp_set = self.get_temp_set()
-        if temp_set:
+        if temp_set is not None:
             data[AZD_TEMP_SET] = temp_set
         temp_set_cool_air = self.get_temp_set_cool_air()
-        if temp_set_cool_air:
+        if temp_set_cool_air is not None:
             data[AZD_TEMP_SET_COOL_AIR] = temp_set_cool_air
         temp_set_dry_air = self.get_temp_set_dry_air()
-        if temp_set_dry_air:
+        if temp_set_dry_air is not None:
             data[AZD_TEMP_SET_DRY_AIR] = temp_set_dry_air
         temp_set_hot_air = self.get_temp_set_hot_air()
-        if temp_set_hot_air:
+        if temp_set_hot_air is not None:
             data[AZD_TEMP_SET_HOT_AIR] = temp_set_hot_air
         temp_set_stop_air = self.get_temp_set_stop_air()
-        if temp_set_stop_air:
+        if temp_set_stop_air is not None:
             data[AZD_TEMP_SET_STOP_AIR] = temp_set_stop_air
         temp_set_vent_air = self.get_temp_set_vent_air()
-        if temp_set_vent_air:
+        if temp_set_vent_air is not None:
             data[AZD_TEMP_SET_VENT_AIR] = temp_set_vent_air
 
         return data
@@ -170,7 +173,7 @@ class HVAC(Device):
 
     def get_temperature(self) -> float | None:
         """Return HVAC device temperature."""
-        if self.temp:
+        if self.temp is not None:
             return round(self.temp, 1)
         return None
 
@@ -178,7 +181,7 @@ class HVAC(Device):
         """Return HVAC device temperature setpoint."""
         temp_set: float | None = None
         mode = self.get_mode()
-        if mode:
+        if mode is not None:
             if mode.is_cool():
                 temp_set = self.get_temp_set_cool_air()
             elif mode.is_dry():
@@ -193,31 +196,31 @@ class HVAC(Device):
 
     def get_temp_set_cool_air(self) -> float | None:
         """Return HVAC device setpoint for Cool Air."""
-        if self.temp_set_cool_air:
+        if self.temp_set_cool_air is not None:
             return round(self.temp_set_cool_air, 1)
         return None
 
     def get_temp_set_dry_air(self) -> float | None:
         """Return HVAC device setpoint for Dry Air."""
-        if self.temp_set_dry_air:
+        if self.temp_set_dry_air is not None:
             return round(self.temp_set_dry_air, 1)
         return None
 
     def get_temp_set_hot_air(self) -> float | None:
         """Return HVAC device setpoint for Heat Air."""
-        if self.temp_set_hot_air:
+        if self.temp_set_hot_air is not None:
             return round(self.temp_set_hot_air, 1)
         return None
 
     def get_temp_set_stop_air(self) -> float | None:
         """Return HVAC device setpoint for Stop Air."""
-        if self.temp_set_stop_air:
+        if self.temp_set_stop_air is not None:
             return round(self.temp_set_stop_air, 1)
         return None
 
     def get_temp_set_vent_air(self) -> float | None:
         """Return HVAC device setpoint for Ventilation Air."""
-        if self.temp_set_vent_air:
+        if self.temp_set_vent_air is not None:
             return round(self.temp_set_vent_air, 1)
         return None
 
@@ -240,37 +243,37 @@ class HVAC(Device):
 
     def get_temp_set_max_cool_air(self) -> float | None:
         """Return HVAC device max setpoint for Cool Air."""
-        if self.temp_set_max_cool_air:
+        if self.temp_set_max_cool_air is not None:
             return round(self.temp_set_max_cool_air, 1)
         return None
 
     def get_temp_set_max_dry_air(self) -> float | None:
         """Return HVAC device max setpoint for Dry Air."""
-        if self.temp_set_max_dry_air:
+        if self.temp_set_max_dry_air is not None:
             return round(self.temp_set_max_dry_air, 1)
         return None
 
     def get_temp_set_max_emerheat_air(self) -> float | None:
         """Return HVAC device max setpoint for Emergency Heat Air."""
-        if self.temp_set_max_emerheat_air:
+        if self.temp_set_max_emerheat_air is not None:
             return round(self.temp_set_max_emerheat_air, 1)
         return None
 
     def get_temp_set_max_hot_air(self) -> float | None:
         """Return HVAC device max setpoint for Heat Air."""
-        if self.temp_set_max_hot_air:
+        if self.temp_set_max_hot_air is not None:
             return round(self.temp_set_max_hot_air, 1)
         return None
 
     def get_temp_set_max_stop_air(self) -> float | None:
         """Return HVAC device max setpoint for Stop Air."""
-        if self.temp_set_max_stop_air:
+        if self.temp_set_max_stop_air is not None:
             return round(self.temp_set_max_stop_air, 1)
         return None
 
     def get_temp_set_max_vent_air(self) -> float | None:
         """Return HVAC device max setpoint for Ventilation Air."""
-        if self.temp_set_max_vent_air:
+        if self.temp_set_max_vent_air is not None:
             return round(self.temp_set_max_vent_air, 1)
         return None
 
@@ -299,37 +302,37 @@ class HVAC(Device):
 
     def get_temp_set_min_dry_air(self) -> float | None:
         """Return HVAC device min setpoint for Dry Air."""
-        if self.temp_set_min_dry_air:
+        if self.temp_set_min_dry_air is not None:
             return round(self.temp_set_min_dry_air, 1)
         return None
 
     def get_temp_set_min_emerheat_air(self) -> float | None:
         """Return HVAC device min setpoint for Emergency Heat Air."""
-        if self.temp_set_min_emerheat_air:
+        if self.temp_set_min_emerheat_air is not None:
             return round(self.temp_set_min_emerheat_air, 1)
         return None
 
     def get_temp_set_min_hot_air(self) -> float | None:
         """Return HVAC device min setpoint for Hot Air."""
-        if self.temp_set_min_hot_air:
+        if self.temp_set_min_hot_air is not None:
             return round(self.temp_set_min_hot_air, 1)
         return None
 
     def get_temp_set_min_stop_air(self) -> float | None:
         """Return HVAC device min setpoint for Stop Air."""
-        if self.temp_set_min_stop_air:
+        if self.temp_set_min_stop_air is not None:
             return round(self.temp_set_min_stop_air, 1)
         return None
 
     def get_temp_set_min_vent_air(self) -> float | None:
         """Return HVAC device min setpoint for Ventilation Air."""
-        if self.temp_set_min_vent_air:
+        if self.temp_set_min_vent_air is not None:
             return round(self.temp_set_min_vent_air, 1)
         return None
 
     def get_temp_step(self) -> float | None:
         """Return HVAC device temperature step."""
-        if self.temp_step:
+        if self.temp_step is not None:
             return round(self.temp_step, 1)
         return API_DEFAULT_TEMP_STEP
 
