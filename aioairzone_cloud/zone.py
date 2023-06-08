@@ -46,7 +46,7 @@ class Zone(HVAC):
         data[AZD_ZONE] = self.get_zone()
 
         system_id = self.get_system_id()
-        if system_id:
+        if system_id is not None:
             data[AZD_SYSTEM_ID] = system_id
 
         return data
