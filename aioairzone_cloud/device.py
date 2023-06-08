@@ -67,7 +67,7 @@ class Device:
             data[AZD_ERRORS] = errors
 
         modes = self.get_modes()
-        if modes:
+        if modes is not None:
             data[AZD_MODES] = modes
 
         warnings = self.get_warnings()
