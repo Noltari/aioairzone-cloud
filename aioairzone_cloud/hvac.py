@@ -8,7 +8,6 @@ from .const import (
     API_DEFAULT_TEMP_STEP,
     API_HUMIDITY,
     API_LOCAL_TEMP,
-    API_NAME,
     API_POWER,
     API_RANGE_SP_MAX_COOL_AIR,
     API_RANGE_SP_MAX_DRY_AIR,
@@ -64,7 +63,7 @@ class HVAC(Device):
         super().__init__(inst_id, ws_id, device_data)
 
         self.humidity: int | None = None
-        self.name = str(device_data[API_NAME])
+        self.name: str = "HVAC"
         self.power: bool | None = None
         self.temp_set_max_cool_air: float | None = None
         self.temp_set_max_dry_air: float | None = None

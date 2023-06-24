@@ -22,6 +22,7 @@ from .const import (
     AZD_FIRMWARE,
     AZD_ID,
     AZD_INSTALLATION,
+    AZD_NAME,
     AZD_TYPE,
     AZD_WIFI_CHANNEL,
     AZD_WIFI_MAC,
@@ -42,6 +43,7 @@ class WebServer:
         self.id = ws_id
         self.installation_id = inst_id
         self.is_connected: bool = False
+        self.name: str = f"WebServer {ws_id}"
         self.stat_quality: int | None = None
         self.type: str | None = None
         self.wifi_channel: int | None = None
@@ -89,6 +91,7 @@ class WebServer:
             AZD_FIRMWARE: self.get_firmware(),
             AZD_ID: self.get_id(),
             AZD_INSTALLATION: self.get_installation(),
+            AZD_NAME: self.get_name(),
             AZD_TYPE: self.get_type(),
         }
 
@@ -137,6 +140,10 @@ class WebServer:
     def get_installation(self) -> str:
         """Return installation ID."""
         return self.installation_id
+
+    def get_name(self) -> str:
+        """Return WebServer name."""
+        return self.name
 
     def get_type(self) -> str | None:
         """Return WebServer type."""

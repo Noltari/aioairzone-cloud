@@ -9,6 +9,7 @@ from .const import (
     API_CONFIG,
     API_META,
     API_MODE_AVAIL,
+    API_NAME,
     API_SYSTEM_NUMBER,
     API_ZONE_NUMBER,
     AZD_MASTER,
@@ -36,6 +37,11 @@ class Zone(HVAC):
 
         self.system_number = int(sub_data[API_SYSTEM_NUMBER])
         self.zone_number = int(sub_data[API_ZONE_NUMBER])
+
+        if API_NAME in device_data:
+            self.name = str(device_data[API_NAME])
+        else:
+            self.name = f"Zone {self.system_number}:{self.zone_number}"
 
     def data(self) -> dict[str, Any]:
         """Return Zone data."""

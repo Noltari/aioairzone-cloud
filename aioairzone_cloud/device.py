@@ -39,6 +39,7 @@ class Device:
         self.installation_id = inst_id
         self.mode: OperationMode | None = None
         self.modes: list[OperationMode] = []
+        self.name: str = "Device"
         self.warnings: list[str] = []
         self.webserver_id = ws_id
         self.ws_connected: bool = True
