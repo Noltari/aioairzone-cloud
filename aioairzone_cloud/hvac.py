@@ -3,7 +3,9 @@ from __future__ import annotations
 
 from typing import Any
 
+from .common import OperationAction, OperationMode
 from .const import (
+    API_ACTIVE,
     API_CELSIUS,
     API_DEFAULT_TEMP_STEP,
     API_HUMIDITY,
@@ -27,6 +29,8 @@ from .const import (
     API_SP_AIR_STOP,
     API_SP_AIR_VENT,
     API_STEP,
+    AZD_ACTION,
+    AZD_ACTIVE,
     AZD_HUMIDITY,
     AZD_POWER,
     AZD_TEMP,
@@ -62,6 +66,7 @@ class HVAC(Device):
         """Airzone Cloud HVAC device init."""
         super().__init__(inst_id, ws_id, device_data)
 
+        self.active: bool | None = None
         self.humidity: int | None = None
         self.name: str = "HVAC"
         self.power: bool | None = None
@@ -89,6 +94,8 @@ class HVAC(Device):
         """Return HVAC device data."""
         data = super().data()
 
+        data[AZD_ACTION] = self.get_action()
+        data[AZD_ACTIVE] = self.get_active()
         data[AZD_POWER] = self.get_power()
         data[AZD_TEMP] = self.get_temperature()
         data[AZD_TEMP_STEP] = self.get_temp_step()
@@ -161,6 +168,72 @@ class HVAC(Device):
             data[AZD_TEMP_SET_VENT_AIR] = temp_set_vent_air
 
         return data
+
+    def get_action(self) -> OperationAction:
+        """Return HVAC action."""
+
+        if self.get_power():
+            if self.get_active():
+                mode = self.get_mode() or OperationMode.STOP
+                if mode.is_cool():
+                    action = OperationAction.COOLING
+                elif mode.is_heat():
+                    action = OperationAction.HEATING
+                elif mode.is_vent():
+                    action = OperationAction.FAN
+                elif mode.is_dry():
+                    action = OperationAction.DRYING
+                elif mode.is_auto():
+                    action = self.get_auto_mode()
+                else:
+                    action = OperationAction.OFF
+            else:
+                action = OperationAction.IDLE
+        else:
+            action = OperationAction.OFF
+
+        return action
+
+    def get_active(self) -> bool | None:
+        """Return HVAC device active status."""
+        return self.active
+
+    def get_auto_mode(self) -> OperationAction:
+        """Return action from auto mode."""
+        temp_sp = self.get_temp_set()
+        temp_min = self.get_temp_set_min()
+        temp_max = self.get_temp_set_max()
+        cool_sp = self.get_temp_set_cool_air()
+        cool_max = self.get_temp_set_max_cool_air()
+        cool_min = self.get_temp_set_min_cool_air()
+        heat_sp = self.get_temp_set_hot_air()
+        heat_max = self.get_temp_set_max_hot_air()
+        heat_min = self.get_temp_set_min_hot_air()
+
+        if (
+            cool_max is not None
+            and cool_min is not None
+            and heat_max is not None
+            and heat_min is not None
+        ):
+            cool_match = cool_max == temp_max and cool_min == temp_min
+            heat_match = heat_max == temp_max and heat_min == temp_min
+
+            if cool_match and not heat_match:
+                return OperationAction.COOLING
+            if heat_match and not cool_match:
+                return OperationAction.HEATING
+
+        if cool_sp is not None and heat_sp is not None:
+            cool_match = cool_sp == temp_sp
+            heat_match = heat_sp == temp_sp
+
+            if cool_match and not heat_match:
+                return OperationAction.COOLING
+            if heat_match and not cool_match:
+                return OperationAction.HEATING
+
+        return OperationAction.IDLE
 
     def get_humidity(self) -> int | None:
         """Return HVAC device humidity."""
@@ -338,6 +411,9 @@ class HVAC(Device):
     def update(self, data: dict[str, Any]) -> None:
         """Update HVAC device data."""
         super().update(data)
+
+        if API_ACTIVE in data:
+            self.active = bool(data[API_ACTIVE])
 
         if API_HUMIDITY in data:
             self.humidity = int(data[API_HUMIDITY])

@@ -3,6 +3,7 @@
 from datetime import timedelta
 from typing import Final
 
+API_ACTIVE: Final[str] = "active"
 API_AUTH_LOGIN: Final[str] = "auth/login"
 API_AUTH_REFRESH_TOKEN: Final[str] = "auth/refreshToken"
 API_CELSIUS: Final[str] = "celsius"
@@ -89,6 +90,8 @@ API_AZ_ZONE: Final[str] = "az_zone"
 
 API_DEFAULT_TEMP_STEP: Final[float] = 0.5
 
+AZD_ACTION: Final[str] = "action"
+AZD_ACTIVE: Final[str] = "active"
 AZD_AIDOOS: Final[str] = "aidoos"
 AZD_AVAILABLE: Final[str] = "available"
 AZD_CONNECTION_DATE: Final[str] = "connection-date"

@@ -13,6 +13,17 @@ class ConnectionOptions:
     password: str
 
 
+class OperationAction(IntEnum):
+    """Airzone Cloud operation actions."""
+
+    COOLING = 1
+    DRYING = 2
+    FAN = 3
+    HEATING = 4
+    IDLE = 5
+    OFF = 6
+
+
 class OperationMode(IntEnum):
     """Airzone Cloud operation modes."""
 
@@ -29,6 +40,10 @@ class OperationMode(IntEnum):
     COOLING_AIR = 10
     COOLING_RADIANT = 11
     COOLING_COMBINED = 12
+
+    def is_auto(self) -> bool:
+        """Return if mode is Auto."""
+        return self.value in [self.AUTO]
 
     def is_cool(self) -> bool:
         """Return if mode is Cool."""
