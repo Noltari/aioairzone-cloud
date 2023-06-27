@@ -11,12 +11,16 @@ from .const import (
     API_HUMIDITY,
     API_LOCAL_TEMP,
     API_POWER,
+    API_RANGE_MAX_AIR,
+    API_RANGE_MIN_AIR,
+    API_RANGE_SP_MAX_AUTO_AIR,
     API_RANGE_SP_MAX_COOL_AIR,
     API_RANGE_SP_MAX_DRY_AIR,
     API_RANGE_SP_MAX_EMERHEAT_AIR,
     API_RANGE_SP_MAX_HOT_AIR,
     API_RANGE_SP_MAX_STOP_AIR,
     API_RANGE_SP_MAX_VENT_AIR,
+    API_RANGE_SP_MIN_AUTO_AIR,
     API_RANGE_SP_MIN_COOL_AIR,
     API_RANGE_SP_MIN_DRY_AIR,
     API_RANGE_SP_MIN_EMERHEAT_AIR,
@@ -35,10 +39,12 @@ from .const import (
     AZD_POWER,
     AZD_TEMP,
     AZD_TEMP_SET,
+    AZD_TEMP_SET_AUTO_AIR,
     AZD_TEMP_SET_COOL_AIR,
     AZD_TEMP_SET_DRY_AIR,
     AZD_TEMP_SET_HOT_AIR,
     AZD_TEMP_SET_MAX,
+    AZD_TEMP_SET_MAX_AUTO_AIR,
     AZD_TEMP_SET_MAX_COOL_AIR,
     AZD_TEMP_SET_MAX_DRY_AIR,
     AZD_TEMP_SET_MAX_EMERHEAT_AIR,
@@ -46,6 +52,7 @@ from .const import (
     AZD_TEMP_SET_MAX_STOP_AIR,
     AZD_TEMP_SET_MAX_VENT_AIR,
     AZD_TEMP_SET_MIN,
+    AZD_TEMP_SET_MIN_AUTO_AIR,
     AZD_TEMP_SET_MIN_COOL_AIR,
     AZD_TEMP_SET_MIN_DRY_AIR,
     AZD_TEMP_SET_MIN_EMERHEAT_AIR,
@@ -70,18 +77,23 @@ class HVAC(Device):
         self.humidity: int | None = None
         self.name: str = "HVAC"
         self.power: bool | None = None
+        self.temp_set_max: float | None = None
+        self.temp_set_max_auto_air: float | None = None
         self.temp_set_max_cool_air: float | None = None
         self.temp_set_max_dry_air: float | None = None
         self.temp_set_max_emerheat_air: float | None = None
         self.temp_set_max_hot_air: float | None = None
         self.temp_set_max_stop_air: float | None = None
         self.temp_set_max_vent_air: float | None = None
+        self.temp_set_min: float | None = None
+        self.temp_set_min_auto_air: float | None = None
         self.temp_set_min_cool_air: float | None = None
         self.temp_set_min_dry_air: float | None = None
         self.temp_set_min_emerheat_air: float | None = None
         self.temp_set_min_hot_air: float | None = None
         self.temp_set_min_stop_air: float | None = None
         self.temp_set_min_vent_air: float | None = None
+        self.temp_set_auto_air: float | None = None
         self.temp_set_cool_air: float | None = None
         self.temp_set_dry_air: float | None = None
         self.temp_set_hot_air: float | None = None
@@ -107,6 +119,9 @@ class HVAC(Device):
         temp_set_max = self.get_temp_set_max()
         if temp_set_max is not None:
             data[AZD_TEMP_SET_MAX] = temp_set_max
+        temp_set_max_auto_air = self.get_temp_set_max_auto_air()
+        if temp_set_max_auto_air is not None:
+            data[AZD_TEMP_SET_MAX_AUTO_AIR] = temp_set_max_auto_air
         temp_set_max_cool_air = self.get_temp_set_max_cool_air()
         if temp_set_max_cool_air is not None:
             data[AZD_TEMP_SET_MAX_COOL_AIR] = temp_set_max_cool_air
@@ -129,6 +144,9 @@ class HVAC(Device):
         temp_set_min = self.get_temp_set_min()
         if temp_set_min is not None:
             data[AZD_TEMP_SET_MIN] = temp_set_min
+        temp_set_min_auto_air = self.get_temp_set_min_auto_air()
+        if temp_set_min_auto_air is not None:
+            data[AZD_TEMP_SET_MIN_AUTO_AIR] = temp_set_min_auto_air
         temp_set_min_cool_air = self.get_temp_set_min_cool_air()
         if temp_set_min_cool_air is not None:
             data[AZD_TEMP_SET_MIN_COOL_AIR] = temp_set_min_cool_air
@@ -151,6 +169,9 @@ class HVAC(Device):
         temp_set = self.get_temp_set()
         if temp_set is not None:
             data[AZD_TEMP_SET] = temp_set
+        temp_set_auto_air = self.get_temp_set_auto_air()
+        if temp_set_auto_air is not None:
+            data[AZD_TEMP_SET_AUTO_AIR] = temp_set_auto_air
         temp_set_cool_air = self.get_temp_set_cool_air()
         if temp_set_cool_air is not None:
             data[AZD_TEMP_SET_COOL_AIR] = temp_set_cool_air
@@ -201,8 +222,8 @@ class HVAC(Device):
     def get_auto_mode(self) -> OperationAction:
         """Return action from auto mode."""
         temp_sp = self.get_temp_set()
-        temp_min = self.get_temp_set_min()
-        temp_max = self.get_temp_set_max()
+        temp_min = self.temp_set_min
+        temp_max = self.temp_set_max
         cool_sp = self.get_temp_set_cool_air()
         cool_max = self.get_temp_set_max_cool_air()
         cool_min = self.get_temp_set_min_cool_air()
@@ -254,7 +275,9 @@ class HVAC(Device):
         temp_set: float | None = None
         mode = self.get_mode()
         if mode is not None:
-            if mode.is_cool():
+            if mode.is_auto():
+                temp_set = self.get_temp_set_auto_air()
+            elif mode.is_cool():
                 temp_set = self.get_temp_set_cool_air()
             elif mode.is_dry():
                 temp_set = self.get_temp_set_dry_air()
@@ -265,6 +288,12 @@ class HVAC(Device):
             elif mode.is_vent():
                 temp_set = self.get_temp_set_vent_air()
         return temp_set
+
+    def get_temp_set_auto_air(self) -> float | None:
+        """Return HVAC device setpoint for Auto Air."""
+        if self.temp_set_auto_air is not None:
+            return round(self.temp_set_auto_air, 1)
+        return None
 
     def get_temp_set_cool_air(self) -> float | None:
         """Return HVAC device setpoint for Cool Air."""
@@ -300,6 +329,8 @@ class HVAC(Device):
         """Return HVAC device max setpoint."""
         max_temp: float | None = None
         temps = [
+            self.temp_set_max,
+            self.get_temp_set_max_auto_air(),
             self.get_temp_set_max_cool_air(),
             self.get_temp_set_max_dry_air(),
             self.get_temp_set_max_emerheat_air(),
@@ -312,6 +343,12 @@ class HVAC(Device):
                 if max_temp is None or temp > max_temp:
                     max_temp = temp
         return max_temp
+
+    def get_temp_set_max_auto_air(self) -> float | None:
+        """Return HVAC device max setpoint for Auto Air."""
+        if self.temp_set_max_auto_air is not None:
+            return round(self.temp_set_max_auto_air, 1)
+        return None
 
     def get_temp_set_max_cool_air(self) -> float | None:
         """Return HVAC device max setpoint for Cool Air."""
@@ -353,6 +390,8 @@ class HVAC(Device):
         """Return HVAC device min setpoint."""
         min_temp: float | None = None
         temps = [
+            self.temp_set_min,
+            self.get_temp_set_min_auto_air(),
             self.get_temp_set_min_cool_air(),
             self.get_temp_set_min_dry_air(),
             self.get_temp_set_min_emerheat_air(),
@@ -365,6 +404,12 @@ class HVAC(Device):
                 if min_temp is None or temp < min_temp:
                     min_temp = temp
         return min_temp
+
+    def get_temp_set_min_auto_air(self) -> float | None:
+        """Return HVAC device min setpoint for Auto Air."""
+        if self.temp_set_min_auto_air:
+            return round(self.temp_set_min_auto_air, 1)
+        return None
 
     def get_temp_set_min_cool_air(self) -> float | None:
         """Return HVAC device min setpoint for Cool Air."""
@@ -425,6 +470,14 @@ class HVAC(Device):
         if API_POWER in data:
             self.power = bool(data[API_POWER])
 
+        if API_RANGE_MAX_AIR in data:
+            if API_CELSIUS in data[API_RANGE_MAX_AIR]:
+                self.temp_set_max = float(data[API_RANGE_MAX_AIR][API_CELSIUS])
+        if API_RANGE_SP_MAX_AUTO_AIR in data:
+            if API_CELSIUS in data[API_RANGE_SP_MAX_AUTO_AIR]:
+                self.temp_set_max_auto_air = float(
+                    data[API_RANGE_SP_MAX_AUTO_AIR][API_CELSIUS]
+                )
         if API_RANGE_SP_MAX_COOL_AIR in data:
             if API_CELSIUS in data[API_RANGE_SP_MAX_COOL_AIR]:
                 self.temp_set_max_cool_air = float(
@@ -456,6 +509,14 @@ class HVAC(Device):
                     data[API_RANGE_SP_MAX_VENT_AIR][API_CELSIUS]
                 )
 
+        if API_RANGE_MIN_AIR in data:
+            if API_CELSIUS in data[API_RANGE_MIN_AIR]:
+                self.temp_set_min = float(data[API_RANGE_MIN_AIR][API_CELSIUS])
+        if API_RANGE_SP_MIN_AUTO_AIR in data:
+            if API_CELSIUS in data[API_RANGE_SP_MIN_AUTO_AIR]:
+                self.temp_set_min_auto_air = float(
+                    data[API_RANGE_SP_MIN_AUTO_AIR][API_CELSIUS]
+                )
         if API_RANGE_SP_MIN_COOL_AIR in data:
             if API_CELSIUS in data[API_RANGE_SP_MIN_COOL_AIR]:
                 self.temp_set_min_cool_air = float(
