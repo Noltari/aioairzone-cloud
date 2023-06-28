@@ -192,7 +192,6 @@ class HVAC(Device):
 
     def get_action(self) -> OperationAction:
         """Return HVAC action."""
-
         if self.get_power():
             if self.get_active():
                 mode = self.get_mode() or OperationMode.STOP
@@ -205,56 +204,36 @@ class HVAC(Device):
                 elif mode.is_dry():
                     action = OperationAction.DRYING
                 elif mode.is_auto():
-                    action = self.get_auto_mode()
+                    action = self.get_action_auto()
                 else:
                     action = OperationAction.OFF
             else:
                 action = OperationAction.IDLE
         else:
             action = OperationAction.OFF
+        return action
 
+    def get_action_auto(self) -> OperationAction:
+        """Return current Auto action."""
+        mode = self.get_mode_auto()
+        if mode is not None:
+            if mode.is_cool():
+                action = OperationAction.COOLING
+            elif mode.is_heat():
+                action = OperationAction.HEATING
+            elif mode.is_vent():
+                action = OperationAction.FAN
+            elif mode.is_dry():
+                action = OperationAction.DRYING
+            else:
+                action = OperationAction.IDLE
+        else:
+            action = OperationAction.IDLE
         return action
 
     def get_active(self) -> bool | None:
         """Return HVAC device active status."""
         return self.active
-
-    def get_auto_mode(self) -> OperationAction:
-        """Return action from auto mode."""
-        temp_sp = self.get_temp_set()
-        temp_min = self.temp_set_min
-        temp_max = self.temp_set_max
-        cool_sp = self.get_temp_set_cool_air()
-        cool_max = self.get_temp_set_max_cool_air()
-        cool_min = self.get_temp_set_min_cool_air()
-        heat_sp = self.get_temp_set_hot_air()
-        heat_max = self.get_temp_set_max_hot_air()
-        heat_min = self.get_temp_set_min_hot_air()
-
-        if (
-            cool_max is not None
-            and cool_min is not None
-            and heat_max is not None
-            and heat_min is not None
-        ):
-            cool_match = cool_max == temp_max and cool_min == temp_min
-            heat_match = heat_max == temp_max and heat_min == temp_min
-
-            if cool_match and not heat_match:
-                return OperationAction.COOLING
-            if heat_match and not cool_match:
-                return OperationAction.HEATING
-
-        if cool_sp is not None and heat_sp is not None:
-            cool_match = cool_sp == temp_sp
-            heat_match = heat_sp == temp_sp
-
-            if cool_match and not heat_match:
-                return OperationAction.COOLING
-            if heat_match and not cool_match:
-                return OperationAction.HEATING
-
-        return OperationAction.IDLE
 
     def get_humidity(self) -> int | None:
         """Return HVAC device humidity."""

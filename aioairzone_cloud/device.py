@@ -20,6 +20,7 @@ from .const import (
     AZD_INSTALLATION,
     AZD_IS_CONNECTED,
     AZD_MODE,
+    AZD_MODE_AUTO,
     AZD_MODES,
     AZD_NAME,
     AZD_PROBLEMS,
@@ -38,6 +39,7 @@ class Device(ABC):
 
     def __init__(self, inst_id: str, ws_id: str, device_data: dict[str, Any]):
         """Airzone Cloud Device init."""
+        self.auto_mode: OperationMode | None = None
         self.errors: list[str] = []
         self.id = str(device_data[API_DEVICE_ID])
         self.installation_id = inst_id
@@ -70,6 +72,10 @@ class Device(ABC):
         errors = self.get_errors()
         if len(errors) > 0:
             data[AZD_ERRORS] = errors
+
+        mode_auto = self.get_mode_auto()
+        if mode_auto is not None:
+            data[AZD_MODE_AUTO] = mode_auto
 
         modes = self.get_modes()
         if modes is not None:
@@ -104,6 +110,10 @@ class Device(ABC):
     def get_mode(self) -> OperationMode | None:
         """Return Device mode."""
         return self.mode
+
+    def get_mode_auto(self) -> OperationMode | None:
+        """Return current auto mode."""
+        return self.auto_mode
 
     def get_modes(self) -> list[OperationMode] | None:
         """Return Device modes."""
