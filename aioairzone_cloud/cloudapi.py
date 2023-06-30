@@ -23,6 +23,7 @@ from .const import (
     API_DEVICE_TYPE,
     API_DEVICES,
     API_EMAIL,
+    API_GROUP,
     API_GROUPS,
     API_INSTALLATION_ID,
     API_INSTALLATIONS,
@@ -41,6 +42,7 @@ from .const import (
     API_WS,
     API_WS_ID,
     AZD_AIDOOS,
+    AZD_GROUPS,
     AZD_INSTALLATIONS,
     AZD_SYSTEMS,
     AZD_WEBSERVERS,
@@ -65,6 +67,7 @@ from .exceptions import (
     TokenRefreshError,
     TooManyRequests,
 )
+from .group import Group
 from .installation import Installation
 from .system import System
 from .webserver import WebServer
@@ -90,6 +93,7 @@ class AirzoneCloudApi:
         }
         self.aidoos: dict[str, Aidoo] = {}
         self.aiohttp_session = aiohttp_session
+        self.groups: dict[str, Group] = {}
         self.installations: dict[str, Installation] = {}
         self.options = options
         self.refresh_time: datetime | None = None
@@ -244,6 +248,19 @@ class AirzoneCloudApi:
             json,
         )
 
+    async def api_put_group(self, group: Group, json: dict[str, Any]) -> dict[str, Any]:
+        """Perform a PUT request to update group parameters."""
+        grp_id = group.get_id()
+        grp_url = urllib.parse.quote(grp_id)
+        inst_id = group.get_installation()
+        inst_url = urllib.parse.quote(inst_id)
+
+        return await self.api_request(
+            "PUT",
+            f"{API_V1}/{API_INSTALLATIONS}/{inst_url}/{API_GROUP}/{grp_url}",
+            json,
+        )
+
     async def api_set_device_param(
         self, device: Device, param: str, data: dict[str, Any]
     ) -> None:
@@ -272,6 +289,12 @@ class AirzoneCloudApi:
 
         await asyncio.gather(*tasks)
 
+    async def api_set_group_params(self, group: Group, params: dict[str, Any]) -> None:
+        """Set group parameters."""
+        await self.api_put_group(group, params)
+
+        group.set_params(params)
+
     async def api_set_aidoo_id_params(
         self, aidoo_id: str, params: dict[str, Any]
     ) -> None:
@@ -291,6 +314,14 @@ class AirzoneCloudApi:
         )
         if device is not None:
             await self.api_set_device_params(device, params)
+
+    async def api_set_group_id_params(
+        self, group_id: str, params: dict[str, Any]
+    ) -> None:
+        """Set group parameters."""
+        group = self.get_group_id(group_id)
+        if group is not None:
+            await self.api_set_group_params(group, params)
 
     async def api_set_system_id_params(
         self, system_id: str, params: dict[str, Any]
@@ -371,6 +402,12 @@ class AirzoneCloudApi:
                 aidoos[key] = aidoo.data()
             data[AZD_AIDOOS] = aidoos
 
+        if len(self.groups) > 0:
+            groups: dict[str, Any] = {}
+            for key, group in self.groups.items():
+                groups[key] = group.data()
+            data[AZD_GROUPS] = groups
+
         if len(self.installations) > 0:
             installations: dict[str, Any] = {}
             for key, installation in self.installations.items():
@@ -400,6 +437,10 @@ class AirzoneCloudApi:
     def get_aidoo_id(self, aidoo_id: str) -> Aidoo | None:
         """Return Airzone Cloud Aidoo by ID."""
         return self.aidoos.get(aidoo_id)
+
+    def get_group_id(self, group_id: str) -> Group | None:
+        """Return Airzone Cloud Group by ID."""
+        return self.groups.get(group_id)
 
     def get_installation_id(self, inst_id: str) -> Installation | None:
         """Return Airzone Cloud Installation by ID."""
@@ -472,13 +513,16 @@ class AirzoneCloudApi:
     async def update_installation(self, inst: Installation) -> None:
         """Update Airzone Cloud installation from API."""
         installation_data = await self.api_get_installation(inst)
-        for group in installation_data[API_GROUPS]:
-            for device_data in group[API_DEVICES]:
+        for group_data in installation_data[API_GROUPS]:
+            group = Group(inst.get_id(), group_data)
+            self.groups[group.get_id()] = group
+            for device_data in group_data[API_DEVICES]:
                 if API_AZ_ZONE == device_data[API_TYPE]:
                     if self.get_zone_id(device_data[API_DEVICE_ID]) is None:
                         zone = Zone(inst.get_id(), device_data[API_WS_ID], device_data)
                         if zone is not None:
                             self.zones[zone.get_id()] = zone
+                            group.add_zone(zone)
                 elif API_AZ_SYSTEM == device_data[API_TYPE]:
                     if self.get_system_id(device_data[API_DEVICE_ID]) is None:
                         system = System(
@@ -486,6 +530,7 @@ class AirzoneCloudApi:
                         )
                         if system is not None:
                             self.systems[system.get_id()] = system
+                            group.add_system(system)
                 elif API_AZ_AIDOO == device_data[API_TYPE]:
                     if self.get_aidoo_id(device_data[API_DEVICE_ID]) is None:
                         aidoo = Aidoo(
@@ -493,6 +538,7 @@ class AirzoneCloudApi:
                         )
                         if aidoo is not None:
                             self.aidoos[aidoo.get_id()] = aidoo
+                            group.add_aidoo(aidoo)
 
     async def update_installations(self) -> None:
         """Update Airzone Cloud installations from API."""
