@@ -155,25 +155,31 @@ class Device(ABC):
 
     def update(self, data: dict[str, Any]) -> None:
         """Update Device data."""
-        if API_IS_CONNECTED in data:
-            self.is_connected = bool(data[API_IS_CONNECTED])
-        if API_WS_CONNECTED in data:
-            self.ws_connected = bool(data[API_WS_CONNECTED])
+        is_connected = data.get(API_IS_CONNECTED)
+        if is_connected is not None:
+            self.is_connected = bool(is_connected)
+        ws_connected = data.get(API_WS_CONNECTED)
+        if ws_connected is not None:
+            self.ws_connected = bool(ws_connected)
 
-        if API_ERRORS in data:
+        errors = data.get(API_ERRORS)
+        if errors is not None:
             self.errors = []
-            for error in data[API_ERRORS]:
+            for error in errors:
                 self.errors += [error]
 
-        if API_MODE in data:
-            self.mode = OperationMode(data[API_MODE])
-        if API_MODE_AVAIL in data and len(data[API_MODE_AVAIL]) > 0:
+        mode = data.get(API_MODE)
+        if mode is not None:
+            self.mode = OperationMode(mode)
+        mode_avail = data.get(API_MODE_AVAIL)
+        if mode_avail is not None and len(mode_avail) > 0:
             modes = []
-            for mode in data[API_MODE_AVAIL]:
+            for mode in mode_avail:
                 modes += [OperationMode(mode)]
             self.modes = modes
 
-        if API_WARNINGS in data:
+        warnings = data.get(API_WARNINGS)
+        if warnings is not None:
             self.warnings = []
-            for warning in data[API_WARNINGS]:
+            for warning in warnings:
                 self.warnings += [warning]

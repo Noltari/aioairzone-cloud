@@ -55,32 +55,42 @@ class WebServer:
     def update(self, data: dict[str, Any]) -> None:
         """Update WebServer data."""
 
-        if API_WS_TYPE in data:
-            self.type = str(data[API_WS_TYPE])
+        ws_type = data.get(API_WS_TYPE)
+        if ws_type is not None:
+            self.type = str(ws_type)
 
         ws_config = data.get(API_CONFIG)
         if ws_config is not None:
-            if API_STAT_AP_MAC in ws_config:
-                self.wifi_mac = str(ws_config[API_STAT_AP_MAC])
-            if API_STAT_CHANNEL in ws_config:
-                self.wifi_channel = int(ws_config[API_STAT_CHANNEL])
-            if API_STAT_SSID in ws_config:
-                self.wifi_ssid = str(ws_config[API_STAT_SSID])
-            if API_WS_FW in ws_config:
-                self.firmware = str(ws_config[API_WS_FW])
+            stat_ap_mac = ws_config.get(API_STAT_AP_MAC)
+            if stat_ap_mac is not None:
+                self.wifi_mac = str(stat_ap_mac)
+            stat_channel = ws_config.get(API_STAT_CHANNEL)
+            if stat_channel is not None:
+                self.wifi_channel = int(stat_channel)
+            stat_ssid = ws_config.get(API_STAT_SSID)
+            if stat_ssid is not None:
+                self.wifi_ssid = str(stat_ssid)
+            ws_fw = ws_config.get(API_WS_FW)
+            if ws_fw is not None:
+                self.firmware = str(ws_fw)
 
         ws_status = data.get(API_STATUS)
         if ws_status is not None:
-            if API_CONNECTION_DATE in ws_status:
-                self.connection_date = str(ws_status[API_CONNECTION_DATE])
-            if API_DISCONNECTION_DATE in ws_status:
-                self.disconnection_date = str(ws_status[API_DISCONNECTION_DATE])
-            if API_IS_CONNECTED in ws_status:
-                self.is_connected = bool(ws_status[API_IS_CONNECTED])
-            if API_STAT_QUALITY in ws_status:
-                self.wifi_quality = int(ws_status[API_STAT_QUALITY])
-            if API_STAT_RSSI in ws_status:
-                self.wifi_rssi = int(ws_status[API_STAT_RSSI])
+            connection_date = ws_status.get(API_CONNECTION_DATE)
+            if connection_date is not None:
+                self.connection_date = str(connection_date)
+            disconnection_date = ws_status.get(API_DISCONNECTION_DATE)
+            if disconnection_date is not None:
+                self.disconnection_date = str(disconnection_date)
+            is_connected = ws_status.get(API_IS_CONNECTED)
+            if is_connected is not None:
+                self.is_connected = bool(is_connected)
+            stat_quality = ws_status.get(API_STAT_QUALITY)
+            if stat_quality is not None:
+                self.wifi_quality = int(stat_quality)
+            stat_rssi = ws_status.get(API_STAT_RSSI)
+            if stat_rssi is not None:
+                self.wifi_rssi = int(stat_rssi)
 
     def data(self) -> dict[str, Any]:
         """Return WebServer data."""
