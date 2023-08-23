@@ -1,8 +1,8 @@
 """Airzone Cloud API Device."""
 from __future__ import annotations
 
-import logging
 from abc import ABC, abstractmethod
+import logging
 from typing import Any
 
 from .common import OperationMode
