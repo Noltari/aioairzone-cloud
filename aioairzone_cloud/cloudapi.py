@@ -2,10 +2,10 @@
 from __future__ import annotations
 
 import asyncio
-import logging
-import urllib.parse
 from datetime import datetime
+import logging
 from typing import Any, cast
+import urllib.parse
 
 from aiohttp import ClientConnectorError, ClientResponseError, ClientSession
 from aiohttp.client_reqrep import ClientResponse
