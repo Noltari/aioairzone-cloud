@@ -93,11 +93,11 @@ class Zone(HVAC):
             if self.system is not None:
                 self.system.set_param(param, data)
             else:
-                self.set_mode(data[API_VALUE])
+                self.set_mode(data[param])
         elif param == API_POWER:
-            self.set_power(data[API_VALUE])
+            self.set_power(data[param])
         elif param == API_SETPOINT:
-            self.set_setpoint(data[API_VALUE])
+            self.set_setpoint(data[param])
 
     def set_system(self, system: System) -> None:
         """Set System."""

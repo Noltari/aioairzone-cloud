@@ -2,10 +2,10 @@
 from __future__ import annotations
 
 import asyncio
-from datetime import datetime
 import logging
-from typing import Any, cast
 import urllib.parse
+from datetime import datetime
+from typing import Any, cast
 
 from aiohttp import ClientConnectorError, ClientResponseError, ClientSession
 from aiohttp.client_reqrep import ClientResponse
@@ -265,9 +265,12 @@ class AirzoneCloudApi:
         self, device: Device, param: str, data: dict[str, Any]
     ) -> None:
         """Set device parameter."""
+        if param == API_OPTS:
+            return
+
         json = {
             API_PARAM: param,
-            API_VALUE: data[API_VALUE],
+            API_VALUE: data[param],
             API_INSTALLATION_ID: device.get_installation(),
         }
 
@@ -285,9 +288,15 @@ class AirzoneCloudApi:
         tasks = []
 
         for param, data in params.items():
-            tasks += [self.api_set_device_param(device, param, data)]
+            tasks += [self.api_set_device_param(device, param, params)]
 
         await asyncio.gather(*tasks)
+
+    async def set_hvac_parameters(
+        self, system_id: str, zone_id: str, params: dict[str, Any]  # remove system_id
+    ) -> dict[str, Any]:
+        """Set Airzone HVAC parameters."""
+        await self.api_set_device_params(self.zones[zone_id], params)
 
     async def api_set_group_params(self, group: Group, params: dict[str, Any]) -> None:
         """Set group parameters."""

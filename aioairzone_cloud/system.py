@@ -57,6 +57,6 @@ class System(Device):
         """Update device parameter from API request."""
 
         if param == API_MODE:
-            self.set_mode(data[API_VALUE])
+            self.set_mode(data[param])
             for zone in self.zones.values():
-                zone.set_mode(data[API_VALUE])
+                zone.set_mode(data[param])
