@@ -1,8 +1,8 @@
 """Airzone Cloud API Device."""
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
 import logging
+from abc import ABC, abstractmethod
 from typing import Any
 
 from .common import OperationMode
@@ -155,22 +155,19 @@ class Device(ABC):
 
     def update(self, data: dict[str, Any]) -> None:
         """Update Device data."""
-        is_connected = data.get(API_IS_CONNECTED)
-        if is_connected is not None:
-            self.is_connected = bool(is_connected)
-        ws_connected = data.get(API_WS_CONNECTED)
-        if ws_connected is not None:
-            self.ws_connected = bool(ws_connected)
+        if API_IS_CONNECTED in data:
+            self.is_connected = bool(data[API_IS_CONNECTED])
+        if API_WS_CONNECTED in data:
+            self.ws_connected = bool(data[API_WS_CONNECTED])
 
-        errors = data.get(API_ERRORS)
-        if errors is not None:
+        if API_ERRORS in data:
             self.errors = []
-            for error in errors:
+            for error in data.get(API_ERRORS):
                 self.errors += [error]
 
-        mode = data.get(API_MODE)
-        if mode is not None:
-            self.mode = OperationMode(mode)
+        if API_MODE in data:
+            self.mode = OperationMode(data.get(API_MODE))
+
         mode_avail = data.get(API_MODE_AVAIL)
         if mode_avail is not None and len(mode_avail) > 0:
             modes = []
@@ -178,8 +175,7 @@ class Device(ABC):
                 modes += [OperationMode(mode)]
             self.modes = modes
 
-        warnings = data.get(API_WARNINGS)
-        if warnings is not None:
+        if API_WARNINGS in data:
             self.warnings = []
-            for warning in warnings:
+            for warning in data.get(API_WARNINGS):
                 self.warnings += [warning]
