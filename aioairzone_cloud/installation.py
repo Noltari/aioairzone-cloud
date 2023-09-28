@@ -3,8 +3,16 @@ from __future__ import annotations
 
 from typing import Any
 
-from .const import API_INSTALLATION_ID, API_NAME, API_WS_IDS, AZD_WEBSERVERS
+from .const import (
+    API_INSTALLATION_ID,
+    API_NAME,
+    API_WS_IDS,
+    AZD_GROUPS,
+    AZD_NUM_GROUPS,
+    AZD_WEBSERVERS,
+)
 from .device_group import DeviceGroup
+from .group import Group
 
 
 class Installation(DeviceGroup):
@@ -14,6 +22,7 @@ class Installation(DeviceGroup):
         """Airzone Cloud Installation init."""
         super().__init__()
 
+        self.groups: dict[str, Group] = {}
         self.id = str(inst_data[API_INSTALLATION_ID])
         self.webservers: list[str] = []
 
@@ -30,9 +39,23 @@ class Installation(DeviceGroup):
         """Return Installation data."""
         data = super().data()
 
+        if len(self.groups) > 0:
+            data[AZD_GROUPS] = list(self.groups)
+
+        data[AZD_NUM_GROUPS] = self.get_groups_num()
         data[AZD_WEBSERVERS] = self.get_webservers()
 
         return data
+
+    def add_group(self, group: Group) -> None:
+        """Add Group to Installation."""
+        group_id = group.get_id()
+        if group_id not in self.groups:
+            self.groups[group_id] = group
+
+    def get_groups_num(self) -> int:
+        """Return Groups count."""
+        return len(self.groups)
 
     def get_id(self) -> str:
         """Return Installation ID."""

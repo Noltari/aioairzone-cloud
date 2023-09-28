@@ -544,6 +544,7 @@ class AirzoneCloudApi:
         installation_data = await self.api_get_installation(inst)
         for group_data in installation_data[API_GROUPS]:
             group = Group(inst.get_id(), group_data)
+            inst.add_group(group)
             self.groups[group.get_id()] = group
             for device_data in group_data[API_DEVICES]:
                 if API_AZ_ZONE == device_data[API_TYPE]:
