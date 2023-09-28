@@ -64,9 +64,9 @@ class Zone(HVAC):
 
         return data
 
-    def get_master(self) -> bool | None:
+    def get_master(self) -> bool:
         """Return Zone device master/slave."""
-        return self.master
+        return self.master or False
 
     def get_system_id(self) -> str | None:
         """Return Zone device System ID."""
