@@ -19,8 +19,13 @@ class Installation:
     def __init__(self, inst_data: dict[str, Any]):
         """Airzone Cloud Installation init."""
         self.id = str(inst_data[API_INSTALLATION_ID])
-        self.name = str(inst_data[API_NAME])
         self.webservers: list[str] = []
+
+        name: str = inst_data.get(API_NAME, "")
+        if len(name) > 0:
+            self.name = name
+        else:
+            self.name = "Installation"
 
         for ws_id in inst_data[API_WS_IDS]:
             self.webservers += [ws_id]

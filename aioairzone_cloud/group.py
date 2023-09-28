@@ -47,8 +47,9 @@ class Group:
         self.systems: dict[str, System] = {}
         self.zones: dict[str, Zone] = {}
 
-        if API_NAME in group_data:
-            self.name = str(group_data[API_NAME])
+        name: str = group_data.get(API_NAME, "")
+        if len(name) > 0:
+            self.name = name
         else:
             self.name = "Group"
 
