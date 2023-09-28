@@ -3,21 +3,17 @@ from __future__ import annotations
 
 from typing import Any
 
-from .const import (
-    API_INSTALLATION_ID,
-    API_NAME,
-    API_WS_IDS,
-    AZD_ID,
-    AZD_NAME,
-    AZD_WEBSERVERS,
-)
+from .const import API_INSTALLATION_ID, API_NAME, API_WS_IDS, AZD_WEBSERVERS
+from .device_group import DeviceGroup
 
 
-class Installation:
+class Installation(DeviceGroup):
     """Airzone Cloud Installation."""
 
-    def __init__(self, inst_data: dict[str, Any]):
+    def __init__(self, inst_data: dict[str, Any]) -> None:
         """Airzone Cloud Installation init."""
+        super().__init__()
+
         self.id = str(inst_data[API_INSTALLATION_ID])
         self.webservers: list[str] = []
 
@@ -32,11 +28,9 @@ class Installation:
 
     def data(self) -> dict[str, Any]:
         """Return Installation data."""
-        data: dict[str, Any] = {
-            AZD_ID: self.get_id(),
-            AZD_NAME: self.get_name(),
-            AZD_WEBSERVERS: self.get_webservers(),
-        }
+        data = super().data()
+
+        data[AZD_WEBSERVERS] = self.get_webservers()
 
         return data
 
