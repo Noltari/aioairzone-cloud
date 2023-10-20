@@ -11,7 +11,7 @@ from aiohttp import ClientConnectorError, ClientResponseError, ClientSession
 from aiohttp.client_reqrep import ClientResponse
 
 from .aidoo import Aidoo
-from .common import ConnectionOptions
+from .common import ConnectionOptions, OperationMode
 from .const import (
     API_AUTH_LOGIN,
     API_AUTH_REFRESH_TOKEN,
@@ -27,6 +27,7 @@ from .const import (
     API_GROUPS,
     API_INSTALLATION_ID,
     API_INSTALLATIONS,
+    API_MODE,
     API_OPTS,
     API_PARAM,
     API_PASSWORD,
@@ -274,13 +275,42 @@ class AirzoneCloudApi:
             json,
         )
 
+    async def api_conv_device_mode(
+        self, modes: list[OperationMode], mode: OperationMode
+    ) -> OperationMode:
+        """Convert Home Assistant Operation Mode into its corresponding API value."""
+        if mode == OperationMode.COOLING:
+            if OperationMode.COOLING_COMBINED in modes:
+                mode = OperationMode.COOLING_COMBINED
+            elif OperationMode.COOLING_AIR in modes:
+                mode = OperationMode.COOLING_AIR
+            elif OperationMode.COOLING_RADIANT in modes:
+                mode = OperationMode.COOLING_RADIANT
+        elif mode == OperationMode.HEATING:
+            if OperationMode.HEAT_COMBINED in modes:
+                mode = OperationMode.HEAT_COMBINED
+            elif OperationMode.HEAT_AIR in modes:
+                mode = OperationMode.HEAT_AIR
+            elif OperationMode.HEAT_RADIANT in modes:
+                mode = OperationMode.HEAT_RADIANT
+            elif OperationMode.EMERGENCY_HEAT in modes:
+                mode = OperationMode.EMERGENCY_HEAT
+        return mode
+
     async def api_set_device_param(
         self, device: Device, param: str, data: dict[str, Any]
     ) -> None:
         """Set device parameter."""
+        value = data[API_VALUE]
+
+        if API_PARAM == API_MODE:
+            modes = device.get_modes() or []
+            if value not in modes:
+                value = self.api_conv_device_mode(modes, value)
+
         json = {
             API_PARAM: param,
-            API_VALUE: data[API_VALUE],
+            API_VALUE: value,
             API_INSTALLATION_ID: device.get_installation(),
         }
 
