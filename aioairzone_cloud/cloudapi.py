@@ -301,12 +301,10 @@ class AirzoneCloudApi:
         self, device: Device, param: str, data: dict[str, Any]
     ) -> None:
         """Set device parameter."""
-        value = data[API_VALUE]
-
         if param == API_MODE:
             modes = device.get_modes() or []
-            if value not in modes:
-                value = self.api_conv_device_mode(modes, value)
+            if data[API_VALUE] not in modes:
+                data[API_VALUE] = self.api_conv_device_mode(modes, data[API_VALUE])
 
             if isinstance(device, Zone) and not device.get_master():
                 # Mode can't be changed on slave zones
@@ -316,7 +314,7 @@ class AirzoneCloudApi:
 
         json = {
             API_PARAM: param,
-            API_VALUE: value,
+            API_VALUE: data[API_VALUE],
             API_INSTALLATION_ID: device.get_installation(),
         }
 
