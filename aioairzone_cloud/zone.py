@@ -68,6 +68,12 @@ class Zone(HVAC):
         """Return Zone device master/slave."""
         return self.master or False
 
+    def get_system(self) -> System | None:
+        """Return Zone device System."""
+        if self.system is not None:
+            return self.system
+        return None
+
     def get_system_id(self) -> str | None:
         """Return Zone device System ID."""
         if self.system is not None:

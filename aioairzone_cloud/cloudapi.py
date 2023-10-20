@@ -275,7 +275,7 @@ class AirzoneCloudApi:
             json,
         )
 
-    async def api_conv_device_mode(
+    def api_conv_device_mode(
         self, modes: list[OperationMode], mode: OperationMode
     ) -> OperationMode:
         """Convert Home Assistant Operation Mode into its corresponding API value."""
@@ -303,10 +303,16 @@ class AirzoneCloudApi:
         """Set device parameter."""
         value = data[API_VALUE]
 
-        if API_PARAM == API_MODE:
+        if param == API_MODE:
             modes = device.get_modes() or []
             if value not in modes:
                 value = self.api_conv_device_mode(modes, value)
+
+            if isinstance(device, Zone) and not device.get_master():
+                # Mode can't be changed on slave zones
+                system = device.get_system()
+                if system is not None:
+                    device = system
 
         json = {
             API_PARAM: param,
