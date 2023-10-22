@@ -659,6 +659,11 @@ class AirzoneCloudApi:
 
         await asyncio.gather(*tasks)
 
+    async def update_systems_zones(self) -> None:
+        """Update all Airzone Cloud Systems/Zones."""
+        await self.update_systems()
+        await self.update_zones()
+
     async def update_webserver(self, ws: WebServer, devices: bool) -> None:
         """Update Airzone Cloud WebServer from API."""
         ws_data = await self.api_get_webserver(ws, devices)
@@ -729,8 +734,7 @@ class AirzoneCloudApi:
     async def _update(self) -> None:
         tasks = [
             self.update_webservers(False),
-            self.update_systems(),
-            self.update_zones(),
+            self.update_systems_zones(),
             self.update_aidoos(),
         ]
 
