@@ -30,6 +30,7 @@ from .const import (
     API_MODE,
     API_OPTS,
     API_PARAM,
+    API_PARAMS,
     API_PASSWORD,
     API_REFRESH_TOKEN,
     API_STATUS,
@@ -275,7 +276,7 @@ class AirzoneCloudApi:
             json,
         )
 
-    def api_conv_device_mode(
+    def api_conv_special_mode(
         self, modes: list[OperationMode], mode: OperationMode
     ) -> OperationMode:
         """Convert Home Assistant Operation Mode into its corresponding API value."""
@@ -304,7 +305,9 @@ class AirzoneCloudApi:
         if param == API_MODE:
             modes = device.get_modes() or []
             if data[API_VALUE] not in modes:
-                data[API_VALUE] = self.api_conv_device_mode(modes, data[API_VALUE])
+                data[API_VALUE] = self.api_conv_special_mode(
+                    modes, data[API_VALUE]
+                ).value
 
             if isinstance(device, Zone) and not device.get_master():
                 # Mode can't be changed on slave zones
@@ -338,6 +341,14 @@ class AirzoneCloudApi:
 
     async def api_set_group_params(self, group: Group, params: dict[str, Any]) -> None:
         """Set group parameters."""
+        for key, value in params.get(API_PARAMS, {}).items():
+            if key == API_MODE:
+                modes = group.get_modes() or []
+                if value not in modes:
+                    params[API_PARAMS][key] = self.api_conv_special_mode(
+                        modes, value
+                    ).value
+
         await self.api_put_group(group, params)
 
         group.set_params(params)
@@ -346,6 +357,14 @@ class AirzoneCloudApi:
         self, inst: Installation, params: dict[str, Any]
     ) -> None:
         """Set installation parameters."""
+        for key, value in params.get(API_PARAMS, {}).items():
+            if key == API_MODE:
+                modes = inst.get_modes() or []
+                if value not in modes:
+                    params[API_PARAMS][key] = self.api_conv_special_mode(
+                        modes, value
+                    ).value
+
         await self.api_put_installation(inst, params)
 
         inst.set_params(params)
