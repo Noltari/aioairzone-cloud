@@ -3,14 +3,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from .const import (
-    API_CONFIG,
-    API_META,
-    API_MODE,
-    API_SYSTEM_NUMBER,
-    API_VALUE,
-    AZD_SYSTEM,
-)
+from .const import API_MODE, API_SYSTEM_NUMBER, API_VALUE, AZD_SYSTEM
 from .device import Device
 
 if TYPE_CHECKING:
@@ -26,11 +19,7 @@ class System(Device):
 
         self.zones: dict[str, Zone] = {}
 
-        if API_CONFIG in device_data:
-            sub_data = device_data[API_CONFIG]
-        else:
-            sub_data = device_data[API_META]
-
+        sub_data = self.sub_data(device_data)
         self.system_number = int(sub_data[API_SYSTEM_NUMBER])
 
         self.name = f"System {self.system_number}"

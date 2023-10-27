@@ -6,8 +6,6 @@ from typing import TYPE_CHECKING, Any
 from aioairzone_cloud.common import OperationMode
 
 from .const import (
-    API_CONFIG,
-    API_META,
     API_MODE,
     API_MODE_AVAIL,
     API_NAME,
@@ -37,11 +35,7 @@ class Zone(HVAC):
         self.master: bool | None = None
         self.system: System | None = None
 
-        if API_CONFIG in device_data:
-            sub_data = device_data[API_CONFIG]
-        else:
-            sub_data = device_data[API_META]
-
+        sub_data = self.sub_data(device_data)
         self.system_number = int(sub_data[API_SYSTEM_NUMBER])
         self.zone_number = int(sub_data[API_ZONE_NUMBER])
 

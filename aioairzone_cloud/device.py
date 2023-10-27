@@ -7,11 +7,14 @@ from typing import Any
 
 from .common import OperationMode
 from .const import (
+    API_CONFIG,
     API_DEVICE_ID,
     API_ERRORS,
     API_IS_CONNECTED,
+    API_META,
     API_MODE,
     API_MODE_AVAIL,
+    API_SYSTEM_NUMBER,
     API_WARNINGS,
     API_WS_CONNECTED,
     AZD_AVAILABLE,
@@ -54,6 +57,20 @@ class Device(ABC):
             self.is_connected = bool(device_data[API_IS_CONNECTED])
         else:
             self.is_connected = True
+
+    def sub_data(self, device_data: dict[str, Any]) -> dict[str, Any]:
+        """Get Device sub data."""
+        if API_META in device_data:
+            meta: dict[str, Any] = device_data.get(API_META, {})
+            if API_SYSTEM_NUMBER in meta:
+                return meta
+
+        if API_CONFIG in device_data:
+            config: dict[str, Any] = device_data.get(API_CONFIG, {})
+            if API_SYSTEM_NUMBER in config:
+                return config
+
+        return device_data
 
     def data(self) -> dict[str, Any]:
         """Return Device data."""
