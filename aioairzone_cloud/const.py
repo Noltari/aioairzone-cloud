@@ -94,6 +94,7 @@ API_WS_TYPE: Final[str] = "ws_type"
 API_ZONE_NUMBER: Final[str] = "zone_number"
 
 API_AZ_AIDOO: Final[str] = "aidoo"
+API_AZ_AIDOO_PRO: Final[str] = "aidoo_it"
 API_AZ_SYSTEM: Final[str] = "az_system"
 API_AZ_ZONE: Final[str] = "az_zone"
 

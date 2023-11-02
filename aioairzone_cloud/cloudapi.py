@@ -16,6 +16,7 @@ from .const import (
     API_AUTH_LOGIN,
     API_AUTH_REFRESH_TOKEN,
     API_AZ_AIDOO,
+    API_AZ_AIDOO_PRO,
     API_AZ_SYSTEM,
     API_AZ_ZONE,
     API_CONFIG,
@@ -600,14 +601,15 @@ class AirzoneCloudApi:
             inst.add_group(group)
             self.groups[group.get_id()] = group
             for device_data in group_data[API_DEVICES]:
-                if API_AZ_ZONE == device_data[API_TYPE]:
+                device_type = device_data[API_TYPE]
+                if device_type == API_AZ_ZONE:
                     if self.get_zone_id(device_data[API_DEVICE_ID]) is None:
                         zone = Zone(inst.get_id(), device_data[API_WS_ID], device_data)
                         if zone is not None:
                             self.zones[zone.get_id()] = zone
                             group.add_zone(zone)
                             inst.add_zone(zone)
-                elif API_AZ_SYSTEM == device_data[API_TYPE]:
+                elif device_type == API_AZ_SYSTEM:
                     if self.get_system_id(device_data[API_DEVICE_ID]) is None:
                         system = System(
                             inst.get_id(), device_data[API_WS_ID], device_data
@@ -616,7 +618,7 @@ class AirzoneCloudApi:
                             self.systems[system.get_id()] = system
                             group.add_system(system)
                             inst.add_system(system)
-                elif API_AZ_AIDOO == device_data[API_TYPE]:
+                elif device_type in [API_AZ_AIDOO, API_AZ_AIDOO_PRO]:
                     if self.get_aidoo_id(device_data[API_DEVICE_ID]) is None:
                         aidoo = Aidoo(
                             inst.get_id(), device_data[API_WS_ID], device_data
@@ -671,21 +673,22 @@ class AirzoneCloudApi:
         if devices:
             inst = self.get_installation_id(ws.get_installation())
             for device_data in ws_data[API_DEVICES]:
-                if API_AZ_ZONE == device_data[API_DEVICE_TYPE]:
+                device_type = device_data[API_DEVICE_TYPE]
+                if device_type == API_AZ_ZONE:
                     if self.get_zone_id(device_data[API_DEVICE_ID]) is None:
                         zone = Zone(ws.get_installation(), ws.get_id(), device_data)
                         if zone is not None:
                             self.zones[zone.get_id()] = zone
                             if inst is not None:
                                 inst.add_zone(zone)
-                elif API_AZ_SYSTEM == device_data[API_DEVICE_TYPE]:
+                elif device_type == API_AZ_SYSTEM:
                     if self.get_system_id(device_data[API_DEVICE_ID]) is None:
                         system = System(ws.get_installation(), ws.get_id(), device_data)
                         if system is not None:
                             self.systems[system.get_id()] = system
                             if inst is not None:
                                 inst.add_system(system)
-                elif API_AZ_AIDOO == device_data[API_DEVICE_TYPE]:
+                elif device_type in [API_AZ_AIDOO, API_AZ_AIDOO_PRO]:
                     if self.get_aidoo_id(device_data[API_DEVICE_ID]) is None:
                         aidoo = Aidoo(ws.get_installation(), ws.get_id(), device_data)
                         if aidoo is not None:
