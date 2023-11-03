@@ -84,7 +84,7 @@ class AirzoneCloudApi:
 
     def __init__(
         self,
-        aiohttp_session: ClientSession,
+        aiohttp_session: ClientSession | None,
         options: ConnectionOptions,
     ):
         """Airzone Cloud API init."""
@@ -95,7 +95,7 @@ class AirzoneCloudApi:
             RAW_WEBSERVERS: {},
         }
         self.aidoos: dict[str, Aidoo] = {}
-        self.aiohttp_session = aiohttp_session
+        self.aiohttp_session: ClientSession | None = aiohttp_session
         self.groups: dict[str, Group] = {}
         self.installations: dict[str, Installation] = {}
         self.options = options
@@ -112,12 +112,17 @@ class AirzoneCloudApi:
         """Airzone Cloud API request."""
         _LOGGER.debug("aiohttp request: /%s (params=%s)", path, json)
 
+        if self.aiohttp_session is None:
+            aiohttp_session = ClientSession()
+        else:
+            aiohttp_session = self.aiohttp_session
+
         headers: dict[str, str] = {}
         if self.token is not None:
             headers[HEADER_AUTHORIZATION] = f"{HEADER_BEARER} {self.token}"
 
         try:
-            resp: ClientResponse = await self.aiohttp_session.request(
+            resp: ClientResponse = await aiohttp_session.request(
                 method,
                 f"{API_URL}/{path}",
                 headers=headers,
@@ -141,6 +146,9 @@ class AirzoneCloudApi:
                 raise TooManyRequests(err) from err
 
             raise AirzoneCloudError(err) from err
+        finally:
+            if self.aiohttp_session is None:
+                await aiohttp_session.close()
 
         resp_json = await resp.json(content_type=None)
         _LOGGER.debug("aiohttp response: %s", resp_json)
@@ -333,12 +341,9 @@ class AirzoneCloudApi:
         self, device: Device, params: dict[str, Any]
     ) -> None:
         """Set device parameters."""
-        tasks = []
-
-        for param, data in params.items():
-            tasks += [self.api_set_device_param(device, param, data)]
-
-        await asyncio.gather(*tasks)
+        async with asyncio.TaskGroup() as tg:
+            for param, data in params.items():
+                tg.create_task(self.api_set_device_param(device, param, data))
 
     async def api_set_group_params(self, group: Group, params: dict[str, Any]) -> None:
         """Set group parameters."""
@@ -586,12 +591,9 @@ class AirzoneCloudApi:
 
     async def update_aidoos(self) -> None:
         """Update all Airzone Cloud Aidoos."""
-        tasks = []
-
-        for aidoo in self.aidoos.values():
-            tasks += [self.update_aidoo(aidoo)]
-
-        await asyncio.gather(*tasks)
+        async with asyncio.TaskGroup() as tg:
+            for aidoo in self.aidoos.values():
+                tg.create_task(self.update_aidoo(aidoo))
 
     async def update_installation(self, inst: Installation) -> None:
         """Update Airzone Cloud installation from API."""
@@ -654,12 +656,9 @@ class AirzoneCloudApi:
 
     async def update_systems(self) -> None:
         """Update all Airzone Cloud Systems."""
-        tasks = []
-
-        for system in self.systems.values():
-            tasks += [self.update_system(system)]
-
-        await asyncio.gather(*tasks)
+        async with asyncio.TaskGroup() as tg:
+            for system in self.systems.values():
+                tg.create_task(self.update_system(system))
 
     async def update_systems_zones(self) -> None:
         """Update all Airzone Cloud Systems/Zones."""
@@ -704,12 +703,9 @@ class AirzoneCloudApi:
 
     async def update_webservers(self, devices: bool) -> None:
         """Update all Airzone Cloud WebServers."""
-        tasks = []
-
-        for ws in self.webservers.values():
-            tasks += [self.update_webserver(ws, devices)]
-
-        await asyncio.gather(*tasks)
+        async with asyncio.TaskGroup() as tg:
+            for ws in self.webservers.values():
+                tg.create_task(self.update_webserver(ws, devices))
 
     async def update_zone(self, zone: Zone) -> None:
         """Update Airzone Cloud Zone from API."""
@@ -724,24 +720,18 @@ class AirzoneCloudApi:
 
     async def update_zones(self) -> None:
         """Update all Airzone Cloud Zones."""
-        tasks = []
-
-        for zone in self.zones.values():
-            tasks += [self.update_zone(zone)]
-
-        await asyncio.gather(*tasks)
+        async with asyncio.TaskGroup() as tg:
+            for zone in self.zones.values():
+                tg.create_task(self.update_zone(zone))
 
         for system in self.systems.values():
             self.set_system_zones_data(system)
 
     async def _update(self) -> None:
-        tasks = [
-            self.update_webservers(False),
-            self.update_systems_zones(),
-            self.update_aidoos(),
-        ]
-
-        await asyncio.gather(*tasks)
+        async with asyncio.TaskGroup() as tg:
+            tg.create_task(self.update_webservers(False))
+            tg.create_task(self.update_systems_zones())
+            tg.create_task(self.update_aidoos())
 
     async def update(self) -> None:
         """Update all Airzone Cloud data."""
