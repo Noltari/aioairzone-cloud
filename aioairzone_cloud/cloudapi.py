@@ -8,7 +8,6 @@ from typing import Any, cast
 import urllib.parse
 
 from aiohttp import ClientConnectorError, ClientResponseError, ClientSession
-from aiohttp.client_reqrep import ClientResponse
 
 from .aidoo import Aidoo
 from .common import ConnectionOptions, OperationMode
@@ -122,14 +121,15 @@ class AirzoneCloudApi:
             headers[HEADER_AUTHORIZATION] = f"{HEADER_BEARER} {self.token}"
 
         try:
-            resp: ClientResponse = await aiohttp_session.request(
+            async with aiohttp_session.request(
                 method,
                 f"{API_URL}/{path}",
                 headers=headers,
                 json=json,
                 raise_for_status=True,
                 timeout=HTTP_CALL_TIMEOUT,
-            )
+            ) as resp:
+                resp_json = await resp.json(content_type=None)
         except ClientConnectorError as err:
             raise AirzoneCloudError(err) from err
         except ClientResponseError as err:
@@ -150,7 +150,6 @@ class AirzoneCloudApi:
             if self.aiohttp_session is None:
                 await aiohttp_session.close()
 
-        resp_json = await resp.json(content_type=None)
         _LOGGER.debug("aiohttp response: %s", resp_json)
 
         return cast(dict[str, Any], resp_json)
