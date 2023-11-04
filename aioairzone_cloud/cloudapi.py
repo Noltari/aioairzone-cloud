@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import asyncio
+from asyncio import Semaphore
 from datetime import datetime
 import logging
 from typing import Any, cast
@@ -52,6 +53,7 @@ from .const import (
     HEADER_AUTHORIZATION,
     HEADER_BEARER,
     HTTP_CALL_TIMEOUT,
+    HTTP_MAX_REQUESTS,
     RAW_DEVICES_CONFIG,
     RAW_DEVICES_STATUS,
     RAW_INSTALLATIONS,
@@ -93,6 +95,7 @@ class AirzoneCloudApi:
             RAW_INSTALLATIONS: {},
             RAW_WEBSERVERS: {},
         }
+        self._api_semaphore: Semaphore = Semaphore(HTTP_MAX_REQUESTS)
         self.aidoos: dict[str, Aidoo] = {}
         self.aiohttp_session: ClientSession | None = aiohttp_session
         self.groups: dict[str, Group] = {}
@@ -120,6 +123,7 @@ class AirzoneCloudApi:
         if self.token is not None:
             headers[HEADER_AUTHORIZATION] = f"{HEADER_BEARER} {self.token}"
 
+        await self._api_semaphore.acquire()
         try:
             async with aiohttp_session.request(
                 method,
@@ -147,6 +151,7 @@ class AirzoneCloudApi:
 
             raise AirzoneCloudError(err) from err
         finally:
+            self._api_semaphore.release()
             if self.aiohttp_session is None:
                 await aiohttp_session.close()
 

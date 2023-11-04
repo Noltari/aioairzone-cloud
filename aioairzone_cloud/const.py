@@ -168,6 +168,7 @@ HEADER_AUTHORIZATION: Final[str] = "Authorization"
 HEADER_BEARER: Final[str] = "Bearer"
 
 HTTP_CALL_TIMEOUT: Final[int] = 45
+HTTP_MAX_REQUESTS: Final[int] = 4
 
 RAW_DEVICES_CONFIG: Final[str] = "devices-config"
 RAW_DEVICES_STATUS: Final[str] = "devices-status"
