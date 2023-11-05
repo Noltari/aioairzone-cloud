@@ -455,9 +455,15 @@ class HVAC(Device):
         """Update HVAC device data."""
         super().update(data)
 
-        active = data.get(API_ACTIVE)
-        if active is not None:
-            self.active = bool(active)
+        if API_ACTIVE in data:
+            active = data.get(API_ACTIVE)
+            if active is not None:
+                self.active = bool(active)
+            else:
+                # API sends active as null instead of False
+                self.active = False
+        else:
+            self.active = None
 
         humidity = data.get(API_HUMIDITY)
         if humidity is not None:
