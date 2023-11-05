@@ -3,7 +3,20 @@ from __future__ import annotations
 
 from typing import Any
 
-from .const import API_MODE, API_NAME, API_POWER, API_SETPOINT, API_VALUE
+from .common import SpeedType
+from .const import (
+    API_MODE,
+    API_NAME,
+    API_POWER,
+    API_SETPOINT,
+    API_SPEED_CONF,
+    API_SPEED_TYPE,
+    API_SPEED_VALUES,
+    API_VALUE,
+    AZD_SPEED,
+    AZD_SPEED_TYPE,
+    AZD_SPEEDS,
+)
 from .hvac import HVAC
 
 
@@ -14,17 +27,87 @@ class Aidoo(HVAC):
         """Airzone Cloud Aidoo device init."""
         super().__init__(inst_id, ws_id, device_data)
 
+        self.speed: int | None = None
+        self.speeds: dict[int, int] = {}
+        self.speed_type: SpeedType | None = None
+
         if API_NAME in device_data:
             self.name = str(device_data[API_NAME])
         else:
             self.name = f"Aidoo {ws_id}"
 
+    def data(self) -> dict[str, Any]:
+        """Return Aidoo device data."""
+        data = super().data()
+
+        speed = self.get_speed()
+        if speed is not None:
+            data[AZD_SPEED] = speed
+
+        speeds = self.get_speeds()
+        if speeds is not None:
+            data[AZD_SPEEDS] = speeds
+
+        speed_type = self.get_speed_type()
+        if speed_type is not None:
+            data[AZD_SPEED_TYPE] = speed_type
+
+        return data
+
+    def get_speed(self) -> int | None:
+        """Return Aidoo speed."""
+        return self.speed
+
+    def get_speeds(self) -> dict[int, int] | None:
+        """Return Aidoo speeds."""
+        if len(self.speeds) > 0:
+            return self.speeds
+        return None
+
+    def get_speed_type(self) -> SpeedType | None:
+        """Return Aidoo speed type."""
+        return self.speed_type
+
+    def set_speed(self, speed: int) -> None:
+        """Set Aidoo speed."""
+        if self.speed is not None:
+            self.speed = speed
+
     def set_param(self, param: str, data: dict[str, Any]) -> None:
         """Update device parameter from API request."""
-
         if param == API_MODE:
             self.set_mode(data[API_VALUE])
         elif param == API_POWER:
             self.set_power(data[API_VALUE])
         elif param == API_SETPOINT:
             self.set_setpoint(data[API_VALUE])
+        elif param == API_SPEED_CONF:
+            self.set_speed(data[API_VALUE])
+
+    def update(self, data: dict[str, Any]) -> None:
+        """Update Aidoo data."""
+        super().update(data)
+
+        speed = data.get(API_SPEED_CONF)
+        if speed is not None:
+            self.speed = int(speed)
+
+        speed_type = data.get(API_SPEED_TYPE)
+        if speed_type is not None:
+            self.speed_type = SpeedType(speed_type)
+
+        speeds_values: list[int] | None = data.get(API_SPEED_VALUES)
+        if speeds_values is not None:
+            speeds: dict[int, int] = {}
+
+            if 0 in speeds_values:
+                speeds[0] = 0
+
+            speed_count = 1
+            speeds_values.sort()
+            for speed_value in speeds_values:
+                if speed_value > 0:
+                    speeds[speed_count] = int(speed_value)
+                    speed_count += 1
+
+            self.speeds = speeds

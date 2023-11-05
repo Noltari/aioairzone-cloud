@@ -77,6 +77,13 @@ class OperationMode(IntEnum):
         return self.value in [self.VENTILATION]
 
 
+class SpeedType(IntEnum):
+    """Airzone Cloud speed type."""
+
+    NORMAL = 0
+    AIRFLOW = 1
+
+
 class TemperatureUnit(IntEnum):
     """Airzone Cloud temperature units."""
 
