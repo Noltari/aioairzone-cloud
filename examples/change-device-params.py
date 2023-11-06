@@ -12,6 +12,7 @@ from aioairzone_cloud.const import (
     API_OPTS,
     API_POWER,
     API_SETPOINT,
+    API_SPEED_CONF,
     API_UNITS,
     API_VALUE,
 )
@@ -44,20 +45,20 @@ async def main():
             print(json.dumps(client.data(), indent=4, sort_keys=True))
             print(f"Update time: {update_end - update_start}")
 
-            await client.api_set_zone_id_params(
-                list(client.zones)[0],
+            await client.api_set_aidoo_id_params(
+                list(client.aidoos)[0],
                 {
                     API_POWER: {
                         API_VALUE: False,
                     },
-                    API_SETPOINT: {
-                        API_VALUE: 26,
-                        API_OPTS: {
-                            API_UNITS: TemperatureUnit.CELSIUS.value,
-                        },
+                    API_SPEED_CONF: {
+                        API_VALUE: 6,
                     },
                 },
             )
+
+            print(json.dumps(client.data(), indent=4, sort_keys=True))
+            print(f"Update time: {update_end - update_start}")
 
             await client.logout()
         except LoginError:
