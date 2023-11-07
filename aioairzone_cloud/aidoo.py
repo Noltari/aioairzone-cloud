@@ -18,6 +18,7 @@ from .const import (
     AZD_SPEED_TYPE,
     AZD_SPEEDS,
 )
+from .entity import EntityUpdate
 from .hvac import HVAC
 
 
@@ -85,9 +86,11 @@ class Aidoo(HVAC):
         elif param == API_SPEED_CONF:
             self.set_speed(data[API_VALUE])
 
-    def update(self, data: dict[str, Any]) -> None:
+    def update_data(self, update: EntityUpdate) -> None:
         """Update Aidoo data."""
-        super().update(data)
+        super().update_data(update)
+
+        data = update.get_data()
 
         speed = data.get(API_SPEED_CONF)
         if speed is not None:

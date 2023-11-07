@@ -3,6 +3,8 @@
 from datetime import timedelta
 from typing import Final
 
+AIRZONE_SERVER: Final[str] = "m.airzonecloud.com"
+
 API_ACTIVE: Final[str] = "active"
 API_AUTH_LOGIN: Final[str] = "auth/login"
 API_AUTH_REFRESH_TOKEN: Final[str] = "auth/refreshToken"
@@ -87,7 +89,7 @@ API_TIMER: Final[str] = "timer"
 API_TOKEN: Final[str] = "token"
 API_TYPE: Final[str] = "type"
 API_UNITS: Final[str] = "units"
-API_URL: Final[str] = "https://m.airzonecloud.com"
+API_URL: Final[str] = f"https://{AIRZONE_SERVER}"
 API_USER: Final[str] = "user"
 API_USER_ID: Final[str] = "user_id"
 API_USER_LOGOUT: Final[str] = "user/logout"
@@ -205,3 +207,20 @@ RAW_USER: Final[str] = "user"
 RAW_WEBSERVERS: Final[str] = "webservers"
 
 TOKEN_REFRESH_PERIOD: Final[timedelta] = timedelta(hours=12)
+
+WS_AUTH: Final[str] = "auth"
+WS_BODY: Final[str] = "body"
+WS_CHANGE: Final[str] = "change"
+WS_CORR_ID: Final[str] = "corrId"
+WS_DEVICE_STATE: Final[str] = "DEVICE_STATE"
+WS_DEVICE_STATE_END: Final[str] = "DEVICE_STATE_END"
+WS_DEVICES_UPDATES: Final[str] = "DEVICES_UPDATES"
+WS_EVENT: Final[str] = "event"
+WS_INIT_TIMEOUT: Final[int] = 15
+WS_INSTALLATION: Final[str] = "installation"
+WS_INSTALLATION_ID: Final[str] = "installationId"
+WS_JWT: Final[str] = "jwt"
+WS_STATUS: Final[str] = "status"
+WS_URL: Final[str] = f"wss://{AIRZONE_SERVER}"
+WS_WEBSERVER_UPDATES: Final[str] = "WEBSERVER_UPDATES"
+WS_WEBSOCKETS: Final[str] = "websockets"

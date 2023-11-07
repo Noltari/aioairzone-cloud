@@ -31,6 +31,10 @@ async def main():
             await client.update_installation(inst_list[0])
             print("***")
 
+            if _secrets.AIRZONE_OPTIONS.websockets:
+                await asyncio.sleep(30)
+                print("***")
+
             update_start = timeit.default_timer()
             await client.update()
             update_end = timeit.default_timer()

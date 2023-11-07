@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import asyncio
 from asyncio import Semaphore
-from datetime import datetime
 import logging
 from typing import Any, cast
 import urllib.parse
@@ -34,9 +33,7 @@ from .const import (
     API_PARAM,
     API_PARAMS,
     API_PASSWORD,
-    API_REFRESH_TOKEN,
     API_STATUS,
-    API_TOKEN,
     API_TYPE,
     API_URL,
     API_USER,
@@ -51,8 +48,6 @@ from .const import (
     AZD_SYSTEMS,
     AZD_WEBSERVERS,
     AZD_ZONES,
-    HEADER_AUTHORIZATION,
-    HEADER_BEARER,
     HTTP_CALL_TIMEOUT,
     HTTP_MAX_REQUESTS,
     RAW_DEVICES_CONFIG,
@@ -61,9 +56,10 @@ from .const import (
     RAW_INSTALLATIONS_LIST,
     RAW_USER,
     RAW_WEBSERVERS,
-    TOKEN_REFRESH_PERIOD,
+    WS_INIT_TIMEOUT,
 )
 from .device import Device
+from .entity import EntityUpdate, UpdateType
 from .exceptions import (
     AirzoneCloudError,
     APIError,
@@ -75,69 +71,12 @@ from .exceptions import (
 from .group import Group
 from .installation import Installation
 from .system import System
+from .token import AirzoneCloudToken
 from .webserver import WebServer
+from .websockets import AirzoneCloudIWS
 from .zone import Zone
 
 _LOGGER = logging.getLogger(__name__)
-
-
-class AirzoneCloudToken:
-    """Airzone Cloud Token."""
-
-    def __init__(self) -> None:
-        """Airzone Cloud Token init."""
-        self.refresh_time: datetime | None = None
-        self.refresh_token: str | None = None
-        self.token: str | None = None
-
-    def check_refresh(self) -> bool:
-        """Check if Airzone Cloud Token needs refreshing."""
-        return (
-            self.refresh_time is not None
-            and (datetime.now() - self.refresh_time) >= TOKEN_REFRESH_PERIOD
-        )
-
-    def clear(self) -> None:
-        """Clear Airzone Cloud Token."""
-        self.refresh_time = None
-        self.refresh_token = None
-        self.token = None
-
-    def headers(self) -> dict[str, Any]:
-        """Airzone Cloud Token headers."""
-        _headers: dict[str, Any] = {}
-
-        if self.token is not None:
-            _headers[HEADER_AUTHORIZATION] = f"{HEADER_BEARER} {self.token}"
-
-        return _headers
-
-    def is_valid(self) -> bool:
-        """Check if Airzone Cloud Token is valid."""
-        return (
-            self.refresh_time is not None
-            and self.refresh_token is not None
-            and self.token is not None
-        )
-
-    def update(self, resp: dict[str, Any], refresh: bool) -> None:
-        """Update Airzone Cloud Token."""
-        refresh_token = resp.get(API_REFRESH_TOKEN)
-        token = resp.get(API_TOKEN)
-
-        if refresh_token is None or token is None:
-            if refresh:
-                raise TokenRefreshError("Invalid API response")
-            raise LoginError("Invalid API response")
-
-        self.refresh_time = datetime.now()
-        self.refresh_token = refresh_token
-        self.token = token
-
-    def url_refresh(self) -> str:
-        """Airzone Cloud Token refresh URL."""
-        refresh_token = urllib.parse.quote(self.refresh_token or "")
-        return f"{API_V1}/{API_AUTH_REFRESH_TOKEN}/{refresh_token}"
 
 
 class AirzoneCloudApi:
@@ -156,6 +95,7 @@ class AirzoneCloudApi:
             RAW_WEBSERVERS: {},
         }
         self._api_semaphore: Semaphore = Semaphore(HTTP_MAX_REQUESTS)
+        self._first_update_done: bool = False
         self.aidoos: dict[str, Aidoo] = {}
         self.devices: dict[str, Device] = {}
         self.groups: dict[str, Group] = {}
@@ -165,6 +105,7 @@ class AirzoneCloudApi:
         self.systems: dict[str, System] = {}
         self.token: AirzoneCloudToken = AirzoneCloudToken()
         self.webservers: dict[str, WebServer] = {}
+        self.websockets: dict[str, AirzoneCloudIWS] = {}
         self.zones: dict[str, Zone] = {}
 
     async def api_request(
@@ -502,6 +443,9 @@ class AirzoneCloudApi:
 
     async def logout(self) -> None:
         """Perform Airzone Cloud API logout."""
+        for inst_ws in self.websockets.values():
+            inst_ws.disconnect()
+
         try:
             if self.token.is_valid():
                 await self.api_request(
@@ -594,9 +538,11 @@ class AirzoneCloudApi:
         """Return Airzone Cloud Aidoo by ID."""
         return self.aidoos.get(aidoo_id)
 
-    def get_device_id(self, dev_id: str) -> Device | None:
+    def get_device_id(self, dev_id: str | None) -> Device | None:
         """Return Airzone Cloud Device by ID."""
-        return self.devices.get(dev_id)
+        if dev_id is not None:
+            return self.devices.get(dev_id)
+        return None
 
     def get_group_id(self, group_id: str) -> Group | None:
         """Return Airzone Cloud Group by ID."""
@@ -610,9 +556,11 @@ class AirzoneCloudApi:
         """Return Airzone Cloud System by ID."""
         return self.systems.get(sys_id)
 
-    def get_webserver_id(self, ws_id: str) -> WebServer | None:
+    def get_webserver_id(self, ws_id: str | None) -> WebServer | None:
         """Return Airzone Cloud WebServer by ID."""
-        return self.webservers.get(ws_id)
+        if ws_id is not None:
+            return self.webservers.get(ws_id)
+        return None
 
     def get_zone_id(self, zone_id: str) -> Zone | None:
         """Return Airzone Cloud Zone by ID."""
@@ -631,6 +579,15 @@ class AirzoneCloudApi:
     def select_installation(self, inst: Installation) -> None:
         """Select single Airzone Cloud installation."""
         inst_id = inst.get_id()
+
+        if self.options.websockets:
+            for _inst in list(self.installations):
+                inst_ws = self.websockets.get(_inst)
+                if inst_ws is not None and inst_ws.disconnect():
+                    self.websockets.pop(_inst)
+
+            if inst_id not in self.websockets:
+                self.websockets[inst_id] = AirzoneCloudIWS(self, inst)
 
         self.installations = {
             inst_id: inst,
@@ -662,7 +619,10 @@ class AirzoneCloudApi:
     async def update_aidoo(self, aidoo: Aidoo) -> None:
         """Update Airzone Cloud Zone from API."""
         device_data = await self.api_get_device_status(aidoo)
-        aidoo.update(device_data)
+
+        update = EntityUpdate(UpdateType.API_FULL, device_data)
+
+        await aidoo.update(update)
 
     async def update_aidoos(self) -> None:
         """Update all Airzone Cloud Aidoos."""
@@ -706,6 +666,10 @@ class AirzoneCloudApi:
                             group.add_aidoo(aidoo)
                             inst.add_aidoo(aidoo)
 
+        inst_ws = self.websockets.get(inst_id)
+        if inst_ws is not None:
+            inst_ws.connect()
+
     async def update_installations(self) -> None:
         """Update Airzone Cloud installations from API."""
         installations_data = await self.api_get_installations()
@@ -720,10 +684,21 @@ class AirzoneCloudApi:
                             ws = WebServer(inst_id, ws_id)
                             self.webservers[ws_id] = ws
 
+    def get_ws_device_data(self, device: Device) -> dict[str, Any] | None:
+        """Get WebSockets device data."""
+        inst_id = device.get_installation()
+        ws = self.websockets.get(inst_id)
+        if ws is not None:
+            return ws.get_device_data(device)
+        return None
+
     async def update_system(self, system: System) -> None:
         """Update Airzone Cloud System from API."""
         device_data = await self.api_get_device_status(system)
-        system.update(device_data)
+
+        update = EntityUpdate(UpdateType.API_FULL, device_data)
+
+        await system.update(update)
 
     async def update_system_id(self, sys_id: str) -> None:
         """Update Airzone Cloud System by ID."""
@@ -748,7 +723,10 @@ class AirzoneCloudApi:
     async def update_webserver(self, ws: WebServer, devices: bool) -> None:
         """Update Airzone Cloud WebServer from API."""
         ws_data = await self.api_get_webserver(ws, devices)
-        ws.update(ws_data)
+
+        update = EntityUpdate(UpdateType.API_FULL, ws_data)
+
+        await ws.update(update)
         if devices:
             ws_id = ws.get_id()
             inst = self.get_installation_id(ws.get_installation())
@@ -795,7 +773,10 @@ class AirzoneCloudApi:
     async def update_zone(self, zone: Zone) -> None:
         """Update Airzone Cloud Zone from API."""
         device_data = await self.api_get_device_status(zone)
-        zone.update(device_data)
+
+        update = EntityUpdate(UpdateType.API_FULL, device_data)
+
+        await zone.update(update)
 
     async def update_zone_id(self, zone_id: str) -> None:
         """Update Airzone Cloud Zone by ID."""
@@ -815,7 +796,8 @@ class AirzoneCloudApi:
         for system in self.systems.values():
             self.set_system_zones_data(system)
 
-    async def _update(self) -> None:
+    async def _update_polling(self) -> None:
+        """Perform a polling update of Airzone Cloud data."""
         tasks = [
             self.update_webservers(False),
             self.update_systems_zones(),
@@ -823,6 +805,29 @@ class AirzoneCloudApi:
         ]
 
         await asyncio.gather(*tasks)
+
+    async def _update_websockets(self) -> bool:
+        """Perform a websockets update of Airzone Cloud data."""
+        if not self.options.websockets:
+            return False
+
+        ws_updated = True
+        for websocket in self.websockets.values():
+            if not websocket.is_connected():
+                websocket.connect()
+            try:
+                await asyncio.wait_for(websocket.state_end.wait(), WS_INIT_TIMEOUT)
+            except asyncio.TimeoutError:
+                ws_updated = False
+        return ws_updated
+
+    async def _update(self) -> None:
+        """Update Airzone Cloud data using websockets and fall back to polling."""
+        if not self._first_update_done:
+            await self._update_polling()
+            self._first_update_done = True
+        elif not await self._update_websockets():
+            await self._update_polling()
 
     async def update(self) -> None:
         """Update all Airzone Cloud data."""

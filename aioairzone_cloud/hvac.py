@@ -71,6 +71,7 @@ from .const import (
     AZD_TEMP_STEP,
 )
 from .device import Device
+from .entity import EntityUpdate, UpdateType
 
 
 class HVAC(Device):
@@ -491,9 +492,11 @@ class HVAC(Device):
         if self.temp_set_vent_air is not None:
             self.temp_set_vent_air = setpoint
 
-    def update(self, data: dict[str, Any]) -> None:
+    def update_data(self, update: EntityUpdate) -> None:
         """Update HVAC device data."""
-        super().update(data)
+        super().update_data(update)
+
+        data = update.get_data()
 
         if API_ACTIVE in data:
             active = data.get(API_ACTIVE)
@@ -503,7 +506,8 @@ class HVAC(Device):
                 # API sends active as null instead of False
                 self.active = False
         else:
-            self.active = None
+            if update.get_type() != UpdateType.WS_PARTIAL:
+                self.active = None
 
         aq_active = data.get(API_AQ_ACTIVE)
         if aq_active is not None:

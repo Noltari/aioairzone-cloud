@@ -21,6 +21,7 @@ from .const import (
     AZD_SYSTEM_ID,
     AZD_ZONE,
 )
+from .entity import EntityUpdate
 from .hvac import HVAC
 
 if TYPE_CHECKING:
@@ -107,9 +108,11 @@ class Zone(HVAC):
         """Set System."""
         self.system = system
 
-    def update(self, data: dict[str, Any]) -> None:
+    def update_data(self, update: EntityUpdate) -> None:
         """Update Zone data."""
-        super().update(data)
+        super().update_data(update)
+
+        data = update.get_data()
 
         if API_MODE_AVAIL in data:
             self.master = len(data[API_MODE_AVAIL]) > 0

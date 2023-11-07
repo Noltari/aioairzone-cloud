@@ -13,6 +13,7 @@ class ConnectionOptions:
 
     username: str
     password: str
+    websockets: bool = False
 
 
 class AirQualityMode(StrEnum):
