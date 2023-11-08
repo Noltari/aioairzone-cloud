@@ -86,7 +86,7 @@ class AirzoneCloudApi:
 
     def __init__(
         self,
-        aiohttp_session: ClientSession | None,
+        session: ClientSession | None,
         options: ConnectionOptions,
     ):
         """Airzone Cloud API init."""
@@ -98,12 +98,12 @@ class AirzoneCloudApi:
         }
         self._api_semaphore: Semaphore = Semaphore(HTTP_MAX_REQUESTS)
         self.aidoos: dict[str, Aidoo] = {}
-        self.aiohttp_session: ClientSession | None = aiohttp_session
         self.groups: dict[str, Group] = {}
         self.installations: dict[str, Installation] = {}
         self.options = options
         self.refresh_time: datetime | None = None
         self.refresh_token: str | None = None
+        self.session: ClientSession | None = session
         self.systems: dict[str, System] = {}
         self.token: str | None = None
         self.webservers: dict[str, WebServer] = {}
@@ -115,10 +115,10 @@ class AirzoneCloudApi:
         """Airzone Cloud API request."""
         _LOGGER.debug("aiohttp request: /%s (params=%s)", path, json)
 
-        if self.aiohttp_session is None:
-            aiohttp_session = ClientSession()
+        if self.session is None:
+            session = ClientSession()
         else:
-            aiohttp_session = self.aiohttp_session
+            session = self.session
 
         headers: dict[str, str] = {}
         if self.token is not None:
@@ -126,7 +126,7 @@ class AirzoneCloudApi:
 
         await self._api_semaphore.acquire()
         try:
-            async with aiohttp_session.request(
+            async with session.request(
                 method,
                 f"{API_URL}/{path}",
                 headers=headers,
@@ -153,8 +153,8 @@ class AirzoneCloudApi:
             raise AirzoneCloudError(err) from err
         finally:
             self._api_semaphore.release()
-            if self.aiohttp_session is None:
-                await aiohttp_session.close()
+            if self.session is None:
+                await session.close()
 
         _LOGGER.debug("aiohttp response: %s", resp_json)
 
