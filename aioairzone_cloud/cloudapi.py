@@ -81,6 +81,65 @@ from .zone import Zone
 _LOGGER = logging.getLogger(__name__)
 
 
+class AirzoneCloudToken:
+    """Airzone Cloud Token."""
+
+    def __init__(self) -> None:
+        """Airzone Cloud Token init."""
+        self.refresh_time: datetime | None = None
+        self.refresh_token: str | None = None
+        self.token: str | None = None
+
+    def check_refresh(self) -> bool:
+        """Check if Airzone Cloud Token needs refreshing."""
+        return (
+            self.refresh_time is not None
+            and (datetime.now() - self.refresh_time) >= TOKEN_REFRESH_PERIOD
+        )
+
+    def clear(self) -> None:
+        """Clear Airzone Cloud Token."""
+        self.refresh_time = None
+        self.refresh_token = None
+        self.token = None
+
+    def headers(self) -> dict[str, Any]:
+        """Airzone Cloud Token headers."""
+        _headers: dict[str, Any] = {}
+
+        if self.token is not None:
+            _headers[HEADER_AUTHORIZATION] = f"{HEADER_BEARER} {self.token}"
+
+        return _headers
+
+    def is_valid(self) -> bool:
+        """Check if Airzone Cloud Token is valid."""
+        return (
+            self.refresh_time is not None
+            and self.refresh_token is not None
+            and self.token is not None
+        )
+
+    def update(self, resp: dict[str, Any], refresh: bool) -> None:
+        """Update Airzone Cloud Token."""
+        refresh_token = resp.get(API_REFRESH_TOKEN)
+        token = resp.get(API_TOKEN)
+
+        if refresh_token is None or token is None:
+            if refresh:
+                raise TokenRefreshError("Invalid API response")
+            raise LoginError("Invalid API response")
+
+        self.refresh_time = datetime.now()
+        self.refresh_token = refresh_token
+        self.token = token
+
+    def url_refresh(self) -> str:
+        """Airzone Cloud Token refresh URL."""
+        refresh_token = urllib.parse.quote(self.refresh_token or "")
+        return f"{API_V1}/{API_AUTH_REFRESH_TOKEN}/{refresh_token}"
+
+
 class AirzoneCloudApi:
     """Airzone Cloud API."""
 
@@ -101,11 +160,9 @@ class AirzoneCloudApi:
         self.groups: dict[str, Group] = {}
         self.installations: dict[str, Installation] = {}
         self.options = options
-        self.refresh_time: datetime | None = None
-        self.refresh_token: str | None = None
         self.session: ClientSession | None = session
         self.systems: dict[str, System] = {}
-        self.token: str | None = None
+        self.token: AirzoneCloudToken = AirzoneCloudToken()
         self.webservers: dict[str, WebServer] = {}
         self.zones: dict[str, Zone] = {}
 
@@ -120,16 +177,12 @@ class AirzoneCloudApi:
         else:
             session = self.session
 
-        headers: dict[str, str] = {}
-        if self.token is not None:
-            headers[HEADER_AUTHORIZATION] = f"{HEADER_BEARER} {self.token}"
-
         await self._api_semaphore.acquire()
         try:
             async with session.request(
                 method,
                 f"{API_URL}/{path}",
-                headers=headers,
+                headers=self.token.headers(),
                 json=json,
                 raise_for_status=True,
                 timeout=HTTP_CALL_TIMEOUT,
@@ -437,7 +490,7 @@ class AirzoneCloudApi:
 
     async def login(self) -> None:
         """Perform Airzone Cloud API login."""
-        if self.token is not None:
+        if self.token.is_valid():
             await self.logout()
         resp = await self.api_request(
             "POST",
@@ -448,16 +501,12 @@ class AirzoneCloudApi:
             },
         )
         _LOGGER.debug("login resp: %s", resp)
-        if resp.keys() < {API_TOKEN, API_REFRESH_TOKEN}:
-            raise LoginError("Invalid API response")
-        self.refresh_time = datetime.now()
-        self.refresh_token = resp[API_REFRESH_TOKEN]
-        self.token = resp[API_TOKEN]
+        self.token.update(resp, False)
 
     async def logout(self) -> None:
         """Perform Airzone Cloud API logout."""
         try:
-            if self.token is not None:
+            if self.token.is_valid():
                 await self.api_request(
                     "GET",
                     f"{API_V1}/{API_USER_LOGOUT}",
@@ -465,24 +514,17 @@ class AirzoneCloudApi:
         except AirzoneCloudError:
             pass
         finally:
-            self.refresh_time = None
-            self.refresh_token = None
-            self.token = None
+            self.token.clear()
 
     async def token_refresh(self) -> None:
         """Perform Airzone Cloud API token refresh."""
-        if self.token is not None and self.refresh_token is not None:
-            refresh_token = urllib.parse.quote(self.refresh_token)
+        if self.token.is_valid():
             resp = await self.api_request(
                 "GET",
-                f"{API_V1}/{API_AUTH_REFRESH_TOKEN}/{refresh_token}",
+                self.token.url_refresh(),
             )
             _LOGGER.debug("refresh resp: %s", resp)
-            if resp.keys() < {API_TOKEN, API_REFRESH_TOKEN}:
-                raise TokenRefreshError("Invalid API response")
-            self.refresh_time = datetime.now()
-            self.refresh_token = resp[API_REFRESH_TOKEN]
-            self.token = resp[API_TOKEN]
+            self.token.update(resp, True)
 
     def raw_data(self) -> dict[str, Any]:
         """Return raw Airzone Cloud API data."""
@@ -761,9 +803,7 @@ class AirzoneCloudApi:
     async def update(self) -> None:
         """Update all Airzone Cloud data."""
 
-        if (self.refresh_time is not None) and (
-            datetime.now() - self.refresh_time
-        ) >= TOKEN_REFRESH_PERIOD:
+        if self.token.check_refresh():
             try:
                 await self.token_refresh()
             except TokenRefreshError:
