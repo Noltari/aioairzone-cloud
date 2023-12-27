@@ -6,6 +6,9 @@ from typing import Any
 from .common import OperationAction, OperationMode
 from .const import (
     API_ACTIVE,
+    API_AQ_ACTIVE,
+    API_AQ_MODE_CONF,
+    API_AQ_MODE_VALUES,
     API_CELSIUS,
     API_DEFAULT_TEMP_STEP,
     API_HUMIDITY,
@@ -35,6 +38,9 @@ from .const import (
     API_STEP,
     AZD_ACTION,
     AZD_ACTIVE,
+    AZD_AQ_ACTIVE,
+    AZD_AQ_MODE_CONF,
+    AZD_AQ_MODE_VALUES,
     AZD_HUMIDITY,
     AZD_POWER,
     AZD_TEMP,
@@ -74,6 +80,9 @@ class HVAC(Device):
         super().__init__(inst_id, ws_id, device_data)
 
         self.active: bool | None = None
+        self.aq_active: bool | None = None
+        self.aq_mode_conf: str | None = None
+        self.aq_mode_values: list[str] | None = None
         self.humidity: int | None = None
         self.name: str = "HVAC"
         self.power: bool | None = None
@@ -111,6 +120,18 @@ class HVAC(Device):
         data[AZD_POWER] = self.get_power()
         data[AZD_TEMP] = self.get_temperature()
         data[AZD_TEMP_STEP] = self.get_temp_step()
+
+        aq_active = self.get_aq_active()
+        if aq_active is not None:
+            data[AZD_AQ_ACTIVE] = aq_active
+
+        aq_mode_conf = self.get_aq_mode_conf()
+        if aq_mode_conf is not None:
+            data[AZD_AQ_MODE_CONF] = aq_mode_conf
+
+        aq_mode_values = self.get_aq_mode_values()
+        if aq_mode_values is not None:
+            data[AZD_AQ_MODE_VALUES] = aq_mode_values
 
         humidity = self.get_humidity()
         if humidity is not None:
@@ -234,6 +255,20 @@ class HVAC(Device):
     def get_active(self) -> bool | None:
         """Return HVAC device active status."""
         return self.active
+
+    def get_aq_active(self) -> bool | None:
+        """Return HVAC device Air Quality active status."""
+        return self.aq_active
+
+    def get_aq_mode_conf(self) -> str | None:
+        """Return HVAC device Air Quality mode conf."""
+        return self.aq_mode_conf
+
+    def get_aq_mode_values(self) -> list[str] | None:
+        """Return HVAC device Air Quality mode values."""
+        if self.aq_mode_values is not None and len(self.aq_mode_values) > 0:
+            return self.aq_mode_values
+        return None
 
     def get_humidity(self) -> int | None:
         """Return HVAC device humidity."""
@@ -464,6 +499,20 @@ class HVAC(Device):
                 self.active = False
         else:
             self.active = None
+
+        aq_active = data.get(API_AQ_ACTIVE)
+        if aq_active is not None:
+            self.aq_active = bool(aq_active)
+
+        aq_mode_conf = data.get(API_AQ_MODE_CONF)
+        if aq_mode_conf is not None:
+            self.aq_mode_conf = str(aq_mode_conf)
+
+        aq_mode_values = data.get(API_AQ_MODE_VALUES)
+        if aq_mode_values is not None:
+            self.aq_mode_values = []
+            for aq_mode_value in aq_mode_values:
+                self.aq_mode_values += [str(aq_mode_value)]
 
         humidity = data.get(API_HUMIDITY)
         if humidity is not None:

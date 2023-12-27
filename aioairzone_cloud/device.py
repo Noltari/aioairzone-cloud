@@ -7,6 +7,12 @@ from typing import Any
 
 from .common import OperationMode
 from .const import (
+    API_AQ_PM_1,
+    API_AQ_PM_2P5,
+    API_AQ_PM_10,
+    API_AQ_PRESENT,
+    API_AQ_QUALITY,
+    API_AQ_STATUS,
     API_CONFIG,
     API_DEVICE_ID,
     API_ERRORS,
@@ -17,6 +23,12 @@ from .const import (
     API_SYSTEM_NUMBER,
     API_WARNINGS,
     API_WS_CONNECTED,
+    AZD_AQ_INDEX,
+    AZD_AQ_PM_1,
+    AZD_AQ_PM_2P5,
+    AZD_AQ_PM_10,
+    AZD_AQ_PRESENT,
+    AZD_AQ_STATUS,
     AZD_AVAILABLE,
     AZD_ERRORS,
     AZD_ID,
@@ -43,6 +55,11 @@ class Device(ABC):
     def __init__(self, inst_id: str, ws_id: str, device_data: dict[str, Any]):
         """Airzone Cloud Device init."""
         self.auto_mode: OperationMode | None = None
+        self.aq_pm_1: int | None = None
+        self.aq_pm_2p5: int | None = None
+        self.aq_pm_10: int | None = None
+        self.aq_present: bool | None = None
+        self.aq_status: str | None = None
         self.errors: list[str] = []
         self.id = str(device_data[API_DEVICE_ID])
         self.installation_id = inst_id
@@ -86,6 +103,30 @@ class Device(ABC):
             AZD_WS_CONNECTED: self.get_ws_connected(),
         }
 
+        aq_index = self.get_aq_index()
+        if aq_index is not None:
+            data[AZD_AQ_INDEX] = aq_index
+
+        aq_pm_1 = self.get_aq_pm_1()
+        if aq_pm_1 is not None:
+            data[AZD_AQ_PM_1] = aq_pm_1
+
+        aq_pm_2p5 = self.get_aq_pm_2p5()
+        if aq_pm_2p5 is not None:
+            data[AZD_AQ_PM_2P5] = aq_pm_2p5
+
+        aq_pm_10 = self.get_aq_pm_10()
+        if aq_pm_10 is not None:
+            data[AZD_AQ_PM_10] = aq_pm_10
+
+        aq_present = self.get_aq_present()
+        if aq_present is not None:
+            data[AZD_AQ_PRESENT] = aq_present
+
+        aq_status = self.get_aq_status()
+        if aq_status is not None:
+            data[AZD_AQ_STATUS] = aq_status
+
         errors = self.get_errors()
         if len(errors) > 0:
             data[AZD_ERRORS] = errors
@@ -103,6 +144,34 @@ class Device(ABC):
             data[AZD_WARNINGS] = warnings
 
         return data
+
+    def get_aq_index(self) -> int | None:
+        """Return HVAC device Air Quality index."""
+        if self.aq_status is not None:
+            for key, value in API_AQ_STATUS.items():
+                if self.aq_status == key:
+                    return value
+        return None
+
+    def get_aq_pm_1(self) -> int | None:
+        """Return HVAC device Air Quality PM 1."""
+        return self.aq_pm_1
+
+    def get_aq_pm_2p5(self) -> int | None:
+        """Return HVAC device Air Quality PM 2.5."""
+        return self.aq_pm_2p5
+
+    def get_aq_pm_10(self) -> int | None:
+        """Return HVAC device Air Quality PM 10."""
+        return self.aq_pm_10
+
+    def get_aq_present(self) -> bool | None:
+        """Return HVAC device Air Quality present."""
+        return self.aq_present
+
+    def get_aq_status(self) -> str | None:
+        """Return HVAC device Air Quality status."""
+        return self.aq_status
 
     def get_available(self) -> bool:
         """Return availability status."""
@@ -178,6 +247,26 @@ class Device(ABC):
         ws_connected = data.get(API_WS_CONNECTED)
         if ws_connected is not None:
             self.ws_connected = bool(ws_connected)
+
+        aq_pm_1 = data.get(API_AQ_PM_1)
+        if aq_pm_1 is not None:
+            self.aq_pm_1 = int(aq_pm_1)
+
+        aq_pm_2p5 = data.get(API_AQ_PM_2P5)
+        if aq_pm_2p5 is not None:
+            self.aq_pm_2p5 = int(aq_pm_2p5)
+
+        aq_pm_10 = data.get(API_AQ_PM_10)
+        if aq_pm_10 is not None:
+            self.aq_pm_10 = int(aq_pm_10)
+
+        aq_present = data.get(API_AQ_PRESENT)
+        if aq_present is not None:
+            self.aq_present = bool(aq_present)
+
+        aq_status = data.get(API_AQ_QUALITY)
+        if aq_status is not None:
+            self.aq_status = str(aq_status)
 
         errors = data.get(API_ERRORS)
         if errors is not None:
