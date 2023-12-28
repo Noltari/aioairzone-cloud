@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from .common import OperationAction, OperationMode
+from .common import AirQualityMode, OperationAction, OperationMode
 from .const import (
     API_ACTIVE,
     API_AQ_ACTIVE,
@@ -81,8 +81,8 @@ class HVAC(Device):
 
         self.active: bool | None = None
         self.aq_active: bool | None = None
-        self.aq_mode_conf: str | None = None
-        self.aq_mode_values: list[str] | None = None
+        self.aq_mode_conf: AirQualityMode | None = None
+        self.aq_mode_values: list[AirQualityMode] | None = None
         self.humidity: int | None = None
         self.name: str = "HVAC"
         self.power: bool | None = None
@@ -260,11 +260,11 @@ class HVAC(Device):
         """Return HVAC device Air Quality active status."""
         return self.aq_active
 
-    def get_aq_mode_conf(self) -> str | None:
+    def get_aq_mode_conf(self) -> AirQualityMode | None:
         """Return HVAC device Air Quality mode conf."""
         return self.aq_mode_conf
 
-    def get_aq_mode_values(self) -> list[str] | None:
+    def get_aq_mode_values(self) -> list[AirQualityMode] | None:
         """Return HVAC device Air Quality mode values."""
         if self.aq_mode_values is not None and len(self.aq_mode_values) > 0:
             return self.aq_mode_values
@@ -467,6 +467,10 @@ class HVAC(Device):
             return round(self.temp_step, 1)
         return API_DEFAULT_TEMP_STEP
 
+    def set_aq_mode(self, aq_mode: AirQualityMode) -> None:
+        """Set HVAC Air Quality mode."""
+        self.aq_mode_conf = aq_mode
+
     def set_power(self, power: bool) -> None:
         """Set HVAC power."""
         self.power = power
@@ -506,13 +510,13 @@ class HVAC(Device):
 
         aq_mode_conf = data.get(API_AQ_MODE_CONF)
         if aq_mode_conf is not None:
-            self.aq_mode_conf = str(aq_mode_conf)
+            self.aq_mode_conf = AirQualityMode(aq_mode_conf)
 
         aq_mode_values = data.get(API_AQ_MODE_VALUES)
         if aq_mode_values is not None:
             self.aq_mode_values = []
             for aq_mode_value in aq_mode_values:
-                self.aq_mode_values += [str(aq_mode_value)]
+                self.aq_mode_values += [AirQualityMode(aq_mode_value)]
 
         humidity = data.get(API_HUMIDITY)
         if humidity is not None:

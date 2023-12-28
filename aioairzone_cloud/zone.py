@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any
 from aioairzone_cloud.common import OperationMode
 
 from .const import (
+    API_AQ_MODE_CONF,
     API_MODE,
     API_MODE_AVAIL,
     API_NAME,
@@ -89,7 +90,9 @@ class Zone(HVAC):
     def set_param(self, param: str, data: dict[str, Any]) -> None:
         """Update device parameter from API request."""
 
-        if param == API_MODE:
+        if param == API_AQ_MODE_CONF:
+            self.set_aq_mode(data[API_VALUE])
+        elif param == API_MODE:
             if self.system is not None:
                 self.system.set_param(param, data)
             else:

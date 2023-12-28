@@ -2,7 +2,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import IntEnum
+from enum import IntEnum, StrEnum
+from typing import Any
 
 
 @dataclass
@@ -11,6 +12,20 @@ class ConnectionOptions:
 
     username: str
     password: str
+
+
+class AirQualityMode(StrEnum):
+    """Airzone Cloud air quality modes."""
+
+    UNKNOWN = "unknown"
+
+    OFF = "off"
+    ON = "on"
+    AUTO = "auto"
+
+    @classmethod
+    def _missing_(cls, value: Any) -> AirQualityMode:
+        return cls.UNKNOWN
 
 
 class OperationAction(IntEnum):
