@@ -33,7 +33,7 @@ class System(Device):
         return data
 
     def add_zone(self, zone: Zone) -> None:
-        """Add zone."""
+        """Add System zone."""
         zone_id = zone.get_id()
         if zone_id not in self.zones:
             self.zones[zone_id] = zone
@@ -43,7 +43,7 @@ class System(Device):
         return self.system_number
 
     def set_param(self, param: str, data: dict[str, Any]) -> None:
-        """Update device parameter from API request."""
+        """Update System parameter from API request."""
 
         if param == API_MODE:
             self.set_mode(data[API_VALUE])
