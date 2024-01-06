@@ -20,6 +20,7 @@ from .const import (
     API_AZ_SYSTEM,
     API_AZ_ZONE,
     API_CONFIG,
+    API_CONFIG_TYPE_ADVANCED,
     API_DEVICE_ID,
     API_DEVICE_TYPE,
     API_DEVICES,
@@ -166,6 +167,7 @@ class AirzoneCloudApi:
 
         params = {
             API_INSTALLATION_ID: device.get_installation(),
+            API_TYPE: API_CONFIG_TYPE_ADVANCED,
         }
         dev_params = urllib.parse.urlencode(params)
 
@@ -184,6 +186,7 @@ class AirzoneCloudApi:
 
         params = {
             API_INSTALLATION_ID: device.get_installation(),
+            API_TYPE: API_CONFIG_TYPE_ADVANCED,
         }
         dev_params = urllib.parse.urlencode(params)
 
@@ -594,7 +597,8 @@ class AirzoneCloudApi:
     async def update_aidoo(self, aidoo: Aidoo) -> None:
         """Update Airzone Cloud Zone from API."""
         device_data = await self.api_get_device_status(aidoo)
-        aidoo.update(device_data)
+        device_config = await self.api_get_device_config(aidoo)
+        aidoo.update(device_data | device_config)
 
     async def update_aidoos(self) -> None:
         """Update all Airzone Cloud Aidoos."""
@@ -656,7 +660,8 @@ class AirzoneCloudApi:
     async def update_system(self, system: System) -> None:
         """Update Airzone Cloud System from API."""
         device_data = await self.api_get_device_status(system)
-        system.update(device_data)
+        device_config = await self.api_get_device_config(system)
+        system.update(device_data | device_config)
 
     async def update_system_id(self, sys_id: str) -> None:
         """Update Airzone Cloud System by ID."""
@@ -726,7 +731,8 @@ class AirzoneCloudApi:
     async def update_zone(self, zone: Zone) -> None:
         """Update Airzone Cloud Zone from API."""
         device_data = await self.api_get_device_status(zone)
-        zone.update(device_data)
+        device_config = await self.api_get_device_config(zone)
+        zone.update(device_data | device_config)
 
     async def update_zone_id(self, zone_id: str) -> None:
         """Update Airzone Cloud Zone by ID."""
