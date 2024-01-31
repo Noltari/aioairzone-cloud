@@ -43,6 +43,7 @@ from .const import (
     AZD_AQ_MODE_VALUES,
     AZD_HUMIDITY,
     AZD_POWER,
+    AZD_RETURN_TEMP,
     AZD_TEMP,
     AZD_TEMP_SET,
     AZD_TEMP_SET_AUTO_AIR,
@@ -82,6 +83,7 @@ from .const import (
     API_EXCH_HEAT_TEMP_UE,
     API_PE_UE,
     API_WORK_TEMP,
+    API_RETURN_TEMP,
 )
 from .device import Device
 
@@ -106,6 +108,7 @@ class HVAC(Device):
         self.name: str = "HVAC"
         self.outdoor_unit_heat_exchanger_temperature: float | None = None
         self.power: bool | None = None
+        self.return_temp: float | None = None
         self.temp_set_max: float | None = None
         self.temp_set_max_auto_air: float | None = None
         self.temp_set_max_cool_air: float | None = None
@@ -145,6 +148,7 @@ class HVAC(Device):
         data[AZD_EXCH_HEAT_TEMP_IU] = self.get_indoor_unit_heat_exchanger_temperature()
         data[AZD_EXCH_HEAT_TEMP_UE] = self.get_outdoor_unit_heat_exchanger_temperature()
         data[AZD_POWER] = self.get_power()
+        data[AZD_RETURN_TEMP] = self.get_return_temperature()
         data[AZD_TEMP] = self.get_temperature()
         data[AZD_TEMP_STEP] = self.get_temp_step()
         data[AZD_WORK_TEMP] = self.get_work_temperature()
@@ -318,6 +322,12 @@ class HVAC(Device):
         """Return HVAC external temperature."""
         if self.ext_temp is not None:
             return round(self.ext_temp, 1)
+        return None
+
+    def get_return_temperature(self) -> float | None:
+        """Return HVAC external temperature."""
+        if self.return_temp is not None:
+            return round(self.return_temp, 1)
         return None
 
     def get_indoor_unit_heat_exchanger_temperature(self) -> float | None:
@@ -603,6 +613,11 @@ class HVAC(Device):
         if ext_temp is not None:
             if API_CELSIUS in ext_temp:
                 self.ext_temp = float(ext_temp[API_CELSIUS])
+
+        return_temp = data.get(API_RETURN_TEMP)
+        if return_temp is not None:
+            if API_CELSIUS in return_temp:
+                self.return_temp = float(return_temp[API_CELSIUS])
 
         indoor_unit_heat_exchanger_temperature = data.get(API_EXCH_HEAT_TEMP_IU)
         if indoor_unit_heat_exchanger_temperature is not None:
