@@ -1,4 +1,5 @@
 """Airzone Cloud token refresh example."""
+
 import asyncio
 import json
 import timeit

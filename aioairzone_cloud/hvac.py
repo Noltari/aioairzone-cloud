@@ -1,4 +1,5 @@
 """Airzone Cloud API HVAC device."""
+
 from __future__ import annotations
 
 from typing import Any

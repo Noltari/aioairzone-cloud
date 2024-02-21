@@ -1,4 +1,5 @@
 """Airzone Cloud API common code."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass

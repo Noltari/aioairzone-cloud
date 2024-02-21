@@ -1,4 +1,5 @@
 """Raw Airzone Cloud API data example."""
+
 import asyncio
 import json
 import timeit

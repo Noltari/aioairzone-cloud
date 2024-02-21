@@ -1,4 +1,5 @@
 """Basic Airzone Cloud client example."""
+
 import asyncio
 import json
 import timeit
