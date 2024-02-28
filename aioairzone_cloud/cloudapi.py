@@ -88,6 +88,7 @@ class AirzoneCloudApi:
         options: ConnectionOptions,
     ):
         """Airzone Cloud API init."""
+        self._api_init_done: bool = False
         self._api_raw_data: dict[str, Any] = {
             RAW_DEVICES_CONFIG: {},
             RAW_DEVICES_STATUS: {},
@@ -95,7 +96,6 @@ class AirzoneCloudApi:
             RAW_WEBSERVERS: {},
         }
         self._api_semaphore: Semaphore = Semaphore(HTTP_MAX_REQUESTS)
-        self._first_update_done: bool = False
         self.aidoos: dict[str, Aidoo] = {}
         self.devices: dict[str, Device] = {}
         self.groups: dict[str, Group] = {}
@@ -805,6 +805,7 @@ class AirzoneCloudApi:
         ]
 
         await asyncio.gather(*tasks)
+        self._api_init_done = True
 
     async def _update_websockets(self) -> bool:
         """Perform a websockets update of Airzone Cloud data."""
@@ -823,10 +824,7 @@ class AirzoneCloudApi:
 
     async def _update(self) -> None:
         """Update Airzone Cloud data using websockets and fall back to polling."""
-        if not self._first_update_done:
-            await self._update_polling()
-            self._first_update_done = True
-        elif not await self._update_websockets():
+        if not self._api_init_done or not await self._update_websockets():
             await self._update_polling()
 
     async def update(self) -> None:
