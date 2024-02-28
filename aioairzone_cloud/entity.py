@@ -103,7 +103,7 @@ class Entity(ABC):
         """Update Entity."""
         newer: bool = update.check_dt(self.datetime)
 
-        _LOGGER.warning(
+        _LOGGER.debug(
             "%s[%s] update (newer=%s) update=%s",
             type(self).__name__,
             self.get_id(),

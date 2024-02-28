@@ -113,14 +113,14 @@ class AirzoneCloudIWS:
                 WS_CORR_ID: corr_id,
                 WS_BODY: self.token.jwt(),
             }
-            _LOGGER.warning("WS[%s]: AUTH[%s]", self.inst_id, corr_id)
+            _LOGGER.debug("WS[%s]: AUTH[%s]", self.inst_id, corr_id)
             await ws.send_json(auth)
         else:
             _LOGGER.error("WS[%s]: AUTH error -> %s", self.inst_id, data)
 
     async def handler_close(self, ws: ClientWebSocketResponse) -> None:
         """WebSockets CLOSE handler."""
-        _LOGGER.warning("WS[%s]: CLOSE", self.inst_id)
+        _LOGGER.debug("WS[%s]: CLOSE", self.inst_id)
         await ws.close()
 
     async def handler_device_state(self, data: dict[str, Any]) -> None:
@@ -129,7 +129,7 @@ class AirzoneCloudIWS:
         update = EntityUpdate(UpdateType.WS_FULL, body)
         dev_id: str | None = body.get(API_DEVICE_ID)
 
-        _LOGGER.warning("WS[%s]: DEVICE_STATE[%s]", self.inst_id, dev_id)
+        _LOGGER.debug("WS[%s]: DEVICE_STATE[%s]", self.inst_id, dev_id)
 
         device = self.cloudapi.get_device_id(dev_id)
         if device is not None:
@@ -143,12 +143,10 @@ class AirzoneCloudIWS:
         body: str | None = data.get(WS_BODY)
 
         if body == self.inst_id:
-            _LOGGER.warning("WS[%s]: DEVICE_STATE_END", self.inst_id)
+            _LOGGER.debug("WS[%s]: DEVICE_STATE_END", self.inst_id)
             self.state_end.set()
         else:
-            _LOGGER.warning(
-                "WS[%s]: DEVICE_STATE_END mismatch (%s)", self.inst_id, body
-            )
+            _LOGGER.error("WS[%s]: DEVICE_STATE_END mismatch (%s)", self.inst_id, body)
 
     async def handler_devices_update(self, data: dict[str, Any]) -> None:
         """WebSockets DEVICES_UPDATES handler."""
@@ -156,7 +154,7 @@ class AirzoneCloudIWS:
         update = EntityUpdate(UpdateType.WS_PARTIAL, body)
         dev_id: str | None = body.get(API_DEVICE_ID)
 
-        _LOGGER.warning("WS[%s]: DEVICES_UPDATES[%s]", self.inst_id, dev_id)
+        _LOGGER.debug("WS[%s]: DEVICES_UPDATES[%s]", self.inst_id, dev_id)
 
         device = self.cloudapi.get_device_id(dev_id)
         if device is not None:
@@ -168,7 +166,7 @@ class AirzoneCloudIWS:
 
     async def handler_ping(self, ws: ClientWebSocketResponse) -> None:
         """WebSockets PING handler."""
-        _LOGGER.warning("WS[%s]: PING (%s)", self.inst_id, datetime.now())
+        _LOGGER.debug("WS[%s]: PING (%s)", self.inst_id, datetime.now())
         await ws.pong()
 
     async def handler_text(
@@ -195,7 +193,7 @@ class AirzoneCloudIWS:
         update = EntityUpdate(UpdateType.WS_PARTIAL, body)
         ws_id: str | None = body.get(API_WS_ID)
 
-        _LOGGER.warning("WS[%s]: WEBSERVER_UPDATES[%s]", self.inst_id, ws_id)
+        _LOGGER.debug("WS[%s]: WEBSERVER_UPDATES[%s]", self.inst_id, ws_id)
 
         webserver = self.cloudapi.get_webserver_id(ws_id)
         if webserver is not None:
@@ -232,7 +230,7 @@ class AirzoneCloudIWS:
 
     async def state_init(self) -> None:
         """WebSockets state init."""
-        _LOGGER.warning("WS[%s]: DEVICE_STATE_INIT", self.inst_id)
+        _LOGGER.debug("WS[%s]: DEVICE_STATE_INIT", self.inst_id)
 
         async with self.device_data_lock:
             self.device_data.clear()
