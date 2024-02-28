@@ -32,8 +32,13 @@ async def main():
             print("***")
 
             if _secrets.AIRZONE_OPTIONS.websockets:
-                await asyncio.sleep(30)
+                update_start = timeit.default_timer()
+                await client.update()
+                update_end = timeit.default_timer()
+                print(json.dumps(client.data(), indent=4, sort_keys=True))
+                print(f"Update time: {update_end - update_start}")
                 print("***")
+                await asyncio.sleep(30)
 
             update_start = timeit.default_timer()
             await client.update()

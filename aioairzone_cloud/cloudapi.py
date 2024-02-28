@@ -816,6 +816,8 @@ class AirzoneCloudApi:
         for websocket in self.websockets.values():
             if not websocket.is_connected():
                 websocket.connect()
+            elif not websocket.is_alive():
+                websocket.reconnect()
             try:
                 await asyncio.wait_for(websocket.state_end.wait(), WS_INIT_TIMEOUT)
             except asyncio.TimeoutError:

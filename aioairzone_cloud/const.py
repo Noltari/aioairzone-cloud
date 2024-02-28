@@ -208,6 +208,7 @@ RAW_WEBSERVERS: Final[str] = "webservers"
 
 TOKEN_REFRESH_PERIOD: Final[timedelta] = timedelta(hours=12)
 
+WS_ALIVE_PERIOD: Final[timedelta] = timedelta(minutes=1)
 WS_AUTH: Final[str] = "auth"
 WS_BODY: Final[str] = "body"
 WS_CHANGE: Final[str] = "change"

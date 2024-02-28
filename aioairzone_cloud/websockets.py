@@ -16,6 +16,7 @@ from .const import (
     API_DEVICE_ID,
     API_V1,
     API_WS_ID,
+    WS_ALIVE_PERIOD,
     WS_AUTH,
     WS_BODY,
     WS_CORR_ID,
@@ -49,6 +50,7 @@ class AirzoneCloudIWS:
         installation: Installation,
     ):
         """Airzone Cloud WebSockets init."""
+        self.alive_dt: datetime | None = None
         self.cloudapi: AirzoneCloudApi = cloudapi
         self.device_data_lock = Lock()
         self.device_data: dict[str, Any] = {}
@@ -98,6 +100,12 @@ class AirzoneCloudIWS:
             self.task = None
 
         return res
+
+    def reconnect(self) -> bool:
+        """WebSockets reconnect."""
+        _LOGGER.warning("WS[%s]: reconnecting...", self.inst_id)
+        self.disconnect()
+        return self.connect()
 
     def get_device_data(self, device: Device) -> dict[str, Any] | None:
         """Return WebSockets device data."""
@@ -209,8 +217,10 @@ class AirzoneCloudIWS:
                 _LOGGER.error(err)
 
             if json_data is not None:
+                self.set_alive()
                 await self.handler_text(ws, json_data)
         elif msg.type == WSMsgType.PING:
+            self.set_alive()
             await self.handler_ping(ws)
         elif msg.type == WSMsgType.CLOSE:
             await self.handler_close(ws)
@@ -218,6 +228,13 @@ class AirzoneCloudIWS:
             await self.handler_error(msg)
         else:
             _LOGGER.warning("Unknown WS msg: %s", msg)
+
+    def is_alive(self) -> bool:
+        """WebSockets connection alive."""
+        return (
+            self.alive_dt is not None
+            and (datetime.now() - self.alive_dt) <= WS_ALIVE_PERIOD
+        )
 
     def is_connected(self) -> bool:
         """WebSockets connection status."""
@@ -228,6 +245,10 @@ class AirzoneCloudIWS:
 
         return not task.done()
 
+    def set_alive(self) -> None:
+        """WebSockets alive status update."""
+        self.alive_dt = datetime.now()
+
     async def state_init(self) -> None:
         """WebSockets state init."""
         _LOGGER.debug("WS[%s]: DEVICE_STATE_INIT", self.inst_id)
@@ -235,4 +256,5 @@ class AirzoneCloudIWS:
         async with self.device_data_lock:
             self.device_data.clear()
 
+        self.alive_dt = None
         self.state_end.clear()
