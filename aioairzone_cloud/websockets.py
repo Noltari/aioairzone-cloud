@@ -90,6 +90,8 @@ class AirzoneCloudIWS:
 
     def disconnect(self) -> bool:
         """WebSockets task deletion."""
+        self.state_end.clear()
+
         task = self.task
 
         if task is None:
