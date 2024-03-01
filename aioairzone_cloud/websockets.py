@@ -84,6 +84,7 @@ class AirzoneCloudIWS:
         if self.task is not None:
             return self.is_connected()
 
+        self.state_end.clear()
         self.task = asyncio.create_task(self._connect())
 
         return True
@@ -93,13 +94,11 @@ class AirzoneCloudIWS:
         self.state_end.clear()
 
         task = self.task
-
         if task is None:
             return True
 
         res = task.cancel()
-        if res:
-            self.task = None
+        self.task = None
 
         return res
 
