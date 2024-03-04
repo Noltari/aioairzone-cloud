@@ -21,6 +21,7 @@ from .const import (
     API_AZ_SYSTEM,
     API_AZ_ZONE,
     API_CONFIG,
+    API_CONFIG_TYPE_ADVANCED,
     API_DEVICE_ID,
     API_DEVICE_TYPE,
     API_DEVICES,
@@ -168,6 +169,7 @@ class AirzoneCloudApi:
 
         params = {
             API_INSTALLATION_ID: device.get_installation(),
+            API_TYPE: API_CONFIG_TYPE_ADVANCED,
         }
         dev_params = urllib.parse.urlencode(params)
 
@@ -186,6 +188,7 @@ class AirzoneCloudApi:
 
         params = {
             API_INSTALLATION_ID: device.get_installation(),
+            API_TYPE: API_CONFIG_TYPE_ADVANCED,
         }
         dev_params = urllib.parse.urlencode(params)
 
@@ -625,8 +628,9 @@ class AirzoneCloudApi:
     async def update_aidoo(self, aidoo: Aidoo) -> None:
         """Update Airzone Cloud Zone from API."""
         device_data = await self.api_get_device_status(aidoo)
+        device_config = await self.api_get_device_config(aidoo)
 
-        update = EntityUpdate(UpdateType.API_FULL, device_data)
+        update = EntityUpdate(UpdateType.API_FULL, device_data | device_config)
 
         await aidoo.update(update)
 
@@ -708,8 +712,9 @@ class AirzoneCloudApi:
     async def update_system(self, system: System) -> None:
         """Update Airzone Cloud System from API."""
         device_data = await self.api_get_device_status(system)
+        device_config = await self.api_get_device_config(system)
 
-        update = EntityUpdate(UpdateType.API_FULL, device_data)
+        update = EntityUpdate(UpdateType.API_FULL, device_data | device_config)
 
         await system.update(update)
 
@@ -786,8 +791,9 @@ class AirzoneCloudApi:
     async def update_zone(self, zone: Zone) -> None:
         """Update Airzone Cloud Zone from API."""
         device_data = await self.api_get_device_status(zone)
+        device_config = await self.api_get_device_config(zone)
 
-        update = EntityUpdate(UpdateType.API_FULL, device_data)
+        update = EntityUpdate(UpdateType.API_FULL, device_data | device_config)
 
         await zone.update(update)
 

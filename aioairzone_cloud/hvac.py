@@ -44,6 +44,7 @@ from .const import (
     AZD_AQ_MODE_VALUES,
     AZD_HUMIDITY,
     AZD_POWER,
+    AZD_RETURN_TEMP,
     AZD_TEMP,
     AZD_TEMP_SET,
     AZD_TEMP_SET_AUTO_AIR,
@@ -69,6 +70,21 @@ from .const import (
     AZD_TEMP_SET_STOP_AIR,
     AZD_TEMP_SET_VENT_AIR,
     AZD_TEMP_STEP,
+    AZD_EXTERNAL_TEMP,
+    API_EXT_TEMP,
+    AZD_CONSUMPTION_UE,
+    AZD_DISCH_COMP_TEMP_UE,
+    AZD_EXCH_HEAT_TEMP_IU,
+    AZD_EXCH_HEAT_TEMP_UE,
+    AZD_PE_UE,
+    AZD_WORK_TEMP,
+    API_CONSUMPTION_UE,
+    API_DISCH_COMP_TEMP_UE,
+    API_EXCH_HEAT_TEMP_IU,
+    API_EXCH_HEAT_TEMP_UE,
+    API_PE_UE,
+    API_WORK_TEMP,
+    API_RETURN_TEMP,
 )
 from .device import Device
 from .entity import EntityUpdate, UpdateType
@@ -85,9 +101,16 @@ class HVAC(Device):
         self.aq_active: bool | None = None
         self.aq_mode_conf: AirQualityMode | None = None
         self.aq_mode_values: list[AirQualityMode] | None = None
+        self.consumption: float | None = None
+        self.compressor_discharge_pressure: float | None = None
+        self.compressor_discharge_temperature: float | None = None
+        self.ext_temp: float | None = None
+        self.indoor_unit_heat_exchanger_temperature: float | None = None
         self.humidity: int | None = None
         self.name: str = "HVAC"
+        self.outdoor_unit_heat_exchanger_temperature: float | None = None
         self.power: bool | None = None
+        self.return_temp: float | None = None
         self.temp_set_max: float | None = None
         self.temp_set_max_auto_air: float | None = None
         self.temp_set_max_cool_air: float | None = None
@@ -112,6 +135,7 @@ class HVAC(Device):
         self.temp_set_vent_air: float | None = None
         self.temp: float | None = None
         self.temp_step: float | None = None
+        self.work_temp: float | None = None
 
     def data(self) -> dict[str, Any]:
         """Return HVAC device data."""
@@ -119,9 +143,17 @@ class HVAC(Device):
 
         data[AZD_ACTION] = self.get_action()
         data[AZD_ACTIVE] = self.get_active()
+        data[AZD_CONSUMPTION_UE] = self.get_consumption()
+        data[AZD_PE_UE] = self.get_compressor_discharge_pressure()
+        data[AZD_DISCH_COMP_TEMP_UE] = self.get_compressor_discharge_temperature()
+        data[AZD_EXTERNAL_TEMP] = self.get_external_temperature()
+        data[AZD_EXCH_HEAT_TEMP_IU] = self.get_indoor_unit_heat_exchanger_temperature()
+        data[AZD_EXCH_HEAT_TEMP_UE] = self.get_outdoor_unit_heat_exchanger_temperature()
         data[AZD_POWER] = self.get_power()
+        data[AZD_RETURN_TEMP] = self.get_return_temperature()
         data[AZD_TEMP] = self.get_temperature()
         data[AZD_TEMP_STEP] = self.get_temp_step()
+        data[AZD_WORK_TEMP] = self.get_work_temperature()
 
         aq_active = self.get_aq_active()
         if aq_active is not None:
@@ -270,6 +302,46 @@ class HVAC(Device):
         """Return HVAC device Air Quality mode values."""
         if self.aq_mode_values is not None and len(self.aq_mode_values) > 0:
             return self.aq_mode_values
+        return None
+
+    def get_consumption(self) -> float | None:
+        """Return HVAC power consumption."""
+        return self.consumption
+
+    def get_compressor_discharge_pressure(self) -> float | None:
+        """Return HVAC discharge pressure."""
+        if self.compressor_discharge_pressure is not None:
+            return self.compressor_discharge_pressure * 1000
+        return None
+
+    def get_compressor_discharge_temperature(self) -> float | None:
+        """Return HVAC compressor discharge temperature."""
+        if self.compressor_discharge_temperature is not None:
+            return round(self.compressor_discharge_temperature, 1)
+        return None
+
+    def get_external_temperature(self) -> float | None:
+        """Return HVAC external temperature."""
+        if self.ext_temp is not None:
+            return round(self.ext_temp, 1)
+        return None
+
+    def get_return_temperature(self) -> float | None:
+        """Return HVAC external temperature."""
+        if self.return_temp is not None:
+            return round(self.return_temp, 1)
+        return None
+
+    def get_indoor_unit_heat_exchanger_temperature(self) -> float | None:
+        """Return HVAC heat exchanger temperature."""
+        if self.indoor_unit_heat_exchanger_temperature is not None:
+            return round(self.indoor_unit_heat_exchanger_temperature, 1)
+        return None
+
+    def get_outdoor_unit_heat_exchanger_temperature(self) -> float | None:
+        """Return HVAC heat exchanger temperature."""
+        if self.outdoor_unit_heat_exchanger_temperature is not None:
+            return round(self.outdoor_unit_heat_exchanger_temperature, 1)
         return None
 
     def get_humidity(self) -> int | None:
@@ -469,6 +541,12 @@ class HVAC(Device):
             return round(self.temp_step, 1)
         return API_DEFAULT_TEMP_STEP
 
+    def get_work_temperature(self) -> float | None:
+        """Return HVAC work temperature."""
+        if self.work_temp is not None:
+            return round(self.work_temp, 1)
+        return None
+
     def set_aq_mode(self, aq_mode: AirQualityMode) -> None:
         """Set HVAC Air Quality mode."""
         self.aq_mode_conf = aq_mode
@@ -522,6 +600,39 @@ class HVAC(Device):
             self.aq_mode_values = []
             for aq_mode_value in aq_mode_values:
                 self.aq_mode_values += [AirQualityMode(aq_mode_value)]
+
+        consumption_ue = data.get(API_CONSUMPTION_UE)
+        if consumption_ue is not None:
+            self.consumption = float(consumption_ue)
+
+        compressor_discharge_temperature = data.get(API_DISCH_COMP_TEMP_UE)
+        if compressor_discharge_temperature is not None:
+            if API_CELSIUS in compressor_discharge_temperature:
+                self.compressor_discharge_temperature = float(compressor_discharge_temperature[API_CELSIUS])
+
+        discharge_pressure = data.get(API_PE_UE)
+        if discharge_pressure is not None:
+            self.compressor_discharge_pressure = float(discharge_pressure)
+
+        ext_temp = data.get(API_EXT_TEMP)
+        if ext_temp is not None:
+            if API_CELSIUS in ext_temp:
+                self.ext_temp = float(ext_temp[API_CELSIUS])
+
+        return_temp = data.get(API_RETURN_TEMP)
+        if return_temp is not None:
+            if API_CELSIUS in return_temp:
+                self.return_temp = float(return_temp[API_CELSIUS])
+
+        indoor_unit_heat_exchanger_temperature = data.get(API_EXCH_HEAT_TEMP_IU)
+        if indoor_unit_heat_exchanger_temperature is not None:
+            if API_CELSIUS in indoor_unit_heat_exchanger_temperature:
+                self.indoor_unit_heat_exchanger_temperature = float(indoor_unit_heat_exchanger_temperature[API_CELSIUS])
+
+        outdoor_unit_heat_exchanger_temperature = data.get(API_EXCH_HEAT_TEMP_UE)
+        if outdoor_unit_heat_exchanger_temperature is not None:
+            if API_CELSIUS in outdoor_unit_heat_exchanger_temperature:
+                self.outdoor_unit_heat_exchanger_temperature = float(outdoor_unit_heat_exchanger_temperature[API_CELSIUS])
 
         humidity = data.get(API_HUMIDITY)
         if humidity is not None:
@@ -631,3 +742,8 @@ class HVAC(Device):
         if step is not None:
             if API_CELSIUS in step:
                 self.temp_step = float(step[API_CELSIUS])
+
+        work_temp = data.get(API_WORK_TEMP)
+        if work_temp is not None:
+            if API_CELSIUS in work_temp:
+                self.work_temp = float(work_temp[API_CELSIUS])
