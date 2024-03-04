@@ -191,8 +191,10 @@ class AirzoneCloudIWS:
             self.handler_device_state_end(data)
         elif event.startswith(WS_DEVICES_UPDATES):
             await self.handler_devices_update(data)
+            self.cloudapi.update_callback()
         elif event.startswith(WS_WEBSERVER_UPDATES):
             await self.handler_webserver_updates(data)
+            self.cloudapi.update_callback()
         else:
             _LOGGER.warning("WS[%s]: EVENT[%s] -> %s", self.inst_id, event, data)
 

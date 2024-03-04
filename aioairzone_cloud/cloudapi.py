@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import asyncio
-from asyncio import Semaphore
+from asyncio import Lock, Semaphore
+from collections.abc import Callable
 import logging
 from typing import Any, cast
 import urllib.parse
@@ -82,6 +83,9 @@ _LOGGER = logging.getLogger(__name__)
 class AirzoneCloudApi:
     """Airzone Cloud API."""
 
+    callback_function: Callable[[dict[str, Any]], None] | None
+    callback_lock: Lock
+
     def __init__(
         self,
         session: ClientSession | None,
@@ -97,6 +101,8 @@ class AirzoneCloudApi:
         }
         self._api_semaphore: Semaphore = Semaphore(HTTP_MAX_REQUESTS)
         self.aidoos: dict[str, Aidoo] = {}
+        self.callback_function = None
+        self.callback_lock = Lock()
         self.devices: dict[str, Device] = {}
         self.groups: dict[str, Group] = {}
         self.installations: dict[str, Installation] = {}
@@ -848,3 +854,20 @@ class AirzoneCloudApi:
         except LoginError:
             await self.login()
             await self._update()
+
+    async def _update_callback(self) -> None:
+        """Perform update callback."""
+        if self.callback_function:
+            async with self.callback_lock:
+                self.callback_function(self.data())
+
+    def update_callback(self) -> None:
+        """Create update callback task."""
+        if self.callback_function:
+            asyncio.ensure_future(self._update_callback())
+
+    def set_update_callback(
+        self, callback_function: Callable[[dict[str, Any]], None]
+    ) -> None:
+        """Set update callback."""
+        self.callback_function = callback_function
