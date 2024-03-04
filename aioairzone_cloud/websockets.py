@@ -85,7 +85,7 @@ class AirzoneCloudIWS:
             return self.is_connected()
 
         self.state_end.clear()
-        self.task = asyncio.create_task(self._connect())
+        self.task = asyncio.ensure_future(self._connect())
 
         return True
 
