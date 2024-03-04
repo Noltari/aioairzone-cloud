@@ -633,6 +633,15 @@ class AirzoneCloudApi:
 
         await asyncio.gather(*tasks)
 
+    def connect_installation_websockets(self, inst_id: str) -> None:
+        """Connect installation WebSockets."""
+        if not self.options.websockets:
+            return
+
+        inst_ws = self.websockets.get(inst_id)
+        if inst_ws is not None:
+            inst_ws.connect()
+
     async def update_installation(self, inst: Installation) -> None:
         """Update Airzone Cloud installation from API."""
         inst_id = inst.get_id()
@@ -666,9 +675,7 @@ class AirzoneCloudApi:
                             group.add_aidoo(aidoo)
                             inst.add_aidoo(aidoo)
 
-        inst_ws = self.websockets.get(inst_id)
-        if inst_ws is not None:
-            inst_ws.connect()
+        self.connect_installation_websockets(inst_id)
 
     async def update_installations(self) -> None:
         """Update Airzone Cloud installations from API."""
