@@ -1,6 +1,8 @@
 """Airzone Cloud Local API based device."""
+
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 from .const import (
@@ -30,13 +32,18 @@ from .const import (
     AZD_WIFI_RSSI,
     AZD_WIFI_SSID,
 )
+from .entity import Entity, EntityUpdate
+
+_LOGGER = logging.getLogger(__name__)
 
 
-class WebServer:
+class WebServer(Entity):
     """Airzone Cloud WebServer."""
 
     def __init__(self, inst_id: str, ws_id: str):
         """Airzone Cloud WebServer init."""
+        super().__init__()
+
         self.connection_date: str | None = None
         self.disconnection_date: str | None = None
         self.firmware: str | None = None
@@ -52,8 +59,9 @@ class WebServer:
         self.wifi_rssi: int | None = None
         self.wifi_ssid: str | None = None
 
-    def update(self, data: dict[str, Any]) -> None:
+    def update_data(self, update: EntityUpdate) -> None:
         """Update WebServer data."""
+        data = update.get_data()
 
         ws_type = data.get(API_WS_TYPE)
         if ws_type is not None:

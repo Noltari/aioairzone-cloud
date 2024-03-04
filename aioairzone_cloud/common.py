@@ -1,4 +1,5 @@
 """Airzone Cloud API common code."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -12,6 +13,7 @@ class ConnectionOptions:
 
     username: str
     password: str
+    websockets: bool = True
 
 
 class AirQualityMode(StrEnum):

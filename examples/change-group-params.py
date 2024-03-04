@@ -1,4 +1,5 @@
 """Change Airzone Cloud group parameters example."""
+
 import asyncio
 import json
 import timeit

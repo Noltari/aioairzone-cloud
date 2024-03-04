@@ -1,7 +1,8 @@
 """Airzone Cloud API Device."""
+
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 import logging
 from typing import Any
 
@@ -43,17 +44,18 @@ from .const import (
     AZD_WEBSERVER,
     AZD_WS_CONNECTED,
 )
+from .entity import Entity, EntityUpdate
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class Device(ABC):
+class Device(Entity):
     """Airzone Cloud Device."""
-
-    name: str
 
     def __init__(self, inst_id: str, ws_id: str, device_data: dict[str, Any]):
         """Airzone Cloud Device init."""
+        super().__init__()
+
         self.auto_mode: OperationMode | None = None
         self.aq_pm_1: int | None = None
         self.aq_pm_2p5: int | None = None
@@ -239,8 +241,10 @@ class Device(ABC):
     def set_param(self, param: str, data: dict[str, Any]) -> None:
         """Update device parameter from API request."""
 
-    def update(self, data: dict[str, Any]) -> None:
+    def update_data(self, update: EntityUpdate) -> None:
         """Update Device data."""
+        data = update.get_data()
+
         is_connected = data.get(API_IS_CONNECTED)
         if is_connected is not None:
             self.is_connected = bool(is_connected)

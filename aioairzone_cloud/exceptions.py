@@ -1,4 +1,5 @@
 """Airzone Cloud API exceptions."""
+
 from __future__ import annotations
 
 

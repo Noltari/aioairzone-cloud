@@ -1,4 +1,5 @@
 """Basic Airzone Cloud client example."""
+
 import asyncio
 import json
 import timeit
@@ -29,6 +30,15 @@ async def main():
             client.select_installation(inst_list[0])
             await client.update_installation(inst_list[0])
             print("***")
+
+            if _secrets.AIRZONE_OPTIONS.websockets:
+                update_start = timeit.default_timer()
+                await client.update()
+                update_end = timeit.default_timer()
+                print(json.dumps(client.data(), indent=4, sort_keys=True))
+                print(f"Update time: {update_end - update_start}")
+                print("***")
+                await asyncio.sleep(30)
 
             update_start = timeit.default_timer()
             await client.update()

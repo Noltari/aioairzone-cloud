@@ -1,4 +1,5 @@
 """Airzone Cloud API Zone device."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
@@ -20,6 +21,7 @@ from .const import (
     AZD_SYSTEM_ID,
     AZD_ZONE,
 )
+from .entity import EntityUpdate, UpdateType
 from .hvac import HVAC
 
 if TYPE_CHECKING:
@@ -106,11 +108,14 @@ class Zone(HVAC):
         """Set System."""
         self.system = system
 
-    def update(self, data: dict[str, Any]) -> None:
+    def update_data(self, update: EntityUpdate) -> None:
         """Update Zone data."""
-        super().update(data)
+        super().update_data(update)
 
-        if API_MODE_AVAIL in data:
-            self.master = len(data[API_MODE_AVAIL]) > 0
-        else:
-            self.master = None
+        if update.get_type() == UpdateType.API_FULL:
+            data = update.get_data()
+
+            if API_MODE_AVAIL in data:
+                self.master = len(data[API_MODE_AVAIL]) > 0
+            else:
+                self.master = None
