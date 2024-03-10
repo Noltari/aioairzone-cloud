@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from .common import parse_str
 from .const import (
     API_INSTALLATION_ID,
     API_NAME,
@@ -24,7 +25,7 @@ class Installation(DeviceGroup):
         super().__init__()
 
         self.groups: dict[str, Group] = {}
-        self.id = str(inst_data[API_INSTALLATION_ID])
+        self.id = parse_str(inst_data[API_INSTALLATION_ID])
         self.webservers: list[str] = []
 
         name: str = inst_data.get(API_NAME, "")

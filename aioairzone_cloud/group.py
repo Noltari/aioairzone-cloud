@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from .common import parse_str
 from .const import API_GROUP_ID, API_NAME, AZD_INSTALLATION
 from .device_group import DeviceGroup
 
@@ -15,7 +16,7 @@ class Group(DeviceGroup):
         """Airzone Cloud Group init."""
         super().__init__()
 
-        self.id = str(group_data[API_GROUP_ID])
+        self.id = parse_str(group_data[API_GROUP_ID])
         self.installation_id = inst_id
 
         name: str = group_data.get(API_NAME, "")

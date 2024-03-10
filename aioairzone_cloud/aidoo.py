@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from .common import SpeedType
+from .common import SpeedType, parse_int, parse_str
 from .const import (
     API_MODE,
     API_NAME,
@@ -33,8 +33,9 @@ class Aidoo(HVAC):
         self.speeds: dict[int, int] = {}
         self.speed_type: SpeedType | None = None
 
-        if API_NAME in device_data:
-            self.name = str(device_data[API_NAME])
+        device_name = parse_str(device_data.get(API_NAME))
+        if device_name is not None:
+            self.name = device_name
         else:
             self.name = f"Aidoo {ws_id}"
 
@@ -92,9 +93,9 @@ class Aidoo(HVAC):
 
         data = update.get_data()
 
-        speed = data.get(API_SPEED_CONF)
+        speed = parse_int(data.get(API_SPEED_CONF))
         if speed is not None:
-            self.speed = int(speed)
+            self.speed = speed
 
         speed_type = data.get(API_SPEED_TYPE)
         if speed_type is not None:

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from .common import parse_int
 from .const import API_MODE, API_SYSTEM_NUMBER, API_VALUE, AZD_SYSTEM
 from .device import Device
 
@@ -21,7 +22,7 @@ class System(Device):
         self.zones: dict[str, Zone] = {}
 
         sub_data = self.sub_data(device_data)
-        self.system_number = int(sub_data[API_SYSTEM_NUMBER])
+        self.system_number = parse_int(sub_data[API_SYSTEM_NUMBER])
 
         self.name = f"System {self.system_number}"
 
