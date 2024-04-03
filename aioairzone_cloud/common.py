@@ -106,3 +106,31 @@ class TemperatureUnit(IntEnum):
 
     CELSIUS = 0
     FAHRENHEIT = 1
+
+
+def parse_bool(data: Any) -> bool | None:
+    """Convert data to bool."""
+    if data is not None:
+        return bool(data)
+    return None
+
+
+def parse_float(data: Any) -> float | None:
+    """Convert data to float."""
+    if data is not None:
+        return float(data)
+    return None
+
+
+def parse_int(data: Any) -> int | None:
+    """Convert data to int."""
+    if data is not None:
+        return int(data)
+    return None
+
+
+def parse_str(data: Any) -> str | None:
+    """Convert data to string."""
+    if data is not None:
+        return str(data)
+    return None
