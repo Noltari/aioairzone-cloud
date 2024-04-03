@@ -6,7 +6,7 @@ from abc import abstractmethod
 import logging
 from typing import Any
 
-from .common import OperationMode
+from .common import OperationMode, parse_bool, parse_int, parse_str
 from .const import (
     API_AQ_PM_1,
     API_AQ_PM_2P5,
@@ -72,8 +72,9 @@ class Device(Entity):
         self.webserver_id = ws_id
         self.ws_connected: bool = True
 
-        if API_IS_CONNECTED in device_data:
-            self.is_connected = bool(device_data[API_IS_CONNECTED])
+        is_connected = parse_bool(device_data.get(API_IS_CONNECTED))
+        if is_connected is not None:
+            self.is_connected = is_connected
         else:
             self.is_connected = True
 
@@ -245,32 +246,32 @@ class Device(Entity):
         """Update Device data."""
         data = update.get_data()
 
-        is_connected = data.get(API_IS_CONNECTED)
+        is_connected = parse_bool(data.get(API_IS_CONNECTED))
         if is_connected is not None:
-            self.is_connected = bool(is_connected)
-        ws_connected = data.get(API_WS_CONNECTED)
+            self.is_connected = is_connected
+        ws_connected = parse_bool(data.get(API_WS_CONNECTED))
         if ws_connected is not None:
-            self.ws_connected = bool(ws_connected)
+            self.ws_connected = ws_connected
 
-        aq_pm_1 = data.get(API_AQ_PM_1)
+        aq_pm_1 = parse_int(data.get(API_AQ_PM_1))
         if aq_pm_1 is not None:
-            self.aq_pm_1 = int(aq_pm_1)
+            self.aq_pm_1 = aq_pm_1
 
-        aq_pm_2p5 = data.get(API_AQ_PM_2P5)
+        aq_pm_2p5 = parse_int(data.get(API_AQ_PM_2P5))
         if aq_pm_2p5 is not None:
-            self.aq_pm_2p5 = int(aq_pm_2p5)
+            self.aq_pm_2p5 = aq_pm_2p5
 
-        aq_pm_10 = data.get(API_AQ_PM_10)
+        aq_pm_10 = parse_int(data.get(API_AQ_PM_10))
         if aq_pm_10 is not None:
-            self.aq_pm_10 = int(aq_pm_10)
+            self.aq_pm_10 = aq_pm_10
 
-        aq_present = data.get(API_AQ_PRESENT)
+        aq_present = parse_bool(data.get(API_AQ_PRESENT))
         if aq_present is not None:
-            self.aq_present = bool(aq_present)
+            self.aq_present = aq_present
 
-        aq_status = data.get(API_AQ_QUALITY)
+        aq_status = parse_str(data.get(API_AQ_QUALITY))
         if aq_status is not None:
-            self.aq_status = str(aq_status)
+            self.aq_status = aq_status
 
         errors = data.get(API_ERRORS)
         if errors is not None:
