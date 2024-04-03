@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any
 
 from aioairzone_cloud.common import OperationMode
 
+from .common import parse_str
 from .const import (
     API_AQ_MODE_CONF,
     API_MODE,
@@ -42,8 +43,9 @@ class Zone(HVAC):
         self.system_number = int(sub_data[API_SYSTEM_NUMBER])
         self.zone_number = int(sub_data[API_ZONE_NUMBER])
 
-        if API_NAME in device_data:
-            self.name = str(device_data[API_NAME])
+        device_name = parse_str(device_data.get(API_NAME))
+        if device_name is not None:
+            self.name = device_name
         else:
             self.name = f"Zone {self.system_number}:{self.zone_number}"
 
