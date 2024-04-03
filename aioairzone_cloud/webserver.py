@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 from typing import Any
 
+from .common import parse_bool, parse_int, parse_str
 from .const import (
     API_CONFIG,
     API_CONNECTION_DATE,
@@ -63,42 +64,42 @@ class WebServer(Entity):
         """Update WebServer data."""
         data = update.get_data()
 
-        ws_type = data.get(API_WS_TYPE)
+        ws_type = parse_str(data.get(API_WS_TYPE))
         if ws_type is not None:
-            self.type = str(ws_type)
+            self.type = ws_type
 
         ws_config = data.get(API_CONFIG)
         if ws_config is not None:
-            stat_ap_mac = ws_config.get(API_STAT_AP_MAC)
+            stat_ap_mac = parse_str(ws_config.get(API_STAT_AP_MAC))
             if stat_ap_mac is not None:
-                self.wifi_mac = str(stat_ap_mac)
-            stat_channel = ws_config.get(API_STAT_CHANNEL)
+                self.wifi_mac = stat_ap_mac
+            stat_channel = parse_int(ws_config.get(API_STAT_CHANNEL))
             if stat_channel is not None:
-                self.wifi_channel = int(stat_channel)
-            stat_ssid = ws_config.get(API_STAT_SSID)
+                self.wifi_channel = stat_channel
+            stat_ssid = parse_str(ws_config.get(API_STAT_SSID))
             if stat_ssid is not None:
-                self.wifi_ssid = str(stat_ssid)
-            ws_fw = ws_config.get(API_WS_FW)
+                self.wifi_ssid = stat_ssid
+            ws_fw = parse_str(ws_config.get(API_WS_FW))
             if ws_fw is not None:
-                self.firmware = str(ws_fw)
+                self.firmware = ws_fw
 
         ws_status = data.get(API_STATUS)
         if ws_status is not None:
-            connection_date = ws_status.get(API_CONNECTION_DATE)
+            connection_date = parse_str(ws_status.get(API_CONNECTION_DATE))
             if connection_date is not None:
-                self.connection_date = str(connection_date)
-            disconnection_date = ws_status.get(API_DISCONNECTION_DATE)
+                self.connection_date = connection_date
+            disconnection_date = parse_str(ws_status.get(API_DISCONNECTION_DATE))
             if disconnection_date is not None:
-                self.disconnection_date = str(disconnection_date)
-            is_connected = ws_status.get(API_IS_CONNECTED)
+                self.disconnection_date = disconnection_date
+            is_connected = parse_bool(ws_status.get(API_IS_CONNECTED))
             if is_connected is not None:
-                self.is_connected = bool(is_connected)
-            stat_quality = ws_status.get(API_STAT_QUALITY)
+                self.is_connected = is_connected
+            stat_quality = parse_int(ws_status.get(API_STAT_QUALITY))
             if stat_quality is not None:
-                self.wifi_quality = int(stat_quality)
-            stat_rssi = ws_status.get(API_STAT_RSSI)
+                self.wifi_quality = stat_quality
+            stat_rssi = parse_int(ws_status.get(API_STAT_RSSI))
             if stat_rssi is not None:
-                self.wifi_rssi = int(stat_rssi)
+                self.wifi_rssi = stat_rssi
 
     def data(self) -> dict[str, Any]:
         """Return WebServer data."""
