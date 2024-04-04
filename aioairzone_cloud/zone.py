@@ -14,6 +14,8 @@ from .const import (
     API_NAME,
     API_POWER,
     API_SETPOINT,
+    API_SP_AIR_COOL,
+    API_SP_AIR_HEAT,
     API_SYSTEM_NUMBER,
     API_VALUE,
     API_ZONE_NUMBER,
@@ -105,6 +107,10 @@ class Zone(HVAC):
             self.set_power(data[API_VALUE])
         elif param == API_SETPOINT:
             self.set_setpoint(data[API_VALUE])
+        elif param == API_SP_AIR_COOL:
+            self.set_setpoint_cool(data[API_VALUE])
+        elif param == API_SP_AIR_HEAT:
+            self.set_setpoint_heat(data[API_VALUE])
 
     def set_system(self, system: System) -> None:
         """Set System."""
