@@ -99,7 +99,6 @@ class Device(Entity):
             AZD_ID: self.get_id(),
             AZD_INSTALLATION: self.get_installation(),
             AZD_IS_CONNECTED: self.get_is_connected(),
-            AZD_MODE: self.get_mode(),
             AZD_NAME: self.get_name(),
             AZD_PROBLEMS: self.get_problems(),
             AZD_WEBSERVER: self.get_webserver(),
@@ -133,6 +132,10 @@ class Device(Entity):
         errors = self.get_errors()
         if len(errors) > 0:
             data[AZD_ERRORS] = errors
+
+        mode = self.get_mode()
+        if mode is not None:
+            data[AZD_MODE] = mode
 
         mode_auto = self.get_mode_auto()
         if mode_auto is not None:

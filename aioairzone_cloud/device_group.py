@@ -16,6 +16,7 @@ from .const import (
     AZD_ACTIVE,
     AZD_AIDOOS,
     AZD_AVAILABLE,
+    AZD_HOT_WATERS,
     AZD_HUMIDITY,
     AZD_ID,
     AZD_MODE,
@@ -31,6 +32,7 @@ from .const import (
     AZD_TEMP_STEP,
     AZD_ZONES,
 )
+from .hotwater import HotWater
 from .system import System
 from .zone import Zone
 
@@ -45,6 +47,7 @@ class DeviceGroup(ABC):
         """Airzone Cloud DeviceGroup init."""
 
         self.aidoos: dict[str, Aidoo] = {}
+        self.dhws: dict[str, HotWater] = {}
         self.systems: dict[str, System] = {}
         self.zones: dict[str, Zone] = {}
 
@@ -54,6 +57,8 @@ class DeviceGroup(ABC):
 
         if len(self.aidoos) > 0:
             data[AZD_AIDOOS] = list(self.aidoos)
+        if len(self.dhws) > 0:
+            data[AZD_HOT_WATERS] = list(self.dhws)
         if len(self.systems) > 0:
             data[AZD_SYSTEMS] = list(self.systems)
         if len(self.zones) > 0:
@@ -134,6 +139,12 @@ class DeviceGroup(ABC):
         aidoo_id = aidoo.get_id()
         if aidoo_id not in self.aidoos:
             self.aidoos[aidoo_id] = aidoo
+
+    def add_dhw(self, dhw: HotWater) -> None:
+        """Add DHW to DeviceGroup."""
+        dhw_id = dhw.get_id()
+        if dhw_id not in self.dhws:
+            self.dhws[dhw_id] = dhw
 
     def add_system(self, system: System) -> None:
         """Add System to DeviceGroup."""

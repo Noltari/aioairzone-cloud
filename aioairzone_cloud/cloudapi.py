@@ -16,7 +16,9 @@ from .common import ConnectionOptions, OperationMode
 from .const import (
     API_AUTH_LOGIN,
     API_AUTH_REFRESH_TOKEN,
+    API_AZ_ACS,
     API_AZ_AIDOO,
+    API_AZ_AIDOO_ACS,
     API_AZ_AIDOO_PRO,
     API_AZ_SYSTEM,
     API_AZ_ZONE,
@@ -45,6 +47,7 @@ from .const import (
     API_WS_ID,
     AZD_AIDOOS,
     AZD_GROUPS,
+    AZD_HOT_WATERS,
     AZD_INSTALLATIONS,
     AZD_SYSTEMS,
     AZD_WEBSERVERS,
@@ -70,6 +73,7 @@ from .exceptions import (
     TooManyRequests,
 )
 from .group import Group
+from .hotwater import HotWater
 from .installation import Installation
 from .system import System
 from .token import AirzoneCloudToken
@@ -104,6 +108,7 @@ class AirzoneCloudApi:
         self.callback_function = None
         self.callback_lock = Lock()
         self.devices: dict[str, Device] = {}
+        self.dhws: dict[str, HotWater] = {}
         self.groups: dict[str, Group] = {}
         self.installations: dict[str, Installation] = {}
         self.options = options
@@ -400,6 +405,12 @@ class AirzoneCloudApi:
         if device is not None:
             await self.api_set_device_params(device, params)
 
+    async def api_set_dhw_id_params(self, dhw_id: str, params: dict[str, Any]) -> None:
+        """Set dhw parameters."""
+        dhw = self.get_dhw_id(dhw_id)
+        if dhw is not None:
+            await self.api_set_device_params(dhw, params)
+
     async def api_set_group_id_params(
         self, group_id: str, params: dict[str, Any]
     ) -> None:
@@ -487,6 +498,12 @@ class AirzoneCloudApi:
                 aidoos[key] = aidoo.data()
             data[AZD_AIDOOS] = aidoos
 
+        if len(self.dhws) > 0:
+            dhws: dict[str, Any] = {}
+            for key, dhw in self.dhws.items():
+                dhws[key] = dhw.data()
+            data[AZD_HOT_WATERS] = dhws
+
         if len(self.groups) > 0:
             groups: dict[str, Any] = {}
             for key, group in self.groups.items():
@@ -530,6 +547,11 @@ class AirzoneCloudApi:
         if dev_id not in self.devices:
             self.devices[dev_id] = device
 
+    def add_dhw(self, dhw: HotWater) -> None:
+        """Add Airzone Cloud Domestic Hot Water."""
+        self.dhws[dhw.get_id()] = dhw
+        self.add_device(dhw)
+
     def add_system(self, system: System) -> None:
         """Add Airzone Cloud System."""
         self.systems[system.get_id()] = system
@@ -549,6 +571,10 @@ class AirzoneCloudApi:
         if dev_id is not None:
             return self.devices.get(dev_id)
         return None
+
+    def get_dhw_id(self, dhw_id: str) -> HotWater | None:
+        """Return Airzone Cloud DHW by ID."""
+        return self.dhws.get(dhw_id)
 
     def get_group_id(self, group_id: str) -> Group | None:
         """Return Airzone Cloud Group by ID."""
@@ -639,6 +665,23 @@ class AirzoneCloudApi:
 
         await asyncio.gather(*tasks)
 
+    async def update_dhw(self, dhw: HotWater) -> None:
+        """Update Airzone Cloud DHW from API."""
+        device_data = await self.api_get_device_status(dhw)
+
+        update = EntityUpdate(UpdateType.API_FULL, device_data)
+
+        await dhw.update(update)
+
+    async def update_dhws(self) -> None:
+        """Update all Airzone Cloud DHWs."""
+        tasks = []
+
+        for dhw in self.dhws.values():
+            tasks += [self.update_dhw(dhw)]
+
+        await asyncio.gather(*tasks)
+
     def connect_installation_websockets(self, inst_id: str) -> None:
         """Connect installation WebSockets."""
         if not self.options.websockets:
@@ -680,6 +723,13 @@ class AirzoneCloudApi:
                             self.add_aidoo(aidoo)
                             group.add_aidoo(aidoo)
                             inst.add_aidoo(aidoo)
+                elif device_type in [API_AZ_ACS, API_AZ_AIDOO_ACS]:
+                    if self.get_dhw_id(device_id) is None:
+                        dhw = HotWater(inst_id, device_data[API_WS_ID], device_data)
+                        if HotWater is not None:
+                            self.add_dhw(dhw)
+                            group.add_dhw(dhw)
+                            inst.add_dhw(dhw)
 
         self.connect_installation_websockets(inst_id)
 
@@ -767,6 +817,13 @@ class AirzoneCloudApi:
                             self.add_aidoo(aidoo)
                             if inst is not None:
                                 inst.add_aidoo(aidoo)
+                elif device_type in [API_AZ_ACS, API_AZ_AIDOO_ACS]:
+                    if self.get_dhw_id(device_id) is None:
+                        dhw = HotWater(ws.get_installation(), ws_id, device_data)
+                        if dhw is not None:
+                            self.add_dhw(dhw)
+                            if inst is not None:
+                                inst.add_dhw(dhw)
 
     async def update_webserver_id(self, ws_id: str, devices: bool) -> None:
         """Update Airzone Cloud WebServer by ID."""
@@ -815,6 +872,7 @@ class AirzoneCloudApi:
             self.update_webservers(False),
             self.update_systems_zones(),
             self.update_aidoos(),
+            self.update_dhws(),
         ]
 
         await asyncio.gather(*tasks)
