@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from .common import parse_bool, parse_float, parse_int
+from .common import HotWaterOperation, parse_bool, parse_float, parse_int
 from .const import (
     API_ACTIVE,
     API_CELSIUS,
@@ -18,6 +18,8 @@ from .const import (
     API_TANK_TEMP,
     API_VALUE,
     AZD_ACTIVE,
+    AZD_OPERATION,
+    AZD_OPERATIONS,
     AZD_POWER,
     AZD_POWER_MODE,
     AZD_TEMP,
@@ -38,7 +40,7 @@ class HotWater(Device):
         super().__init__(inst_id, ws_id, device_data)
 
         self.active: bool | None = None
-        self.name: str = "DHW"
+        self.name: str = "Airzone Cloud DHW"
         self.power: bool | None = None
         self.power_mode: bool | None = None
         self.temp_set_max: int | None = None
@@ -52,6 +54,8 @@ class HotWater(Device):
         data = super().data()
 
         data[AZD_ACTIVE] = self.get_active()
+        data[AZD_OPERATION] = self.get_operation()
+        data[AZD_OPERATIONS] = self.get_operations()
         data[AZD_POWER] = self.get_power()
         data[AZD_TEMP] = self.get_temperature()
         data[AZD_TEMP_SET] = self.get_temp_set()
@@ -68,6 +72,24 @@ class HotWater(Device):
     def get_active(self) -> bool | None:
         """Return DHW device active status."""
         return self.active
+
+    def get_operation(self) -> HotWaterOperation:
+        """Return DHW current operation."""
+        if self.get_power():
+            if self.get_power_mode():
+                return HotWaterOperation.Powerful
+            return HotWaterOperation.On
+        return HotWaterOperation.Off
+
+    def get_operations(self) -> list[HotWaterOperation]:
+        """Return DHW operation list."""
+        operations = [
+            HotWaterOperation.Off,
+            HotWaterOperation.On,
+        ]
+        if self.get_power_mode() is not None:
+            operations += [HotWaterOperation.Powerful]
+        return operations
 
     def get_power(self) -> bool | None:
         """Return DHW device power."""
