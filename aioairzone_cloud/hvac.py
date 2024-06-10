@@ -8,6 +8,7 @@ from .common import (
     AirQualityMode,
     OperationAction,
     OperationMode,
+    SpeedType,
     parse_bool,
     parse_float,
     parse_int,
@@ -44,6 +45,9 @@ from .const import (
     API_SP_AIR_HEAT,
     API_SP_AIR_STOP,
     API_SP_AIR_VENT,
+    API_SPEED_CONF,
+    API_SPEED_TYPE,
+    API_SPEED_VALUES,
     API_STEP,
     AZD_ACTION,
     AZD_ACTIVE,
@@ -53,6 +57,9 @@ from .const import (
     AZD_DOUBLE_SET_POINT,
     AZD_HUMIDITY,
     AZD_POWER,
+    AZD_SPEED,
+    AZD_SPEED_TYPE,
+    AZD_SPEEDS,
     AZD_TEMP,
     AZD_TEMP_SET,
     AZD_TEMP_SET_AUTO_AIR,
@@ -98,6 +105,9 @@ class HVAC(Device):
         self.humidity: int | None = None
         self.name: str = "HVAC"
         self.power: bool | None = None
+        self.speed: int | None = None
+        self.speeds: dict[int, int] = {}
+        self.speed_type: SpeedType | None = None
         self.temp_set_max: float | None = None
         self.temp_set_max_auto_air: float | None = None
         self.temp_set_max_cool_air: float | None = None
@@ -149,6 +159,18 @@ class HVAC(Device):
         humidity = self.get_humidity()
         if humidity is not None:
             data[AZD_HUMIDITY] = humidity
+
+        speed = self.get_speed()
+        if speed is not None:
+            data[AZD_SPEED] = speed
+
+        speeds = self.get_speeds()
+        if speeds is not None:
+            data[AZD_SPEEDS] = speeds
+
+        speed_type = self.get_speed_type()
+        if speed_type is not None:
+            data[AZD_SPEED_TYPE] = speed_type
 
         temp_set_max = self.get_temp_set_max()
         if temp_set_max is not None:
@@ -296,6 +318,25 @@ class HVAC(Device):
     def get_power(self) -> bool | None:
         """Return HVAC device power."""
         return self.power
+
+    def get_speed(self) -> int | None:
+        """Return HVAC speed."""
+        return self.speed
+
+    def get_speeds(self) -> dict[int, int] | None:
+        """Return HVAC speeds."""
+        if len(self.speeds) > 0:
+            return self.speeds
+        return None
+
+    def get_speed_type(self) -> SpeedType | None:
+        """Return HVAC speed type."""
+        return self.speed_type
+
+    def set_speed(self, speed: int) -> None:
+        """Set HVAC speed."""
+        if self.speed is not None:
+            self.speed = speed
 
     def get_temperature(self) -> float | None:
         """Return HVAC device temperature."""
@@ -643,6 +684,30 @@ class HVAC(Device):
         )
         if range_sp_min_vent_air is not None:
             self.temp_set_min_vent_air = range_sp_min_vent_air
+
+        speed = parse_int(data.get(API_SPEED_CONF))
+        if speed is not None:
+            self.speed = speed
+
+        speed_type = data.get(API_SPEED_TYPE)
+        if speed_type is not None:
+            self.speed_type = SpeedType(speed_type)
+
+        speeds_values: list[int] | None = data.get(API_SPEED_VALUES)
+        if speeds_values is not None:
+            speeds: dict[int, int] = {}
+
+            if 0 in speeds_values:
+                speeds[0] = 0
+
+            speed_count = 1
+            speeds_values.sort()
+            for speed_value in speeds_values:
+                if speed_value > 0:
+                    speeds[speed_count] = int(speed_value)
+                    speed_count += 1
+
+            self.speeds = speeds
 
         sp_air_cool = parse_float(data.get(API_SP_AIR_COOL, {}).get(API_CELSIUS))
         if sp_air_cool is not None:
