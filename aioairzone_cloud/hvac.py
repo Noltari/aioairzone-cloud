@@ -15,6 +15,7 @@ from .common import (
 )
 from .const import (
     API_ACTIVE,
+    API_AIR_ACTIVE,
     API_AQ_ACTIVE,
     API_AQ_MODE_CONF,
     API_AQ_MODE_VALUES,
@@ -24,6 +25,7 @@ from .const import (
     API_HUMIDITY,
     API_LOCAL_TEMP,
     API_POWER,
+    API_RAD_ACTIVE,
     API_RANGE_MAX_AIR,
     API_RANGE_MIN_AIR,
     API_RANGE_SP_MAX_AUTO_AIR,
@@ -51,10 +53,12 @@ from .const import (
     API_STEP,
     AZD_ACTION,
     AZD_ACTIVE,
+    AZD_AIR_DEMAND,
     AZD_AQ_ACTIVE,
     AZD_AQ_MODE_CONF,
     AZD_AQ_MODE_VALUES,
     AZD_DOUBLE_SET_POINT,
+    AZD_FLOOR_DEMAND,
     AZD_HUMIDITY,
     AZD_POWER,
     AZD_SPEED,
@@ -98,11 +102,13 @@ class HVAC(Device):
         super().__init__(inst_id, ws_id, device_data)
 
         self.active: bool | None = None
+        self.air_demand: bool | None = None
         self.aq_active: bool | None = None
         self.aq_mode_conf: AirQualityMode | None = None
         self.aq_mode_values: list[AirQualityMode] | None = None
         self.double_set_point: bool | None = None
         self.humidity: int | None = None
+        self.floor_demand: bool | None = None
         self.name: str = "HVAC"
         self.power: bool | None = None
         self.speed: int | None = None
@@ -143,6 +149,13 @@ class HVAC(Device):
         data[AZD_POWER] = self.get_power()
         data[AZD_TEMP] = self.get_temperature()
         data[AZD_TEMP_STEP] = self.get_temp_step()
+
+        air_demand = self.get_air_demand()
+        if air_demand is not None:
+            data[AZD_AIR_DEMAND] = air_demand
+        floor_demand = self.get_floor_demand()
+        if floor_demand is not None:
+            data[AZD_FLOOR_DEMAND] = floor_demand
 
         aq_active = self.get_aq_active()
         if aq_active is not None:
@@ -291,6 +304,10 @@ class HVAC(Device):
         """Return HVAC device active status."""
         return self.active
 
+    def get_air_demand(self) -> bool | None:
+        """Return HVAC device air_demand status."""
+        return self.air_demand
+
     def get_aq_active(self) -> bool | None:
         """Return HVAC device Air Quality active status."""
         return self.aq_active
@@ -310,6 +327,10 @@ class HVAC(Device):
         if self.double_set_point is not None:
             return self.double_set_point
         return False
+
+    def get_floor_demand(self) -> bool | None:
+        """Return HVAC device floor demand status."""
+        return self.floor_demand
 
     def get_humidity(self) -> int | None:
         """Return HVAC device humidity."""
@@ -576,6 +597,28 @@ class HVAC(Device):
         else:
             if update.get_type() != UpdateType.WS_PARTIAL:
                 self.active = None
+
+        if API_AIR_ACTIVE in data:
+            air_demand = parse_bool(data.get(API_AIR_ACTIVE))
+            if air_demand is not None:
+                self.air_demand = air_demand
+            else:
+                # API sends API_AIR_ACTIVE as null instead of False
+                self.air_demand = False
+        else:
+            if update.get_type() != UpdateType.WS_PARTIAL:
+                self.air_demand = None
+
+        if API_RAD_ACTIVE in data:
+            floor_demand = parse_bool(data.get(API_RAD_ACTIVE))
+            if floor_demand is not None:
+                self.floor_demand = floor_demand
+            else:
+                # API sends API_RAD_ACTIVE as null instead of False
+                self.floor_demand = False
+        else:
+            if update.get_type() != UpdateType.WS_PARTIAL:
+                self.floor_demand = None
 
         aq_active = parse_bool(data.get(API_AQ_ACTIVE))
         if aq_active is not None:
