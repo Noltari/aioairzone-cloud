@@ -53,12 +53,10 @@ from .const import (
     API_STEP,
     AZD_ACTION,
     AZD_ACTIVE,
-    AZD_AIR_DEMAND,
     AZD_AQ_ACTIVE,
     AZD_AQ_MODE_CONF,
     AZD_AQ_MODE_VALUES,
     AZD_DOUBLE_SET_POINT,
-    AZD_FLOOR_DEMAND,
     AZD_HUMIDITY,
     AZD_POWER,
     AZD_SPEED,
@@ -149,13 +147,6 @@ class HVAC(Device):
         data[AZD_POWER] = self.get_power()
         data[AZD_TEMP] = self.get_temperature()
         data[AZD_TEMP_STEP] = self.get_temp_step()
-
-        air_demand = self.get_air_demand()
-        if air_demand is not None:
-            data[AZD_AIR_DEMAND] = air_demand
-        floor_demand = self.get_floor_demand()
-        if floor_demand is not None:
-            data[AZD_FLOOR_DEMAND] = floor_demand
 
         aq_active = self.get_aq_active()
         if aq_active is not None:

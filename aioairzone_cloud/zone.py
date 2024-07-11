@@ -20,6 +20,8 @@ from .const import (
     API_SYSTEM_NUMBER,
     API_VALUE,
     API_ZONE_NUMBER,
+    AZD_AIR_DEMAND,
+    AZD_FLOOR_DEMAND,
     AZD_MASTER,
     AZD_SYSTEM,
     AZD_SYSTEM_ID,
@@ -56,6 +58,8 @@ class Zone(HVAC):
         """Return Zone data."""
         data = super().data()
 
+        data[AZD_AIR_DEMAND] = self.get_air_demand()
+        data[AZD_FLOOR_DEMAND] = self.get_floor_demand()
         data[AZD_MASTER] = self.get_master()
         data[AZD_SYSTEM] = self.get_system_num()
         data[AZD_ZONE] = self.get_zone()
