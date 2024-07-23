@@ -130,37 +130,36 @@ class AirzoneCloudApi:
         else:
             session = self.session
 
-        await self._api_semaphore.acquire()
-        try:
-            async with session.request(
-                method,
-                f"{API_URL}/{path}",
-                headers=self.token.headers(),
-                json=json,
-                raise_for_status=True,
-                timeout=HTTP_CALL_TIMEOUT,
-            ) as resp:
-                resp_json = await resp.json(content_type=None)
-        except ClientConnectorError as err:
-            raise AirzoneCloudError(err) from err
-        except ClientResponseError as err:
-            if path.endswith(API_AUTH_LOGIN):
-                raise LoginError(err) from err
-            if path.endswith(API_AUTH_REFRESH_TOKEN):
-                raise TokenRefreshError(err) from err
+        async with self._api_semaphore:
+            try:
+                async with session.request(
+                    method,
+                    f"{API_URL}/{path}",
+                    headers=self.token.headers(),
+                    json=json,
+                    raise_for_status=True,
+                    timeout=HTTP_CALL_TIMEOUT,
+                ) as resp:
+                    resp_json = await resp.json(content_type=None)
+            except ClientConnectorError as err:
+                raise AirzoneCloudError(err) from err
+            except ClientResponseError as err:
+                if path.endswith(API_AUTH_LOGIN):
+                    raise LoginError(err) from err
+                if path.endswith(API_AUTH_REFRESH_TOKEN):
+                    raise TokenRefreshError(err) from err
 
-            if err.status == 400:
-                raise APIError(err) from err
-            if err.status == 401:
-                raise AuthError(err) from err
-            if err.status == 429:
-                raise TooManyRequests(err) from err
+                if err.status == 400:
+                    raise APIError(err) from err
+                if err.status == 401:
+                    raise AuthError(err) from err
+                if err.status == 429:
+                    raise TooManyRequests(err) from err
 
-            raise AirzoneCloudError(err) from err
-        finally:
-            self._api_semaphore.release()
-            if self.session is None:
-                await session.close()
+                raise AirzoneCloudError(err) from err
+            finally:
+                if self.session is None:
+                    await session.close()
 
         _LOGGER.debug("aiohttp response: %s", resp_json)
 
