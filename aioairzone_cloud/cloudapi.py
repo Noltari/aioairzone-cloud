@@ -92,7 +92,7 @@ class AirzoneCloudApi:
 
     def __init__(
         self,
-        session: ClientSession | None,
+        session: ClientSession,
         options: ConnectionOptions,
     ):
         """Airzone Cloud API init."""
@@ -112,7 +112,7 @@ class AirzoneCloudApi:
         self.groups: dict[str, Group] = {}
         self.installations: dict[str, Installation] = {}
         self.options = options
-        self.session: ClientSession | None = session
+        self.session = session
         self.systems: dict[str, System] = {}
         self.token: AirzoneCloudToken = AirzoneCloudToken()
         self.webservers: dict[str, WebServer] = {}
@@ -125,14 +125,9 @@ class AirzoneCloudApi:
         """Airzone Cloud API request."""
         _LOGGER.debug("aiohttp request: /%s (params=%s)", path, json)
 
-        if self.session is None:
-            session = ClientSession()
-        else:
-            session = self.session
-
         async with self._api_semaphore:
             try:
-                async with session.request(
+                async with self.session.request(
                     method,
                     f"{API_URL}/{path}",
                     headers=self.token.headers(),
@@ -157,9 +152,6 @@ class AirzoneCloudApi:
                     raise TooManyRequests(err) from err
 
                 raise AirzoneCloudError(err) from err
-            finally:
-                if self.session is None:
-                    await session.close()
 
         _LOGGER.debug("aiohttp response: %s", resp_json)
 
