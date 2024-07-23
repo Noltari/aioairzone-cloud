@@ -354,7 +354,9 @@ class AirzoneCloudApi:
         tasks = []
 
         for param, data in params.items():
-            tasks += [self.api_set_device_param(device, param, data)]
+            tasks += [
+                asyncio.create_task(self.api_set_device_param(device, param, data))
+            ]
 
         await asyncio.gather(*tasks)
 
@@ -660,7 +662,7 @@ class AirzoneCloudApi:
         tasks = []
 
         for aidoo in self.aidoos.values():
-            tasks += [self.update_aidoo(aidoo)]
+            tasks += [asyncio.create_task(self.update_aidoo(aidoo))]
 
         await asyncio.gather(*tasks)
 
@@ -677,7 +679,7 @@ class AirzoneCloudApi:
         tasks = []
 
         for dhw in self.dhws.values():
-            tasks += [self.update_dhw(dhw)]
+            tasks += [asyncio.create_task(self.update_dhw(dhw))]
 
         await asyncio.gather(*tasks)
 
@@ -773,7 +775,7 @@ class AirzoneCloudApi:
         tasks = []
 
         for system in self.systems.values():
-            tasks += [self.update_system(system)]
+            tasks += [asyncio.create_task(self.update_system(system))]
 
         await asyncio.gather(*tasks)
 
@@ -835,7 +837,7 @@ class AirzoneCloudApi:
         tasks = []
 
         for ws in self.webservers.values():
-            tasks += [self.update_webserver(ws, devices)]
+            tasks += [asyncio.create_task(self.update_webserver(ws, devices))]
 
         await asyncio.gather(*tasks)
 
@@ -858,7 +860,7 @@ class AirzoneCloudApi:
         tasks = []
 
         for zone in self.zones.values():
-            tasks += [self.update_zone(zone)]
+            tasks += [asyncio.create_task(self.update_zone(zone))]
 
         await asyncio.gather(*tasks)
 
@@ -868,13 +870,14 @@ class AirzoneCloudApi:
     async def _update_polling(self) -> None:
         """Perform a polling update of Airzone Cloud data."""
         tasks = [
-            self.update_webservers(False),
-            self.update_systems_zones(),
-            self.update_aidoos(),
-            self.update_dhws(),
+            asyncio.create_task(self.update_webservers(False)),
+            asyncio.create_task(self.update_systems_zones()),
+            asyncio.create_task(self.update_aidoos()),
+            asyncio.create_task(self.update_dhws()),
         ]
 
         await asyncio.gather(*tasks)
+
         self._api_init_done = True
 
     async def _update_websockets(self) -> bool:
