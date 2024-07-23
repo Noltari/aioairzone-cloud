@@ -103,6 +103,7 @@ class AirzoneCloudApi:
             RAW_INSTALLATIONS: {},
             RAW_WEBSERVERS: {},
         }
+        self._api_raw_data_lock = Lock()
         self._api_semaphore: Semaphore = Semaphore(HTTP_MAX_REQUESTS)
         self.aidoos: dict[str, Aidoo] = {}
         self.callback_function = None
@@ -118,6 +119,17 @@ class AirzoneCloudApi:
         self.webservers: dict[str, WebServer] = {}
         self.websockets: dict[str, AirzoneCloudIWS] = {}
         self.zones: dict[str, Zone] = {}
+
+    async def set_api_raw_data(
+        self, key: str, subkey: str | None, data: dict[str, Any] | None
+    ) -> None:
+        """Save API raw data if not empty."""
+        if data is not None:
+            async with self._api_raw_data_lock:
+                if subkey is None:
+                    self._api_raw_data[key] = data
+                else:
+                    self._api_raw_data[key][subkey] = data
 
     async def api_request(
         self, method: str, path: str, json: Any | None = None
@@ -171,7 +183,7 @@ class AirzoneCloudApi:
             "GET",
             f"{API_V1}/{API_DEVICES}/{url_id}/{API_CONFIG}?{dev_params}",
         )
-        self._api_raw_data[RAW_DEVICES_CONFIG][dev_id] = res
+        await self.set_api_raw_data(RAW_DEVICES_CONFIG, dev_id, res)
 
         return res
 
@@ -189,7 +201,7 @@ class AirzoneCloudApi:
             "GET",
             f"{API_V1}/{API_DEVICES}/{url_id}/{API_STATUS}?{dev_params}",
         )
-        self._api_raw_data[RAW_DEVICES_STATUS][dev_id] = res
+        await self.set_api_raw_data(RAW_DEVICES_STATUS, dev_id, res)
 
         return res
 
@@ -202,7 +214,7 @@ class AirzoneCloudApi:
             "GET",
             f"{API_V1}/{API_INSTALLATIONS}/{url_id}",
         )
-        self._api_raw_data[RAW_INSTALLATIONS][inst_id] = res
+        await self.set_api_raw_data(RAW_INSTALLATIONS, inst_id, res)
 
         return res
 
@@ -212,7 +224,7 @@ class AirzoneCloudApi:
             "GET",
             f"{API_V1}/{API_INSTALLATIONS}",
         )
-        self._api_raw_data[RAW_INSTALLATIONS_LIST] = res
+        await self.set_api_raw_data(RAW_INSTALLATIONS_LIST, None, res)
 
         return res
 
@@ -222,7 +234,7 @@ class AirzoneCloudApi:
             "GET",
             f"{API_V1}/{API_USER}",
         )
-        self._api_raw_data[RAW_USER] = res
+        await self.set_api_raw_data(RAW_USER, None, res)
 
         return res
 
@@ -244,7 +256,7 @@ class AirzoneCloudApi:
             "GET",
             f"{API_V1}/{API_DEVICES}/{API_WS}/{url_id}/{API_STATUS}?{ws_params}",
         )
-        self._api_raw_data[RAW_WEBSERVERS][ws_id] = res
+        await self.set_api_raw_data(RAW_WEBSERVERS, ws_id, res)
 
         return res
 
