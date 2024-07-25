@@ -172,6 +172,9 @@ class AirzoneCloudApi:
 
     async def api_get_device_config(self, device: Device) -> dict[str, Any]:
         """Request API device config data."""
+        if not self.options.device_config:
+            return {}
+
         dev_id = device.get_id()
         inst_id = device.get_installation()
         url_id = urllib.parse.quote(dev_id)
@@ -665,9 +668,13 @@ class AirzoneCloudApi:
 
     async def update_aidoo(self, aidoo: Aidoo) -> None:
         """Update Airzone Cloud Zone from API."""
-        device_data = await self.api_get_device_status(aidoo)
+        config_task = asyncio.create_task(self.api_get_device_config(aidoo))
+        status_task = asyncio.create_task(self.api_get_device_status(aidoo))
 
-        update = EntityUpdate(UpdateType.API_FULL, device_data)
+        config_data = await config_task
+        status_data = await status_task
+
+        update = EntityUpdate(UpdateType.API_FULL, config_data | status_data)
 
         await aidoo.update(update)
 
@@ -682,9 +689,11 @@ class AirzoneCloudApi:
 
     async def update_dhw(self, dhw: HotWater) -> None:
         """Update Airzone Cloud DHW from API."""
-        device_data = await self.api_get_device_status(dhw)
+        status_task = asyncio.create_task(self.api_get_device_status(dhw))
 
-        update = EntityUpdate(UpdateType.API_FULL, device_data)
+        status_data = await status_task
+
+        update = EntityUpdate(UpdateType.API_FULL, status_data)
 
         await dhw.update(update)
 
@@ -772,9 +781,13 @@ class AirzoneCloudApi:
 
     async def update_system(self, system: System) -> None:
         """Update Airzone Cloud System from API."""
-        device_data = await self.api_get_device_status(system)
+        config_task = asyncio.create_task(self.api_get_device_config(system))
+        status_task = asyncio.create_task(self.api_get_device_status(system))
 
-        update = EntityUpdate(UpdateType.API_FULL, device_data)
+        config_data = await config_task
+        status_data = await status_task
+
+        update = EntityUpdate(UpdateType.API_FULL, config_data | status_data)
 
         await system.update(update)
 
@@ -857,9 +870,13 @@ class AirzoneCloudApi:
 
     async def update_zone(self, zone: Zone) -> None:
         """Update Airzone Cloud Zone from API."""
-        device_data = await self.api_get_device_status(zone)
+        config_task = asyncio.create_task(self.api_get_device_config(zone))
+        status_task = asyncio.create_task(self.api_get_device_status(zone))
 
-        update = EntityUpdate(UpdateType.API_FULL, device_data)
+        config_data = await config_task
+        status_data = await status_task
+
+        update = EntityUpdate(UpdateType.API_FULL, config_data | status_data)
 
         await zone.update(update)
 

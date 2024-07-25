@@ -13,6 +13,7 @@ class ConnectionOptions:
 
     username: str
     password: str
+    device_config: bool = True
     websockets: bool = True
 
 
