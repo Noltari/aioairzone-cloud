@@ -18,6 +18,8 @@ from .const import (
     API_SP_AIR_HEAT,
     API_SPEED_CONF,
     API_SYSTEM_NUMBER,
+    API_THERMOSTAT_FW,
+    API_THERMOSTAT_TYPE,
     API_VALUE,
     API_ZONE_NUMBER,
     AZD_AIR_DEMAND,
@@ -25,6 +27,8 @@ from .const import (
     AZD_MASTER,
     AZD_SYSTEM,
     AZD_SYSTEM_ID,
+    AZD_THERMOSTAT_FW,
+    AZD_THERMOSTAT_MODEL,
     AZD_ZONE,
 )
 from .entity import EntityUpdate, UpdateType
@@ -43,6 +47,8 @@ class Zone(HVAC):
 
         self.master: bool | None = None
         self.system: System | None = None
+        self.thermostat_fw: str | None = None
+        self.thermostat_type: str | None = None
 
         sub_data = self.sub_data(device_data)
         self.system_number = int(sub_data[API_SYSTEM_NUMBER])
@@ -68,6 +74,14 @@ class Zone(HVAC):
         if system_id is not None:
             data[AZD_SYSTEM_ID] = system_id
 
+        thermostat_firmware = self.get_thermostat_fw()
+        if thermostat_firmware is not None:
+            data[AZD_THERMOSTAT_FW] = thermostat_firmware
+
+        thermostat_model = self.get_thermostat_type()
+        if thermostat_model is not None:
+            data[AZD_THERMOSTAT_MODEL] = thermostat_model
+
         return data
 
     def get_master(self) -> bool:
@@ -89,6 +103,14 @@ class Zone(HVAC):
     def get_system_num(self) -> int:
         """Return System number."""
         return self.system_number
+
+    def get_thermostat_fw(self) -> str | None:
+        """Return Thermostat firmware."""
+        return self.thermostat_fw
+
+    def get_thermostat_type(self) -> str | None:
+        """Return Thermostat type."""
+        return self.thermostat_type
 
     def get_zone(self) -> int:
         """Return Zone number."""
@@ -134,3 +156,11 @@ class Zone(HVAC):
                 self.master = len(data[API_MODE_AVAIL]) > 0
             else:
                 self.master = None
+
+        thermostat_fw = parse_str(data.get(API_THERMOSTAT_FW))
+        if thermostat_fw is not None:
+            self.thermostat_fw = thermostat_fw
+
+        thermostat_type = parse_str(data.get(API_THERMOSTAT_TYPE))
+        if thermostat_type is not None:
+            self.thermostat_type = thermostat_type
