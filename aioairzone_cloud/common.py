@@ -148,3 +148,21 @@ def parse_str(data: Any) -> str | None:
     if data is not None:
         return str(data)
     return None
+
+
+class UserAccessType(StrEnum):
+    """Airzone Cloud user access type."""
+
+    UNKNOWN = "unknown"
+
+    ADMIN = "admin"
+    ADVANCED = "advanced"
+    BASIC = "basic"
+
+    @classmethod
+    def _missing_(cls, value: Any) -> UserAccessType:
+        return cls.UNKNOWN
+
+    def is_admin(self) -> bool:
+        """Return if access type is admin."""
+        return self.value in [self.ADMIN, self.ADVANCED]

@@ -4,12 +4,17 @@ from __future__ import annotations
 
 from typing import Any
 
+from .common import UserAccessType
 from .const import (
+    API_ACCESS_TYPE,
     API_INSTALLATION_ID,
     API_NAME,
+    API_TYPE_ALL,
+    API_TYPE_USER,
     API_WS_IDS,
     AZD_GROUPS,
     AZD_NUM_GROUPS,
+    AZD_USER_ACCESS,
     AZD_WEBSERVERS,
 )
 from .device_group import DeviceGroup
@@ -25,6 +30,7 @@ class Installation(DeviceGroup):
 
         self.groups: dict[str, Group] = {}
         self.id = str(inst_data[API_INSTALLATION_ID])
+        self.user_access: UserAccessType = UserAccessType.UNKNOWN
         self.webservers: list[str] = []
 
         name: str = inst_data.get(API_NAME, "")
@@ -32,6 +38,10 @@ class Installation(DeviceGroup):
             self.name = name
         else:
             self.name = "Installation"
+
+        access_type = inst_data.get(API_ACCESS_TYPE)
+        if access_type is not None:
+            self.user_access = UserAccessType(str(access_type))
 
         for ws_id in inst_data[API_WS_IDS]:
             self.webservers += [ws_id]
@@ -44,6 +54,7 @@ class Installation(DeviceGroup):
             data[AZD_GROUPS] = list(self.groups)
 
         data[AZD_NUM_GROUPS] = self.get_groups_num()
+        data[AZD_USER_ACCESS] = self.get_user_access()
         data[AZD_WEBSERVERS] = self.get_webservers()
 
         return data
@@ -65,6 +76,16 @@ class Installation(DeviceGroup):
     def get_name(self) -> str:
         """Return Installation name."""
         return self.name
+
+    def get_request_type(self) -> str:
+        """Return request type."""
+        if self.user_access.is_admin():
+            return API_TYPE_ALL
+        return API_TYPE_USER
+
+    def get_user_access(self) -> str:
+        """Return Installation user access."""
+        return self.user_access
 
     def get_webservers(self) -> list[str]:
         """Return Installation WebServers."""
