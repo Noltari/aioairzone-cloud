@@ -38,6 +38,7 @@ from .const import (
     API_PASSWORD,
     API_STATUS,
     API_TYPE,
+    API_TYPE_USER,
     API_URL,
     API_USER,
     API_USER_LOGOUT,
@@ -172,10 +173,18 @@ class AirzoneCloudApi:
     async def api_get_device_config(self, device: Device) -> dict[str, Any]:
         """Request API device config data."""
         dev_id = device.get_id()
+        inst_id = device.get_installation()
         url_id = urllib.parse.quote(dev_id)
 
+        inst = self.get_installation_id(inst_id)
+        if inst is not None:
+            request_type = inst.get_request_type()
+        else:
+            request_type = API_TYPE_USER
+
         params = {
-            API_INSTALLATION_ID: device.get_installation(),
+            API_INSTALLATION_ID: inst_id,
+            API_TYPE: request_type,
         }
         dev_params = urllib.parse.urlencode(params)
 
@@ -190,10 +199,11 @@ class AirzoneCloudApi:
     async def api_get_device_status(self, device: Device) -> dict[str, Any]:
         """Request API device status data."""
         dev_id = device.get_id()
+        inst_id = device.get_installation()
         url_id = urllib.parse.quote(dev_id)
 
         params = {
-            API_INSTALLATION_ID: device.get_installation(),
+            API_INSTALLATION_ID: inst_id,
         }
         dev_params = urllib.parse.urlencode(params)
 
