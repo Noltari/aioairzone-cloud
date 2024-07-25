@@ -667,7 +667,7 @@ class AirzoneCloudApi:
                 zone.set_modes(modes)
 
     async def update_aidoo(self, aidoo: Aidoo) -> None:
-        """Update Airzone Cloud Zone from API."""
+        """Update Airzone Cloud Aidoo from API."""
         config_task = asyncio.create_task(self.api_get_device_config(aidoo))
         status_task = asyncio.create_task(self.api_get_device_status(aidoo))
 
