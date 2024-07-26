@@ -12,6 +12,7 @@ from .common import (
     parse_bool,
     parse_float,
     parse_int,
+    parse_str,
 )
 from .const import (
     API_ACTIVE,
@@ -32,6 +33,8 @@ from .const import (
     API_PE_UE,
     API_POWER,
     API_RAD_ACTIVE,
+    API_RADIO_BATTERY_PERCENT,
+    API_RADIO_COVERAGE_PERCENT,
     API_RANGE_MAX_AIR,
     API_RANGE_MIN_AIR,
     API_RANGE_SP_MAX_AUTO_AIR,
@@ -58,6 +61,8 @@ from .const import (
     API_SPEED_TYPE,
     API_SPEED_VALUES,
     API_STEP,
+    API_THERMOSTAT_FW,
+    API_THERMOSTAT_TYPE,
     API_WORK_TEMP,
     AZD_ACTION,
     AZD_ACTIVE,
@@ -103,6 +108,10 @@ from .const import (
     AZD_TEMP_SET_STOP_AIR,
     AZD_TEMP_SET_VENT_AIR,
     AZD_TEMP_STEP,
+    AZD_THERMOSTAT_BATTERY,
+    AZD_THERMOSTAT_COVERAGE,
+    AZD_THERMOSTAT_FW,
+    AZD_THERMOSTAT_MODEL,
 )
 from .device import Device
 from .entity import EntityUpdate, UpdateType
@@ -160,6 +169,10 @@ class HVAC(Device):
         self.temp_set_vent_air: float | None = None
         self.temp: float | None = None
         self.temp_step: float | None = None
+        self.thermostat_battery: int | None = None
+        self.thermostat_coverage: int | None = None
+        self.thermostat_fw: str | None = None
+        self.thermostat_type: str | None = None
 
     def data(self) -> dict[str, Any]:
         """Return HVAC device data."""
@@ -303,6 +316,22 @@ class HVAC(Device):
         temp_set_vent_air = self.get_temp_set_vent_air()
         if temp_set_vent_air is not None:
             data[AZD_TEMP_SET_VENT_AIR] = temp_set_vent_air
+
+        thermostat_battery = self.get_thermostat_battery()
+        if thermostat_battery is not None:
+            data[AZD_THERMOSTAT_BATTERY] = thermostat_battery
+
+        thermostat_coverage = self.get_thermostat_coverage()
+        if thermostat_coverage is not None:
+            data[AZD_THERMOSTAT_COVERAGE] = thermostat_coverage
+
+        thermostat_firmware = self.get_thermostat_fw()
+        if thermostat_firmware is not None:
+            data[AZD_THERMOSTAT_FW] = thermostat_firmware
+
+        thermostat_model = self.get_thermostat_type()
+        if thermostat_model is not None:
+            data[AZD_THERMOSTAT_MODEL] = thermostat_model
 
         return data
 
@@ -641,6 +670,22 @@ class HVAC(Device):
             return round(self.temp_step, 1)
         return API_DEFAULT_TEMP_STEP
 
+    def get_thermostat_battery(self) -> int | None:
+        """Return Thermostat battery."""
+        return self.thermostat_battery
+
+    def get_thermostat_coverage(self) -> int | None:
+        """Return Thermostat coverage."""
+        return self.thermostat_coverage
+
+    def get_thermostat_fw(self) -> str | None:
+        """Return Thermostat firmware."""
+        return self.thermostat_fw
+
+    def get_thermostat_type(self) -> str | None:
+        """Return Thermostat type."""
+        return self.thermostat_type
+
     def set_aq_mode(self, aq_mode: AirQualityMode) -> None:
         """Set HVAC Air Quality mode."""
         self.aq_mode_conf = aq_mode
@@ -902,3 +947,19 @@ class HVAC(Device):
         step = parse_float(data.get(API_STEP, {}).get(API_CELSIUS))
         if step is not None:
             self.temp_step = step
+
+        thermostat_battery = parse_int(data.get(API_RADIO_BATTERY_PERCENT))
+        if thermostat_battery is not None:
+            self.thermostat_battery = thermostat_battery
+
+        thermostat_coverage = parse_int(data.get(API_RADIO_COVERAGE_PERCENT))
+        if thermostat_coverage is not None:
+            self.thermostat_coverage = thermostat_coverage
+
+        thermostat_fw = parse_str(data.get(API_THERMOSTAT_FW))
+        if thermostat_fw is not None:
+            self.thermostat_fw = thermostat_fw
+
+        thermostat_type = parse_str(data.get(API_THERMOSTAT_TYPE))
+        if thermostat_type is not None:
+            self.thermostat_type = thermostat_type
