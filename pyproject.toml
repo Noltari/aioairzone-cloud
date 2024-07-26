@@ -1,6 +1,6 @@
 [project]
 name = "aioairzone-cloud"
-version = "0.6.0"
+version = "0.6.1"
 description = "Library to control Airzone Cloud devices"
 readme = "README.md"
 requires-python = ">=3.11"
