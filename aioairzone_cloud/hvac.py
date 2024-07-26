@@ -62,6 +62,7 @@ from .const import (
     API_SPEED_VALUES,
     API_STEP,
     API_THERMOSTAT_FW,
+    API_THERMOSTAT_LOW_BATTERY_VALUE,
     API_THERMOSTAT_TYPE,
     API_WORK_TEMP,
     AZD_ACTION,
@@ -109,6 +110,7 @@ from .const import (
     AZD_TEMP_SET_VENT_AIR,
     AZD_TEMP_STEP,
     AZD_THERMOSTAT_BATTERY,
+    AZD_THERMOSTAT_BATTERY_LOW,
     AZD_THERMOSTAT_COVERAGE,
     AZD_THERMOSTAT_FW,
     AZD_THERMOSTAT_MODEL,
@@ -320,6 +322,10 @@ class HVAC(Device):
         thermostat_battery = self.get_thermostat_battery()
         if thermostat_battery is not None:
             data[AZD_THERMOSTAT_BATTERY] = thermostat_battery
+
+        thermostat_battery_low = self.get_thermostat_battery_low()
+        if thermostat_battery_low is not None:
+            data[AZD_THERMOSTAT_BATTERY_LOW] = thermostat_battery_low
 
         thermostat_coverage = self.get_thermostat_coverage()
         if thermostat_coverage is not None:
@@ -673,6 +679,12 @@ class HVAC(Device):
     def get_thermostat_battery(self) -> int | None:
         """Return Thermostat battery."""
         return self.thermostat_battery
+
+    def get_thermostat_battery_low(self) -> bool | None:
+        """Return Thermostat battery low."""
+        if self.thermostat_battery is not None:
+            return self.thermostat_battery < API_THERMOSTAT_LOW_BATTERY_VALUE
+        return None
 
     def get_thermostat_coverage(self) -> int | None:
         """Return Thermostat coverage."""

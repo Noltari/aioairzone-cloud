@@ -147,6 +147,7 @@ API_AZ_AIDOO_PRO: Final[str] = "aidoo_it"
 API_AZ_ACS: Final[str] = "az_acs"
 API_AZ_SYSTEM: Final[str] = "az_system"
 API_AZ_ZONE: Final[str] = "az_zone"
+API_THERMOSTAT_LOW_BATTERY_VALUE: Final[int] = 35
 
 API_DEFAULT_TEMP_STEP: Final[float] = 0.5
 API_DEFAULT_TEMP_STEP_ACS: Final[int] = 1
@@ -233,6 +234,7 @@ AZD_TEMP_SET_MIN_STOP_AIR: Final[str] = "temperature-setpoint-min-stop-air"
 AZD_TEMP_SET_MIN_VENT_AIR: Final[str] = "temperature-setpoint-min-vent-air"
 AZD_TEMP_SET_MIN: Final[str] = "temperature-setpoint-min"
 AZD_THERMOSTAT_BATTERY: Final[str] = "thermostat-battery"
+AZD_THERMOSTAT_BATTERY_LOW: Final[str] = "thermostat-battery-low"
 AZD_THERMOSTAT_COVERAGE: Final[str] = "thermostat-coverage"
 AZD_THERMOSTAT_FW: Final[str] = "thermostat-fw"
 AZD_THERMOSTAT_MODEL: Final[str] = "thermostat-model"
