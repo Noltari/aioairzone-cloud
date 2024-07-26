@@ -9,7 +9,11 @@ from .common import parse_bool, parse_int, parse_str
 from .const import (
     API_CONFIG,
     API_CONNECTION_DATE,
+    API_CPU_WS,
     API_DISCONNECTION_DATE,
+    API_FREE,
+    API_FREE_MEM,
+    API_GENERAL,
     API_IS_CONNECTED,
     API_STAT_AP_MAC,
     API_STAT_CHANNEL,
@@ -21,10 +25,12 @@ from .const import (
     API_WS_TYPE,
     AZD_AVAILABLE,
     AZD_CONNECTION_DATE,
+    AZD_CPU_USAGE,
     AZD_DISCONNECTION_DATE,
     AZD_FIRMWARE,
     AZD_ID,
     AZD_INSTALLATION,
+    AZD_MEMORY_FREE,
     AZD_NAME,
     AZD_TYPE,
     AZD_WIFI_CHANNEL,
@@ -45,12 +51,14 @@ class WebServer(Entity):
         """Airzone Cloud WebServer init."""
         super().__init__()
 
+        self.cpu_usage: int | None = None
         self.connection_date: str | None = None
         self.disconnection_date: str | None = None
         self.firmware: str | None = None
         self.id = ws_id
         self.installation_id = inst_id
         self.is_connected: bool = False
+        self.memory_free: int | None = None
         self.name: str = f"WebServer {ws_id}"
         self.stat_quality: int | None = None
         self.type: str | None = None
@@ -88,12 +96,18 @@ class WebServer(Entity):
             connection_date = parse_str(ws_status.get(API_CONNECTION_DATE))
             if connection_date is not None:
                 self.connection_date = connection_date
+            cpu_usage = parse_int(ws_status.get(API_CPU_WS, {}).get(API_GENERAL))
+            if cpu_usage is not None:
+                self.cpu_usage = cpu_usage
             disconnection_date = parse_str(ws_status.get(API_DISCONNECTION_DATE))
             if disconnection_date is not None:
                 self.disconnection_date = disconnection_date
             is_connected = parse_bool(ws_status.get(API_IS_CONNECTED))
             if is_connected is not None:
                 self.is_connected = is_connected
+            memory_free = parse_int(ws_status.get(API_FREE_MEM, {}).get(API_FREE))
+            if memory_free is not None:
+                self.memory_free = memory_free
             stat_quality = parse_int(ws_status.get(API_STAT_QUALITY))
             if stat_quality is not None:
                 self.wifi_quality = stat_quality
@@ -113,6 +127,14 @@ class WebServer(Entity):
             AZD_NAME: self.get_name(),
             AZD_TYPE: self.get_type(),
         }
+
+        cpu_usage = self.get_cpu_usage()
+        if cpu_usage is not None:
+            data[AZD_CPU_USAGE] = cpu_usage
+
+        memory_free = self.get_memory_free()
+        if memory_free is not None:
+            data[AZD_MEMORY_FREE] = memory_free
 
         wifi_channel = self.get_wifi_channel()
         if wifi_channel is not None:
@@ -140,6 +162,10 @@ class WebServer(Entity):
         """Return availability status."""
         return self.is_connected
 
+    def get_cpu_usage(self) -> int | None:
+        """Return CPU load percentage."""
+        return self.cpu_usage
+
     def get_connection_date(self) -> str | None:
         """Return connection date."""
         return self.connection_date
@@ -159,6 +185,10 @@ class WebServer(Entity):
     def get_installation(self) -> str:
         """Return installation ID."""
         return self.installation_id
+
+    def get_memory_free(self) -> int | None:
+        """Return free memory."""
+        return self.memory_free
 
     def get_name(self) -> str:
         """Return WebServer name."""
