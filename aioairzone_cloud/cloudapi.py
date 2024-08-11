@@ -9,7 +9,12 @@ import logging
 from typing import Any, cast
 import urllib.parse
 
-from aiohttp import ClientConnectorError, ClientResponseError, ClientSession
+from aiohttp import (
+    ClientConnectorError,
+    ClientResponseError,
+    ClientSession,
+    ClientTimeout,
+)
 
 from .aidoo import Aidoo
 from .common import ConnectionOptions, OperationMode
@@ -106,6 +111,7 @@ class AirzoneCloudApi:
         }
         self._api_raw_data_lock = Lock()
         self._api_semaphore: Semaphore = Semaphore(HTTP_MAX_REQUESTS)
+        self._api_timeout: ClientTimeout = ClientTimeout(total=HTTP_CALL_TIMEOUT)
         self.aidoos: dict[str, Aidoo] = {}
         self.callback_function = None
         self.callback_lock = Lock()
@@ -146,7 +152,7 @@ class AirzoneCloudApi:
                     headers=self.token.headers(),
                     json=json,
                     raise_for_status=True,
-                    timeout=HTTP_CALL_TIMEOUT,
+                    timeout=self._api_timeout,
                 ) as resp:
                     resp_json = await resp.json(content_type=None)
             except ClientConnectorError as err:
