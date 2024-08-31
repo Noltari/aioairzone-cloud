@@ -166,4 +166,8 @@ class UserAccessType(StrEnum):
 
     def is_admin(self) -> bool:
         """Return if access type is admin."""
+        return self.value == self.ADMIN
+
+    def is_advanced(self) -> bool:
+        """Return if access type is advanced."""
         return self.value in [self.ADMIN, self.ADVANCED]
