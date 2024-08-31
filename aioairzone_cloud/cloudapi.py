@@ -819,6 +819,11 @@ class AirzoneCloudApi:
 
     async def update_webserver(self, ws: WebServer, devices: bool) -> None:
         """Update Airzone Cloud WebServer from API."""
+        inst_id = ws.get_installation()
+        inst = self.get_installation_id(inst_id)
+        if inst and not inst.user_access.is_admin():
+            return
+
         ws_data = await self.api_get_webserver(ws, devices)
 
         update = EntityUpdate(UpdateType.API_FULL, ws_data)
