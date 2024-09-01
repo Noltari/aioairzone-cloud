@@ -9,7 +9,7 @@ from enum import IntEnum
 import logging
 from typing import Any
 
-from .const import WS_CHANGE, WS_STATUS
+from .const import WS_ADV_CONF, WS_CHANGE, WS_STATUS
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -41,8 +41,9 @@ class EntityUpdate:
         """Get Entity Update data."""
         if self.type == UpdateType.WS_PARTIAL:
             change: dict[str, Any] = self.data.get(WS_CHANGE, {})
+            adv_conf: dict[str, Any] = change.get(WS_ADV_CONF, {})
             status: dict[str, Any] = change.get(WS_STATUS, {})
-            return status
+            return adv_conf | status
 
         return self.data
 

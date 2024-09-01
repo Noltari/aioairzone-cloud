@@ -269,6 +269,7 @@ RAW_WEBSERVERS: Final[str] = "webservers"
 
 TOKEN_REFRESH_PERIOD: Final[timedelta] = timedelta(hours=12)
 
+WS_ADV_CONF: Final[str] = "adv_conf"
 WS_ALIVE_PERIOD: Final[timedelta] = timedelta(seconds=45)
 WS_AUTH: Final[str] = "auth"
 WS_BODY: Final[str] = "body"
