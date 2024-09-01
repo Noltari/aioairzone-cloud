@@ -30,6 +30,7 @@ from .const import (
     API_EXT_TEMP,
     API_HUMIDITY,
     API_LOCAL_TEMP,
+    API_PC_UE,
     API_PE_UE,
     API_POWER,
     API_RAD_ACTIVE,
@@ -75,9 +76,10 @@ from .const import (
     AZD_INDOOR_EXCHANGER_TEMP,
     AZD_INDOOR_RETURN_TEMP,
     AZD_INDOOR_WORK_TEMP,
-    AZD_OUTDOOR_DISCHARGE_PRESS,
+    AZD_OUTDOOR_CONDENSER_PRESS,
     AZD_OUTDOOR_DISCHARGE_TEMP,
     AZD_OUTDOOR_ELECTRIC_CURRENT,
+    AZD_OUTDOOR_EVAPORATOR_PRESS,
     AZD_OUTDOOR_EXCHANGER_TEMP,
     AZD_OUTDOOR_TEMP,
     AZD_POWER,
@@ -138,9 +140,10 @@ class HVAC(Device):
         self.indoor_return_temp: float | None = None
         self.indoor_work_temp: float | None = None
         self.name: str = "HVAC"
-        self.outdoor_electric_current: float | None = None
-        self.outdoor_discharge_press: float | None = None
+        self.outdoor_condenser_press: float | None = None
         self.outdoor_discharge_temp: float | None = None
+        self.outdoor_electric_current: float | None = None
+        self.outdoor_evaporator_press: float | None = None
         self.outdoor_exchanger_temp: float | None = None
         self.outdoor_temp: float | None = None
         self.power: bool | None = None
@@ -215,9 +218,9 @@ class HVAC(Device):
         if indoor_work_temperature is not None:
             data[AZD_INDOOR_WORK_TEMP] = indoor_work_temperature
 
-        outdoor_discharge_press = self.get_outdoor_discharge_pressure()
-        if outdoor_discharge_press is not None:
-            data[AZD_OUTDOOR_DISCHARGE_PRESS] = outdoor_discharge_press
+        outdoor_condenser_press = self.get_outdoor_condenser_pressure()
+        if outdoor_condenser_press is not None:
+            data[AZD_OUTDOOR_CONDENSER_PRESS] = outdoor_condenser_press
 
         outdoor_discharge_temp = self.get_outdoor_discharge_temperature()
         if outdoor_discharge_temp is not None:
@@ -226,6 +229,10 @@ class HVAC(Device):
         outdoor_electric_current = self.get_outdoor_electric_current()
         if outdoor_electric_current is not None:
             data[AZD_OUTDOOR_ELECTRIC_CURRENT] = outdoor_electric_current
+
+        outdoor_evaporator_press = self.get_outdoor_evaporator_pressure()
+        if outdoor_evaporator_press is not None:
+            data[AZD_OUTDOOR_EVAPORATOR_PRESS] = outdoor_evaporator_press
 
         outdoor_exchanger_temperature = self.get_outdoor_exchanger_temperature()
         if outdoor_exchanger_temperature is not None:
@@ -436,20 +443,26 @@ class HVAC(Device):
         """Return HVAC device humidity."""
         return self.humidity
 
-    def get_outdoor_electric_current(self) -> float | None:
-        """Return HVAC outdoor electric current."""
-        return self.outdoor_electric_current
-
-    def get_outdoor_discharge_pressure(self) -> float | None:
-        """Return HVAC outdoor compressor discharge pressure."""
-        if self.outdoor_discharge_press is not None:
-            return self.outdoor_discharge_press * 1000
+    def get_outdoor_condenser_pressure(self) -> float | None:
+        """Return HVAC outdoor condenser pressure."""
+        if self.outdoor_condenser_press is not None:
+            return self.outdoor_condenser_press * 1000
         return None
 
     def get_outdoor_discharge_temperature(self) -> float | None:
         """Return HVAC outdoor compressor discharge temperature."""
         if self.outdoor_discharge_temp is not None:
             return round(self.outdoor_discharge_temp, 1)
+        return None
+
+    def get_outdoor_electric_current(self) -> float | None:
+        """Return HVAC outdoor electric current."""
+        return self.outdoor_electric_current
+
+    def get_outdoor_evaporator_pressure(self) -> float | None:
+        """Return HVAC outdoor evaporator pressure."""
+        if self.outdoor_evaporator_press is not None:
+            return self.outdoor_evaporator_press * 1000
         return None
 
     def get_outdoor_exchanger_temperature(self) -> float | None:
@@ -814,15 +827,19 @@ class HVAC(Device):
         if outdoor_electric_current is not None:
             self.outdoor_electric_current = outdoor_electric_current
 
-        outdoor_discharge_press = parse_float(data.get(API_PE_UE))
-        if outdoor_discharge_press is not None:
-            self.outdoor_discharge_press = outdoor_discharge_press
+        outdoor_condenser_press = parse_float(data.get(API_PC_UE))
+        if outdoor_condenser_press is not None:
+            self.outdoor_condenser_press = outdoor_condenser_press
 
         outdoor_discharge_temp = parse_float(
             data.get(API_DISCH_COMP_TEMP_UE, {}).get(API_CELSIUS)
         )
         if outdoor_discharge_temp is not None:
             self.outdoor_discharge_temp = outdoor_discharge_temp
+
+        outdoor_evaporator_press = parse_float(data.get(API_PE_UE))
+        if outdoor_evaporator_press is not None:
+            self.outdoor_evaporator_press = outdoor_evaporator_press
 
         outdoor_exchanger_temp = parse_float(
             data.get(API_EXCH_HEAT_TEMP_UE, {}).get(API_CELSIUS)
