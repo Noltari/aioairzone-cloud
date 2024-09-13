@@ -4,7 +4,7 @@ import asyncio
 import json
 import timeit
 
-import _secrets
+from _secrets import AIRZONE_OPTIONS
 import aiohttp
 
 from aioairzone_cloud.cloudapi import AirzoneCloudApi
@@ -15,7 +15,7 @@ async def main():
     """Basic Airzone client example."""
 
     async with aiohttp.ClientSession() as aiohttp_session:
-        client = AirzoneCloudApi(aiohttp_session, _secrets.AIRZONE_OPTIONS)
+        client = AirzoneCloudApi(aiohttp_session, AIRZONE_OPTIONS)
 
         try:
             await client.login()

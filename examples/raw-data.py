@@ -4,7 +4,7 @@ import asyncio
 import json
 import timeit
 
-import _secrets
+from _secrets import AIRZONE_INST, AIRZONE_OPTIONS
 import aiohttp
 
 from aioairzone_cloud.cloudapi import AirzoneCloudApi
@@ -15,7 +15,7 @@ async def main():
     """Raw Airzone Cloud API data example."""
 
     async with aiohttp.ClientSession() as aiohttp_session:
-        client = AirzoneCloudApi(aiohttp_session, _secrets.AIRZONE_OPTIONS)
+        client = AirzoneCloudApi(aiohttp_session, AIRZONE_OPTIONS)
 
         try:
             await client.login()
@@ -27,8 +27,8 @@ async def main():
             inst_list = await client.list_installations()
             for inst in inst_list:
                 print(json.dumps(inst.data(), indent=4, sort_keys=True))
-            client.select_installation(inst_list[0])
-            await client.update_installation(inst_list[0])
+            client.select_installation(inst_list[AIRZONE_INST])
+            await client.update_installation(inst_list[AIRZONE_INST])
             print("***")
 
             update_start = timeit.default_timer()
