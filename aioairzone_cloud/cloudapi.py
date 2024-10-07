@@ -77,6 +77,7 @@ from .exceptions import (
     LoginError,
     TokenRefreshError,
     TooManyRequests,
+    UnprocessableEntity,
 )
 from .group import Group
 from .hotwater import HotWater
@@ -167,6 +168,8 @@ class AirzoneCloudApi:
                     raise APIError(err) from err
                 if err.status == 401:
                     raise AuthError(err) from err
+                if err.status == 422:
+                    raise UnprocessableEntity(err) from err
                 if err.status == 429:
                     raise TooManyRequests(err) from err
 
@@ -197,10 +200,14 @@ class AirzoneCloudApi:
         }
         dev_params = urllib.parse.urlencode(params)
 
-        res = await self.api_request(
-            "GET",
-            f"{API_V1}/{API_DEVICES}/{url_id}/{API_CONFIG}?{dev_params}",
-        )
+        try:
+            res = await self.api_request(
+                "GET",
+                f"{API_V1}/{API_DEVICES}/{url_id}/{API_CONFIG}?{dev_params}",
+            )
+        except UnprocessableEntity:
+            res = {}
+
         await self.set_api_raw_data(RAW_DEVICES_CONFIG, dev_id, res)
 
         return res

@@ -33,3 +33,7 @@ class ParamUpdateFailure(AirzoneCloudError):
 
 class TooManyRequests(AirzoneCloudError):
     """Exception raised when max API requests are exceeded."""
+
+
+class UnprocessableEntity(AirzoneCloudError):
+    """Exception raised when device is disconnected."""
