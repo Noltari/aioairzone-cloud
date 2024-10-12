@@ -174,6 +174,8 @@ class AirzoneCloudApi:
                     raise TooManyRequests(err) from err
 
                 raise AirzoneCloudError(err) from err
+            except TimeoutError as err:
+                raise TimeoutError(err) from err
 
         _LOGGER.debug("aiohttp response: %s", resp_json)
 

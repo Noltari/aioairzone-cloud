@@ -7,6 +7,10 @@ class AirzoneCloudError(Exception):
     """Base class for Airzone Cloud errors."""
 
 
+class AirzoneTimeout(AirzoneCloudError):
+    """Exception raised when API times out."""
+
+
 class APIError(AirzoneCloudError):
     """Exception raised when API fails."""
 
