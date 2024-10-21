@@ -220,7 +220,10 @@ class Device(Entity):
     def get_modes(self) -> list[OperationMode] | None:
         """Return Device modes."""
         if len(self.modes) > 0:
-            return self.modes
+            modes = self.modes.copy()
+            if OperationMode.AUTO in modes and not self.get_double_set_point():
+                modes.pop(OperationMode.AUTO)
+            return modes
         return None
 
     def get_name(self) -> str:
