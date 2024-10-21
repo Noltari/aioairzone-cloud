@@ -24,7 +24,6 @@ from .const import (
     API_CONSUMPTION_UE,
     API_DEFAULT_TEMP_STEP,
     API_DISCH_COMP_TEMP_UE,
-    API_DOUBLE_SET_POINT,
     API_EXCH_HEAT_TEMP_IU,
     API_EXCH_HEAT_TEMP_UE,
     API_EXT_TEMP,
@@ -71,7 +70,6 @@ from .const import (
     AZD_AQ_ACTIVE,
     AZD_AQ_MODE_CONF,
     AZD_AQ_MODE_VALUES,
-    AZD_DOUBLE_SET_POINT,
     AZD_HUMIDITY,
     AZD_INDOOR_EXCHANGER_TEMP,
     AZD_INDOOR_RETURN_TEMP,
@@ -133,7 +131,6 @@ class HVAC(Device):
         self.aq_active: bool | None = None
         self.aq_mode_conf: AirQualityMode | None = None
         self.aq_mode_values: list[AirQualityMode] | None = None
-        self.double_set_point: bool | None = None
         self.floor_demand: bool | None = None
         self.humidity: int | None = None
         self.indoor_exchanger_temp: float | None = None
@@ -185,7 +182,6 @@ class HVAC(Device):
 
         data[AZD_ACTION] = self.get_action()
         data[AZD_ACTIVE] = self.get_active()
-        data[AZD_DOUBLE_SET_POINT] = self.get_double_set_point()
         data[AZD_POWER] = self.get_power()
         data[AZD_TEMP] = self.get_temperature()
         data[AZD_TEMP_STEP] = self.get_temp_step()
@@ -410,12 +406,6 @@ class HVAC(Device):
         if self.aq_mode_values is not None and len(self.aq_mode_values) > 0:
             return self.aq_mode_values
         return None
-
-    def get_double_set_point(self) -> bool:
-        """Return HVAC double set point."""
-        if self.double_set_point is not None:
-            return self.double_set_point
-        return False
 
     def get_floor_demand(self) -> bool | None:
         """Return HVAC device floor demand status."""
@@ -796,10 +786,6 @@ class HVAC(Device):
             self.aq_mode_values = []
             for aq_mode_value in aq_mode_values:
                 self.aq_mode_values += [AirQualityMode(aq_mode_value)]
-
-        double_set_point = parse_bool(data.get(API_DOUBLE_SET_POINT))
-        if double_set_point is not None:
-            self.double_set_point = double_set_point
 
         humidity = parse_int(data.get(API_HUMIDITY))
         if humidity is not None:
