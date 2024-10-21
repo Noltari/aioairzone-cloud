@@ -16,6 +16,7 @@ from .const import (
     API_AQ_STATUS,
     API_CONFIG,
     API_DEVICE_ID,
+    API_DOUBLE_SET_POINT,
     API_ERRORS,
     API_IS_CONNECTED,
     API_META,
@@ -31,6 +32,7 @@ from .const import (
     AZD_AQ_PRESENT,
     AZD_AQ_STATUS,
     AZD_AVAILABLE,
+    AZD_DOUBLE_SET_POINT,
     AZD_ERRORS,
     AZD_ID,
     AZD_INSTALLATION,
@@ -62,6 +64,7 @@ class Device(Entity):
         self.aq_pm_10: int | None = None
         self.aq_present: bool | None = None
         self.aq_status: str | None = None
+        self.double_set_point: bool | None = None
         self.errors: list[str] = []
         self.id = str(device_data[API_DEVICE_ID])
         self.installation_id = inst_id
@@ -96,6 +99,7 @@ class Device(Entity):
         """Return Device data."""
         data: dict[str, Any] = {
             AZD_AVAILABLE: self.get_available(),
+            AZD_DOUBLE_SET_POINT: self.get_double_set_point(),
             AZD_ID: self.get_id(),
             AZD_INSTALLATION: self.get_installation(),
             AZD_IS_CONNECTED: self.get_is_connected(),
@@ -182,6 +186,12 @@ class Device(Entity):
     def get_available(self) -> bool:
         """Return availability status."""
         return self.is_connected and self.ws_connected
+
+    def get_double_set_point(self) -> bool:
+        """Return Device double set point."""
+        if self.double_set_point is not None:
+            return self.double_set_point
+        return False
 
     def get_errors(self) -> list[str]:
         """Return Device errors."""
@@ -275,6 +285,10 @@ class Device(Entity):
         aq_status = parse_str(data.get(API_AQ_QUALITY))
         if aq_status is not None:
             self.aq_status = aq_status
+
+        double_set_point = parse_bool(data.get(API_DOUBLE_SET_POINT))
+        if double_set_point is not None:
+            self.double_set_point = double_set_point
 
         errors = data.get(API_ERRORS)
         if errors is not None:
