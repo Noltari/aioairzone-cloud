@@ -17,6 +17,7 @@ from .const import (
     API_CONFIG,
     API_DEVICE_ID,
     API_DOUBLE_SET_POINT,
+    API_DUAL_SP_CONF,
     API_ERRORS,
     API_IS_CONNECTED,
     API_META,
@@ -33,6 +34,7 @@ from .const import (
     AZD_AQ_STATUS,
     AZD_AVAILABLE,
     AZD_DOUBLE_SET_POINT,
+    AZD_DUAL_SP_CONF,
     AZD_ERRORS,
     AZD_ID,
     AZD_INSTALLATION,
@@ -65,6 +67,7 @@ class Device(Entity):
         self.aq_present: bool | None = None
         self.aq_status: str | None = None
         self.double_set_point: bool | None = None
+        self.dual_sp_conf: bool | None = None
         self.errors: list[str] = []
         self.id = str(device_data[API_DEVICE_ID])
         self.installation_id = inst_id
@@ -133,6 +136,10 @@ class Device(Entity):
         if aq_status is not None:
             data[AZD_AQ_STATUS] = aq_status
 
+        dual_sp_conf = self.get_dual_sp_conf()
+        if dual_sp_conf is not None:
+            data[AZD_DUAL_SP_CONF] = dual_sp_conf
+
         errors = self.get_errors()
         if len(errors) > 0:
             data[AZD_ERRORS] = errors
@@ -192,6 +199,10 @@ class Device(Entity):
         if self.double_set_point is not None:
             return self.double_set_point
         return False
+
+    def get_dual_sp_conf(self) -> bool | None:
+        """Return Device dual set point config."""
+        return self.dual_sp_conf
 
     def get_errors(self) -> list[str]:
         """Return Device errors."""
@@ -289,6 +300,10 @@ class Device(Entity):
         double_set_point = parse_bool(data.get(API_DOUBLE_SET_POINT))
         if double_set_point is not None:
             self.double_set_point = double_set_point
+
+        dual_sp_conf = parse_bool(data.get(API_DUAL_SP_CONF))
+        if dual_sp_conf is not None:
+            self.dual_sp_conf = dual_sp_conf
 
         errors = data.get(API_ERRORS)
         if errors is not None:
