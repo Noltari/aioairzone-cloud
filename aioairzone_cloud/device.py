@@ -23,6 +23,7 @@ from .const import (
     API_META,
     API_MODE,
     API_MODE_AVAIL,
+    API_SIMULATOR_MODE,
     API_SYSTEM_NUMBER,
     API_WARNINGS,
     API_WS_CONNECTED,
@@ -44,6 +45,7 @@ from .const import (
     AZD_MODES,
     AZD_NAME,
     AZD_PROBLEMS,
+    AZD_SIMULATOR_MODE,
     AZD_WARNINGS,
     AZD_WEBSERVER,
     AZD_WS_CONNECTED,
@@ -74,6 +76,7 @@ class Device(Entity):
         self.mode: OperationMode | None = None
         self.modes: list[OperationMode] = []
         self.name: str = "Device"
+        self.simulator_mode: bool | None = None
         self.warnings: list[str] = []
         self.webserver_id = ws_id
         self.ws_connected: bool = True
@@ -155,6 +158,10 @@ class Device(Entity):
         modes = self.get_modes()
         if modes is not None:
             data[AZD_MODES] = modes
+
+        simulator_mode = self.get_simulator_mode()
+        if simulator_mode is not None:
+            data[AZD_SIMULATOR_MODE] = simulator_mode
 
         warnings = self.get_warnings()
         if len(warnings) > 0:
@@ -242,6 +249,10 @@ class Device(Entity):
         """Return Device problems."""
         return bool(self.errors) or bool(self.warnings)
 
+    def get_simulator_mode(self) -> bool | None:
+        """Return Device simulator mode."""
+        return self.simulator_mode
+
     def get_warnings(self) -> list[str]:
         """Return Device warnings."""
         return self.warnings
@@ -320,6 +331,10 @@ class Device(Entity):
             for mode in mode_avail:
                 modes += [OperationMode(mode)]
             self.modes = modes
+
+        simulator_mode = parse_bool(data.get(API_SIMULATOR_MODE))
+        if simulator_mode is not None:
+            self.simulator_mode = simulator_mode
 
         warnings = data.get(API_WARNINGS)
         if warnings is not None:
