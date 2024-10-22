@@ -14,6 +14,7 @@ from .const import (
     API_AQ_PRESENT,
     API_AQ_QUALITY,
     API_AQ_STATUS,
+    API_AUTO_MODE,
     API_CONFIG,
     API_DEVICE_ID,
     API_DOUBLE_SET_POINT,
@@ -307,6 +308,10 @@ class Device(Entity):
         aq_status = parse_str(data.get(API_AQ_QUALITY))
         if aq_status is not None:
             self.aq_status = aq_status
+
+        auto_mode = data.get(API_AUTO_MODE)
+        if auto_mode is not None:
+            self.auto_mode = OperationMode(auto_mode)
 
         double_set_point = parse_bool(data.get(API_DOUBLE_SET_POINT))
         if double_set_point is not None:
