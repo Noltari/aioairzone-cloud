@@ -52,6 +52,7 @@ from .const import (
     API_RANGE_SP_MIN_STOP_AIR,
     API_RANGE_SP_MIN_VENT_AIR,
     API_RETURN_TEMP,
+    API_SP_AIR_AUTO,
     API_SP_AIR_COOL,
     API_SP_AIR_DRY,
     API_SP_AIR_HEAT,
@@ -943,6 +944,9 @@ class HVAC(Device):
 
             self.speeds = speeds
 
+        sp_air_auto = parse_float(data.get(API_SP_AIR_AUTO, {}).get(API_CELSIUS))
+        if sp_air_auto is not None:
+            self.temp_set_auto_air = sp_air_auto
         sp_air_cool = parse_float(data.get(API_SP_AIR_COOL, {}).get(API_CELSIUS))
         if sp_air_cool is not None:
             self.temp_set_cool_air = sp_air_cool
