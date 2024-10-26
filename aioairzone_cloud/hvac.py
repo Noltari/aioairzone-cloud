@@ -725,15 +725,35 @@ class HVAC(Device):
         if self.temp_set_vent_air is not None:
             self.temp_set_vent_air = setpoint
 
+    def set_setpoint_auto(self, setpoint: float) -> None:
+        """Set HVAC auto setpoint."""
+        if self.temp_set_auto_air is not None:
+            self.temp_set_auto_air = setpoint
+
     def set_setpoint_cool(self, setpoint: float) -> None:
         """Set HVAC cool setpoint."""
         if self.temp_set_cool_air is not None:
             self.temp_set_cool_air = setpoint
 
+    def set_setpoint_dry(self, setpoint: float) -> None:
+        """Set HVAC dry setpoint."""
+        if self.temp_set_dry_air is not None:
+            self.temp_set_dry_air = setpoint
+
     def set_setpoint_heat(self, setpoint: float) -> None:
         """Set HVAC heat setpoint."""
         if self.temp_set_hot_air is not None:
             self.temp_set_hot_air = setpoint
+
+    def set_setpoint_stop(self, setpoint: float) -> None:
+        """Set HVAC stop setpoint."""
+        if self.temp_set_stop_air is not None:
+            self.temp_set_stop_air = setpoint
+
+    def set_setpoint_vent(self, setpoint: float) -> None:
+        """Set HVAC vent setpoint."""
+        if self.temp_set_vent_air is not None:
+            self.temp_set_vent_air = setpoint
 
     def update_data(self, update: EntityUpdate) -> None:
         """Update HVAC device data."""
