@@ -712,18 +712,22 @@ class HVAC(Device):
 
     def set_setpoint(self, setpoint: float) -> None:
         """Set HVAC setpoint."""
-        if self.temp_set_auto_air is not None:
-            self.temp_set_auto_air = setpoint
-        if self.temp_set_cool_air is not None:
-            self.temp_set_cool_air = setpoint
-        if self.temp_set_dry_air is not None:
-            self.temp_set_dry_air = setpoint
-        if self.temp_set_hot_air is not None:
-            self.temp_set_hot_air = setpoint
-        if self.temp_set_stop_air is not None:
-            self.temp_set_stop_air = setpoint
-        if self.temp_set_vent_air is not None:
-            self.temp_set_vent_air = setpoint
+        mode = self.get_mode()
+        if mode is None:
+            return
+
+        if mode.is_auto():
+            self.set_setpoint_auto(setpoint)
+        elif mode.is_cool():
+            self.set_setpoint_cool(setpoint)
+        elif mode.is_dry():
+            self.set_setpoint_dry(setpoint)
+        elif mode.is_heat():
+            self.set_setpoint_heat(setpoint)
+        elif mode.is_vent():
+            self.set_setpoint_vent(setpoint)
+        elif mode.is_stop():
+            self.set_setpoint_stop(setpoint)
 
     def set_setpoint_auto(self, setpoint: float) -> None:
         """Set HVAC auto setpoint."""
