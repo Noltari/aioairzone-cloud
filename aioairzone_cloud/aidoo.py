@@ -12,8 +12,12 @@ from .const import (
     API_NAME,
     API_POWER,
     API_SETPOINT,
+    API_SP_AIR_AUTO,
     API_SP_AIR_COOL,
+    API_SP_AIR_DRY,
     API_SP_AIR_HEAT,
+    API_SP_AIR_STOP,
+    API_SP_AIR_VENT,
     API_SPEED_CONF,
     API_TYPE,
     API_VALUE,
@@ -66,9 +70,17 @@ class Aidoo(HVAC):
             self.set_power(data[API_VALUE])
         elif param == API_SETPOINT:
             self.set_setpoint(data[API_VALUE])
+        elif param == API_SP_AIR_AUTO:
+            self.set_setpoint_auto(data[API_VALUE])
         elif param == API_SP_AIR_COOL:
             self.set_setpoint_cool(data[API_VALUE])
+        elif param == API_SP_AIR_DRY:
+            self.set_setpoint_dry(data[API_VALUE])
         elif param == API_SP_AIR_HEAT:
             self.set_setpoint_heat(data[API_VALUE])
+        elif param == API_SP_AIR_STOP:
+            self.set_setpoint_stop(data[API_VALUE])
+        elif param == API_SP_AIR_VENT:
+            self.set_setpoint_vent(data[API_VALUE])
         elif param == API_SPEED_CONF:
             self.set_speed(data[API_VALUE])
