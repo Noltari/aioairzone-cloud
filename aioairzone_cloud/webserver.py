@@ -39,7 +39,7 @@ from .const import (
     AZD_WIFI_RSSI,
     AZD_WIFI_SSID,
 )
-from .entity import Entity, EntityUpdate
+from .entity import Entity, EntityUpdate, UpdateType
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -76,7 +76,13 @@ class WebServer(Entity):
         if ws_type is not None:
             self.type = ws_type
 
-        ws_config = data.get(API_CONFIG)
+        if update.get_type() != UpdateType.WS_PARTIAL:
+            ws_config = data.get(API_CONFIG)
+            ws_status = data.get(API_STATUS)
+        else:
+            ws_config = None
+            ws_status = data
+
         if ws_config is not None:
             stat_ap_mac = parse_str(ws_config.get(API_STAT_AP_MAC))
             if stat_ap_mac is not None:
@@ -91,7 +97,6 @@ class WebServer(Entity):
             if ws_fw is not None:
                 self.firmware = ws_fw
 
-        ws_status = data.get(API_STATUS)
         if ws_status is not None:
             connection_date = parse_str(ws_status.get(API_CONNECTION_DATE))
             if connection_date is not None:
