@@ -80,7 +80,7 @@ class WebServer(Entity):
             ws_config = data.get(API_CONFIG)
             ws_status = data.get(API_STATUS)
         else:
-            ws_config = None
+            ws_config = data
             ws_status = data
 
         if ws_config is not None:
