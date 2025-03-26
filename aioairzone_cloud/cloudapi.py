@@ -95,7 +95,6 @@ class AirzoneCloudApi:
     """Airzone Cloud API."""
 
     callback_function: Callable[[dict[str, Any]], None] | None
-    callback_lock: Lock
 
     def __init__(
         self,
@@ -115,11 +114,12 @@ class AirzoneCloudApi:
         self._api_timeout: ClientTimeout = ClientTimeout(total=HTTP_CALL_TIMEOUT)
         self.aidoos: dict[str, Aidoo] = {}
         self.callback_function = None
-        self.callback_lock = Lock()
+        self.callback_lock: Lock = Lock()
         self.devices: dict[str, Device] = {}
         self.dhws: dict[str, HotWater] = {}
         self.groups: dict[str, Group] = {}
         self.installations: dict[str, Installation] = {}
+        self.loop = asyncio.get_running_loop()
         self.options = options
         self.session = session
         self.systems: dict[str, System] = {}
@@ -968,14 +968,13 @@ class AirzoneCloudApi:
 
     async def _update_callback(self) -> None:
         """Perform update callback."""
-        if self.callback_function:
-            async with self.callback_lock:
+        async with self.callback_lock:
+            if self.callback_function:
                 self.callback_function(self.data())
 
     def update_callback(self) -> None:
         """Create update callback task."""
-        if self.callback_function:
-            asyncio.ensure_future(self._update_callback())
+        asyncio.run_coroutine_threadsafe(self._update_callback(), self.loop)
 
     def set_update_callback(
         self, callback_function: Callable[[dict[str, Any]], None]

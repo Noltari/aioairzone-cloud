@@ -3,6 +3,7 @@
 import asyncio
 import json
 import timeit
+from typing import Any
 
 from _secrets import AIRZONE_OPTIONS
 import aiohttp
@@ -11,11 +12,18 @@ from aioairzone_cloud.cloudapi import AirzoneCloudApi
 from aioairzone_cloud.exceptions import LoginError, TooManyRequests
 
 
+def update_callback(data: dict[str, Any]) -> None:
+    """Update callback function."""
+    print(f"update_callback: data_len={len(data)}")
+
+
 async def main():
     """Basic Airzone client example."""
 
     async with aiohttp.ClientSession() as aiohttp_session:
         client = AirzoneCloudApi(aiohttp_session, AIRZONE_OPTIONS)
+
+        client.set_update_callback(update_callback)
 
         try:
             await client.login()
