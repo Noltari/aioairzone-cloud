@@ -150,6 +150,7 @@ API_AZ_AIRQSENSOR: Final[str] = "az_airqsensor"
 API_AZ_AIDOO: Final[str] = "aidoo"
 API_AZ_AIDOO_ACS: Final[str] = "aidoo_acs"
 API_AZ_AIDOO_PRO: Final[str] = "aidoo_it"
+API_AZ_OUTPUTS: Final[str] = "az_outputs"
 API_AZ_SYSTEM: Final[str] = "az_system"
 API_AZ_ZONE: Final[str] = "az_zone"
 API_THERMOSTAT_LOW_BATTERY_VALUE: Final[int] = 35

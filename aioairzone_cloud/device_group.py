@@ -34,6 +34,7 @@ from .const import (
     AZD_ZONES,
 )
 from .hotwater import HotWater
+from .output import Output
 from .system import System
 from .zone import Zone
 
@@ -50,6 +51,7 @@ class DeviceGroup(ABC):
         self.aidoos: dict[str, Aidoo] = {}
         self.air_quality: dict[str, AirQuality] = {}
         self.dhws: dict[str, HotWater] = {}
+        self.outputs: dict[str, Output] = {}
         self.systems: dict[str, System] = {}
         self.zones: dict[str, Zone] = {}
 
@@ -153,6 +155,12 @@ class DeviceGroup(ABC):
         dhw_id = dhw.get_id()
         if dhw_id not in self.dhws:
             self.dhws[dhw_id] = dhw
+
+    def add_output(self, output: Output) -> None:
+        """Add Output to DeviceGroup."""
+        output_id = output.get_id()
+        if output_id not in self.outputs:
+            self.outputs[output_id] = output
 
     def add_system(self, system: System) -> None:
         """Add System to DeviceGroup."""

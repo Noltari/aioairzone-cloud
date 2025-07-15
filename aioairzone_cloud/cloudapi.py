@@ -27,6 +27,7 @@ from .const import (
     API_AZ_AIDOO_ACS,
     API_AZ_AIDOO_PRO,
     API_AZ_AIRQSENSOR,
+    API_AZ_OUTPUTS,
     API_AZ_SYSTEM,
     API_AZ_ZONE,
     API_CONFIG,
@@ -84,6 +85,7 @@ from .exceptions import (
 from .group import Group
 from .hotwater import HotWater
 from .installation import Installation
+from .output import Output
 from .system import System
 from .token import AirzoneCloudToken
 from .webserver import WebServer
@@ -124,6 +126,7 @@ class AirzoneCloudApi:
         self.installations: dict[str, Installation] = {}
         self.loop = asyncio.get_running_loop()
         self.options = options
+        self.outputs: dict[str, Output] = {}
         self.session = session
         self.systems: dict[str, System] = {}
         self.token: AirzoneCloudToken = AirzoneCloudToken()
@@ -599,6 +602,11 @@ class AirzoneCloudApi:
         self.dhws[dhw.get_id()] = dhw
         self.add_device(dhw)
 
+    def add_output(self, output: Output) -> None:
+        """Add Airzone Cloud Output."""
+        self.outputs[output.get_id()] = output
+        self.add_device(output)
+
     def add_system(self, system: System) -> None:
         """Add Airzone Cloud System."""
         self.systems[system.get_id()] = system
@@ -634,6 +642,10 @@ class AirzoneCloudApi:
     def get_installation_id(self, inst_id: str) -> Installation | None:
         """Return Airzone Cloud Installation by ID."""
         return self.installations.get(inst_id)
+
+    def get_output_id(self, output_id: str) -> Output | None:
+        """Return Airzone Cloud Output by ID."""
+        return self.outputs.get(output_id)
 
     def get_system_id(self, sys_id: str) -> System | None:
         """Return Airzone Cloud System by ID."""
@@ -795,6 +807,13 @@ class AirzoneCloudApi:
                             self.add_air_quality(air_quality)
                             group.add_air_quality(air_quality)
                             inst.add_air_quality(air_quality)
+                elif device_type == API_AZ_OUTPUTS:
+                    if self.get_output_id(device_id) is None:
+                        output = Output(inst_id, ws_id, device_data)
+                        if output is not None:
+                            self.add_output(output)
+                            group.add_output(output)
+                            inst.add_output(output)
                 else:
                     _LOGGER.warning(
                         "unsupported device_type=%s %s", device_type, device_data
@@ -910,6 +929,13 @@ class AirzoneCloudApi:
                             self.add_air_quality(air_quality)
                             if inst is not None:
                                 inst.add_air_quality(air_quality)
+                elif device_type == API_AZ_OUTPUTS:
+                    if self.get_output_id(device_id) is None:
+                        output = Output(inst_id, ws_id, device_data)
+                        if output is not None:
+                            self.add_output(output)
+                            if inst is not None:
+                                inst.add_output(output)
                 else:
                     _LOGGER.warning(
                         "unsupported device_type=%s %s", device_type, device_data
