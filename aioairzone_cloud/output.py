@@ -45,4 +45,4 @@ class Output(Device):
 
         data = update.get_data()
 
-        _LOGGER.warning("output: %s", data)
+        _LOGGER.debug("output: %s", data)

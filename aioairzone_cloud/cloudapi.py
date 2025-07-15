@@ -850,7 +850,7 @@ class AirzoneCloudApi:
                             group.add_output(output)
                             inst.add_output(output)
                 else:
-                    _LOGGER.warning(
+                    _LOGGER.debug(
                         "unsupported device_type=%s %s", device_type, device_data
                     )
 
@@ -993,7 +993,7 @@ class AirzoneCloudApi:
                             if inst is not None:
                                 inst.add_output(output)
                 else:
-                    _LOGGER.warning(
+                    _LOGGER.debug(
                         "unsupported device_type=%s %s", device_type, device_data
                     )
 
