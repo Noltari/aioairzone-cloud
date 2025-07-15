@@ -17,6 +17,7 @@ from aiohttp import (
 )
 
 from .aidoo import Aidoo
+from .air_quality import AirQuality
 from .common import ConnectionOptions, OperationMode
 from .const import (
     API_AUTH_LOGIN,
@@ -25,6 +26,7 @@ from .const import (
     API_AZ_AIDOO,
     API_AZ_AIDOO_ACS,
     API_AZ_AIDOO_PRO,
+    API_AZ_AIRQSENSOR,
     API_AZ_SYSTEM,
     API_AZ_ZONE,
     API_CONFIG,
@@ -52,6 +54,7 @@ from .const import (
     API_WS,
     API_WS_ID,
     AZD_AIDOOS,
+    AZD_AIR_QUALITY,
     AZD_GROUPS,
     AZD_HOT_WATERS,
     AZD_INSTALLATIONS,
@@ -113,6 +116,7 @@ class AirzoneCloudApi:
         self._api_semaphore: Semaphore = Semaphore(HTTP_MAX_REQUESTS)
         self._api_timeout: ClientTimeout = ClientTimeout(total=HTTP_CALL_TIMEOUT)
         self.aidoos: dict[str, Aidoo] = {}
+        self.air_quality: dict[str, AirQuality] = {}
         self.callback_function = None
         self.callback_lock: Lock = Lock()
         self.devices: dict[str, Device] = {}
@@ -537,6 +541,12 @@ class AirzoneCloudApi:
                 aidoos[key] = aidoo.data()
             data[AZD_AIDOOS] = aidoos
 
+        if len(self.air_quality) > 0:
+            air_quality_data: dict[str, Any] = {}
+            for key, air_quality in self.air_quality.items():
+                air_quality_data[key] = air_quality.data()
+            data[AZD_AIR_QUALITY] = air_quality_data
+
         if len(self.dhws) > 0:
             dhws: dict[str, Any] = {}
             for key, dhw in self.dhws.items():
@@ -580,6 +590,11 @@ class AirzoneCloudApi:
         self.aidoos[aidoo.get_id()] = aidoo
         self.add_device(aidoo)
 
+    def add_air_quality(self, air_quality: AirQuality) -> None:
+        """Add Airzone Cloud Aidoo."""
+        self.air_quality[air_quality.get_id()] = air_quality
+        self.add_device(air_quality)
+
     def add_device(self, device: Device) -> None:
         """Add Airzone Cloud Device."""
         dev_id = device.get_id()
@@ -604,6 +619,10 @@ class AirzoneCloudApi:
     def get_aidoo_id(self, aidoo_id: str) -> Aidoo | None:
         """Return Airzone Cloud Aidoo by ID."""
         return self.aidoos.get(aidoo_id)
+
+    def get_air_quality_id(self, air_quality_id: str) -> AirQuality | None:
+        """Return Airzone Cloud Air Quality by ID."""
+        return self.air_quality.get(air_quality_id)
 
     def get_device_id(self, dev_id: str | None) -> Device | None:
         """Return Airzone Cloud Device by ID."""
@@ -708,6 +727,27 @@ class AirzoneCloudApi:
 
         await asyncio.gather(*tasks)
 
+    async def update_air_quality(self, air_quality: AirQuality) -> None:
+        """Update Airzone Cloud Air Quality from API."""
+        config_task = asyncio.create_task(self.api_get_device_config(air_quality))
+        status_task = asyncio.create_task(self.api_get_device_status(air_quality))
+
+        config_data = await config_task
+        status_data = await status_task
+
+        update = EntityUpdate(UpdateType.API_FULL, config_data | status_data)
+
+        await air_quality.update(update)
+
+    async def update_air_qualitys(self) -> None:
+        """Update all Airzone Cloud Air Qualitys."""
+        tasks = []
+
+        for aidoo in self.air_quality.values():
+            tasks += [asyncio.create_task(self.update_air_quality(aidoo))]
+
+        await asyncio.gather(*tasks)
+
     async def update_dhw(self, dhw: HotWater) -> None:
         """Update Airzone Cloud DHW from API."""
         status_task = asyncio.create_task(self.api_get_device_status(dhw))
@@ -747,34 +787,46 @@ class AirzoneCloudApi:
             for device_data in group_data[API_DEVICES]:
                 device_id = device_data[API_DEVICE_ID]
                 device_type = device_data[API_TYPE]
+                ws_id = device_data[API_WS_ID]
                 if device_type == API_AZ_ZONE:
                     if self.get_zone_id(device_id) is None:
-                        zone = Zone(inst_id, device_data[API_WS_ID], device_data)
+                        zone = Zone(inst_id, ws_id, device_data)
                         if zone is not None:
                             self.add_zone(zone)
                             group.add_zone(zone)
                             inst.add_zone(zone)
                 elif device_type == API_AZ_SYSTEM:
                     if self.get_system_id(device_id) is None:
-                        system = System(inst_id, device_data[API_WS_ID], device_data)
+                        system = System(inst_id, ws_id, device_data)
                         if system is not None:
                             self.add_system(system)
                             group.add_system(system)
                             inst.add_system(system)
                 elif device_type in [API_AZ_AIDOO, API_AZ_AIDOO_PRO]:
                     if self.get_aidoo_id(device_id) is None:
-                        aidoo = Aidoo(inst_id, device_data[API_WS_ID], device_data)
+                        aidoo = Aidoo(inst_id, ws_id, device_data)
                         if aidoo is not None:
                             self.add_aidoo(aidoo)
                             group.add_aidoo(aidoo)
                             inst.add_aidoo(aidoo)
                 elif device_type in [API_AZ_ACS, API_AZ_AIDOO_ACS]:
                     if self.get_dhw_id(device_id) is None:
-                        dhw = HotWater(inst_id, device_data[API_WS_ID], device_data)
+                        dhw = HotWater(inst_id, ws_id, device_data)
                         if HotWater is not None:
                             self.add_dhw(dhw)
                             group.add_dhw(dhw)
                             inst.add_dhw(dhw)
+                elif device_type == API_AZ_AIRQSENSOR:
+                    if self.get_air_quality_id(device_id) is None:
+                        air_quality = AirQuality(inst_id, ws_id, device_data)
+                        if air_quality is not None:
+                            self.add_air_quality(air_quality)
+                            group.add_air_quality(air_quality)
+                            inst.add_air_quality(air_quality)
+                else:
+                    _LOGGER.warning(
+                        "unsupported device_type=%s %s", device_type, device_data
+                    )
 
         self.connect_installation_websockets(inst_id)
 
@@ -846,38 +898,50 @@ class AirzoneCloudApi:
         await ws.update(update)
         if devices:
             ws_id = ws.get_id()
-            inst = self.get_installation_id(ws.get_installation())
+            inst_id = ws.get_installation()
+            inst = self.get_installation_id(inst_id)
             for device_data in ws_data[API_DEVICES]:
                 device_id = device_data[API_DEVICE_ID]
                 device_type = device_data[API_DEVICE_TYPE]
                 if device_type == API_AZ_ZONE:
                     if self.get_zone_id(device_id) is None:
-                        zone = Zone(ws.get_installation(), ws_id, device_data)
+                        zone = Zone(inst_id, ws_id, device_data)
                         if zone is not None:
                             self.add_zone(zone)
                             if inst is not None:
                                 inst.add_zone(zone)
                 elif device_type == API_AZ_SYSTEM:
                     if self.get_system_id(device_id) is None:
-                        system = System(ws.get_installation(), ws_id, device_data)
+                        system = System(inst_id, ws_id, device_data)
                         if system is not None:
                             self.add_system(system)
                             if inst is not None:
                                 inst.add_system(system)
                 elif device_type in [API_AZ_AIDOO, API_AZ_AIDOO_PRO]:
                     if self.get_aidoo_id(device_id) is None:
-                        aidoo = Aidoo(ws.get_installation(), ws_id, device_data)
+                        aidoo = Aidoo(inst_id, ws_id, device_data)
                         if aidoo is not None:
                             self.add_aidoo(aidoo)
                             if inst is not None:
                                 inst.add_aidoo(aidoo)
                 elif device_type in [API_AZ_ACS, API_AZ_AIDOO_ACS]:
                     if self.get_dhw_id(device_id) is None:
-                        dhw = HotWater(ws.get_installation(), ws_id, device_data)
+                        dhw = HotWater(inst_id, ws_id, device_data)
                         if dhw is not None:
                             self.add_dhw(dhw)
                             if inst is not None:
                                 inst.add_dhw(dhw)
+                elif device_type == API_AZ_AIRQSENSOR:
+                    if self.get_air_quality_id(device_id) is None:
+                        air_quality = AirQuality(inst_id, ws_id, device_data)
+                        if air_quality is not None:
+                            self.add_air_quality(air_quality)
+                            if inst is not None:
+                                inst.add_air_quality(air_quality)
+                else:
+                    _LOGGER.warning(
+                        "unsupported device_type=%s %s", device_type, device_data
+                    )
 
     async def update_webserver_id(self, ws_id: str, devices: bool) -> None:
         """Update Airzone Cloud WebServer by ID."""
@@ -931,6 +995,7 @@ class AirzoneCloudApi:
             asyncio.create_task(self.update_systems_zones()),
             asyncio.create_task(self.update_aidoos()),
             asyncio.create_task(self.update_dhws()),
+            asyncio.create_task(self.update_air_qualitys()),
         ]
 
         await asyncio.gather(*tasks)
