@@ -27,6 +27,7 @@ from .const import (
     API_AZ_AIDOO_ACS,
     API_AZ_AIDOO_PRO,
     API_AZ_AIRQSENSOR,
+    API_AZ_OUTPUTS,
     API_AZ_SYSTEM,
     API_AZ_ZONE,
     API_CONFIG,
@@ -58,6 +59,7 @@ from .const import (
     AZD_GROUPS,
     AZD_HOT_WATERS,
     AZD_INSTALLATIONS,
+    AZD_OUTPUTS,
     AZD_SYSTEMS,
     AZD_WEBSERVERS,
     AZD_ZONES,
@@ -85,6 +87,7 @@ from .exceptions import (
 from .group import Group
 from .hotwater import HotWater
 from .installation import Installation
+from .output import Output
 from .system import System
 from .token import AirzoneCloudToken
 from .webserver import WebServer
@@ -125,6 +128,7 @@ class AirzoneCloudApi:
         self.installations: dict[str, Installation] = {}
         self.loop = asyncio.get_running_loop()
         self.options = options
+        self.outputs: dict[str, Output] = {}
         self.session = session
         self.systems: dict[str, System] = {}
         self.token: AirzoneCloudToken = AirzoneCloudToken()
@@ -565,6 +569,12 @@ class AirzoneCloudApi:
                 installations[key] = installation.data()
             data[AZD_INSTALLATIONS] = installations
 
+        if len(self.outputs) > 0:
+            outputs: dict[str, Any] = {}
+            for key, output in self.outputs.items():
+                outputs[key] = output.data()
+            data[AZD_OUTPUTS] = outputs
+
         if len(self.systems) > 0:
             systems: dict[str, Any] = {}
             for key, system in self.systems.items():
@@ -606,6 +616,11 @@ class AirzoneCloudApi:
         self.dhws[dhw.get_id()] = dhw
         self.add_device(dhw)
 
+    def add_output(self, output: Output) -> None:
+        """Add Airzone Cloud Output."""
+        self.outputs[output.get_id()] = output
+        self.add_device(output)
+
     def add_system(self, system: System) -> None:
         """Add Airzone Cloud System."""
         self.systems[system.get_id()] = system
@@ -641,6 +656,10 @@ class AirzoneCloudApi:
     def get_installation_id(self, inst_id: str) -> Installation | None:
         """Return Airzone Cloud Installation by ID."""
         return self.installations.get(inst_id)
+
+    def get_output_id(self, output_id: str) -> Output | None:
+        """Return Airzone Cloud Output by ID."""
+        return self.outputs.get(output_id)
 
     def get_system_id(self, sys_id: str) -> System | None:
         """Return Airzone Cloud System by ID."""
@@ -823,6 +842,13 @@ class AirzoneCloudApi:
                             self.add_air_quality(air_quality)
                             group.add_air_quality(air_quality)
                             inst.add_air_quality(air_quality)
+                elif device_type == API_AZ_OUTPUTS:
+                    if self.get_output_id(device_id) is None:
+                        output = Output(inst_id, ws_id, device_data)
+                        if output is not None:
+                            self.add_output(output)
+                            group.add_output(output)
+                            inst.add_output(output)
                 else:
                     _LOGGER.warning(
                         "unsupported device_type=%s %s", device_type, device_data
@@ -843,6 +869,27 @@ class AirzoneCloudApi:
                         if self.get_webserver_id(ws_id) is None:
                             ws = WebServer(inst_id, ws_id)
                             self.webservers[ws_id] = ws
+
+    async def update_output(self, output: Output) -> None:
+        """Update Airzone Cloud Output from API."""
+        config_task = asyncio.create_task(self.api_get_device_config(output))
+        status_task = asyncio.create_task(self.api_get_device_status(output))
+
+        config_data = await config_task
+        status_data = await status_task
+
+        update = EntityUpdate(UpdateType.API_FULL, config_data | status_data)
+
+        await output.update(update)
+
+    async def update_outputs(self) -> None:
+        """Update all Airzone Cloud Outputs."""
+        tasks = []
+
+        for aidoo in self.outputs.values():
+            tasks += [asyncio.create_task(self.update_output(aidoo))]
+
+        await asyncio.gather(*tasks)
 
     def get_ws_device_data(self, device: Device) -> dict[str, Any] | None:
         """Get WebSockets device data."""
@@ -938,6 +985,13 @@ class AirzoneCloudApi:
                             self.add_air_quality(air_quality)
                             if inst is not None:
                                 inst.add_air_quality(air_quality)
+                elif device_type == API_AZ_OUTPUTS:
+                    if self.get_output_id(device_id) is None:
+                        output = Output(inst_id, ws_id, device_data)
+                        if output is not None:
+                            self.add_output(output)
+                            if inst is not None:
+                                inst.add_output(output)
                 else:
                     _LOGGER.warning(
                         "unsupported device_type=%s %s", device_type, device_data
@@ -996,6 +1050,7 @@ class AirzoneCloudApi:
             asyncio.create_task(self.update_aidoos()),
             asyncio.create_task(self.update_dhws()),
             asyncio.create_task(self.update_air_qualitys()),
+            asyncio.create_task(self.update_outputs()),
         ]
 
         await asyncio.gather(*tasks)
