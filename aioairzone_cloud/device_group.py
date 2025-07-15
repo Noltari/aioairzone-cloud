@@ -7,6 +7,7 @@ from collections import Counter
 from typing import Any
 
 from .aidoo import Aidoo
+from .air_quality import AirQuality
 from .common import OperationAction, OperationMode
 from .const import (
     API_DEFAULT_TEMP_STEP,
@@ -47,6 +48,7 @@ class DeviceGroup(ABC):
         """Airzone Cloud DeviceGroup init."""
 
         self.aidoos: dict[str, Aidoo] = {}
+        self.air_quality: dict[str, AirQuality] = {}
         self.dhws: dict[str, HotWater] = {}
         self.systems: dict[str, System] = {}
         self.zones: dict[str, Zone] = {}
@@ -139,6 +141,12 @@ class DeviceGroup(ABC):
         aidoo_id = aidoo.get_id()
         if aidoo_id not in self.aidoos:
             self.aidoos[aidoo_id] = aidoo
+
+    def add_air_quality(self, air_quality: AirQuality) -> None:
+        """Add Air Quality to DeviceGroup."""
+        air_quality_id = air_quality.get_id()
+        if air_quality_id not in self.air_quality:
+            self.air_quality[air_quality_id] = air_quality
 
     def add_dhw(self, dhw: HotWater) -> None:
         """Add DHW to DeviceGroup."""
