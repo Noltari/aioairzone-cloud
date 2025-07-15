@@ -186,6 +186,12 @@ class AirzoneCloudApi:
         if not self.options.device_config:
             return {}
 
+        ws_id = device.get_webserver()
+        ws = self.webservers.get(ws_id)
+        if ws is not None and ws.get_old():
+            _LOGGER.debug("device_config: legacy webserver")
+            return {}
+
         dev_id = device.get_id()
         inst_id = device.get_installation()
         url_id = urllib.parse.quote(dev_id)

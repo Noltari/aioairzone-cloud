@@ -15,6 +15,7 @@ from .const import (
     API_FREE_MEM,
     API_GENERAL,
     API_IS_CONNECTED,
+    API_OLD_WS,
     API_STAT_AP_MAC,
     API_STAT_CHANNEL,
     API_STAT_QUALITY,
@@ -32,6 +33,7 @@ from .const import (
     AZD_INSTALLATION,
     AZD_MEMORY_FREE,
     AZD_NAME,
+    AZD_OLD,
     AZD_TYPE,
     AZD_WIFI_CHANNEL,
     AZD_WIFI_MAC,
@@ -60,6 +62,7 @@ class WebServer(Entity):
         self.is_connected: bool = False
         self.memory_free: int | None = None
         self.name: str = f"WebServer {ws_id}"
+        self.old: bool | None = None
         self.stat_quality: int | None = None
         self.type: str | None = None
         self.wifi_channel: int | None = None
@@ -84,6 +87,9 @@ class WebServer(Entity):
             ws_status = data
 
         if ws_config is not None:
+            old_ws = parse_bool(ws_config.get(API_OLD_WS))
+            if old_ws is not None:
+                self.old = old_ws
             stat_ap_mac = parse_str(ws_config.get(API_STAT_AP_MAC))
             if stat_ap_mac is not None:
                 self.wifi_mac = stat_ap_mac
@@ -140,6 +146,10 @@ class WebServer(Entity):
         memory_free = self.get_memory_free()
         if memory_free is not None:
             data[AZD_MEMORY_FREE] = memory_free
+
+        old = self.get_old()
+        if old is not None:
+            data[AZD_OLD] = old
 
         wifi_channel = self.get_wifi_channel()
         if wifi_channel is not None:
@@ -198,6 +208,10 @@ class WebServer(Entity):
     def get_name(self) -> str:
         """Return WebServer name."""
         return self.name
+
+    def get_old(self) -> bool | None:
+        """Return WebServer old."""
+        return self.old
 
     def get_type(self) -> str | None:
         """Return WebServer type."""
