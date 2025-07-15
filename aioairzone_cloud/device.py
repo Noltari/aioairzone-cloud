@@ -4,10 +4,11 @@ from __future__ import annotations
 
 from abc import abstractmethod
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from .common import OperationMode, parse_bool, parse_int, parse_str
 from .const import (
+    API_AQ_ACTIVE,
     API_AQ_PM_1,
     API_AQ_PM_2P5,
     API_AQ_PM_10,
@@ -28,6 +29,7 @@ from .const import (
     API_SYSTEM_NUMBER,
     API_WARNINGS,
     API_WS_CONNECTED,
+    AZD_AQ_ACTIVE,
     AZD_AQ_INDEX,
     AZD_AQ_PM_1,
     AZD_AQ_PM_2P5,
@@ -53,6 +55,9 @@ from .const import (
 )
 from .entity import Entity, EntityUpdate
 
+if TYPE_CHECKING:
+    from .air_quality import AirQuality
+
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -63,7 +68,9 @@ class Device(Entity):
         """Airzone Cloud Device init."""
         super().__init__()
 
+        self.air_quality: AirQuality | None = None
         self.auto_mode: OperationMode | None = None
+        self.aq_active: bool | None = None
         self.aq_pm_1: int | None = None
         self.aq_pm_2p5: int | None = None
         self.aq_pm_10: int | None = None
@@ -115,6 +122,10 @@ class Device(Entity):
             AZD_WEBSERVER: self.get_webserver(),
             AZD_WS_CONNECTED: self.get_ws_connected(),
         }
+
+        aq_active = self.get_aq_active()
+        if aq_active is not None:
+            data[AZD_AQ_ACTIVE] = aq_active
 
         aq_index = self.get_aq_index()
         if aq_index is not None:
@@ -170,32 +181,49 @@ class Device(Entity):
 
         return data
 
+    def get_aq_active(self) -> bool | None:
+        """Return HVAC device Air Quality active status."""
+        if self.air_quality is not None:
+            return self.air_quality.aq_active
+        return self.aq_active
+
     def get_aq_index(self) -> int | None:
         """Return HVAC device Air Quality index."""
-        if self.aq_status is not None:
+        aq_status = self.get_aq_status()
+        if aq_status is not None:
             for key, value in API_AQ_STATUS.items():
-                if self.aq_status == key:
+                if aq_status == key:
                     return value
         return None
 
     def get_aq_pm_1(self) -> int | None:
         """Return HVAC device Air Quality PM 1."""
+        if self.air_quality is not None:
+            return self.air_quality.aq_pm_1
         return self.aq_pm_1
 
     def get_aq_pm_2p5(self) -> int | None:
         """Return HVAC device Air Quality PM 2.5."""
+        if self.air_quality is not None:
+            return self.air_quality.aq_pm_2p5
         return self.aq_pm_2p5
 
     def get_aq_pm_10(self) -> int | None:
         """Return HVAC device Air Quality PM 10."""
+        if self.air_quality is not None:
+            return self.air_quality.aq_pm_10
         return self.aq_pm_10
 
     def get_aq_present(self) -> bool | None:
         """Return HVAC device Air Quality present."""
+        if self.air_quality is not None:
+            return self.air_quality.aq_present
         return self.aq_present
 
     def get_aq_status(self) -> str | None:
         """Return HVAC device Air Quality status."""
+        if self.air_quality is not None:
+            return self.air_quality.aq_status
         return self.aq_status
 
     def get_available(self) -> bool:
@@ -266,6 +294,10 @@ class Device(Entity):
         """Return WebServer connection status."""
         return self.ws_connected
 
+    def set_air_quality(self, air_quality: AirQuality) -> None:
+        """Set Air Quality."""
+        self.air_quality = air_quality
+
     def set_mode(self, mode: int | OperationMode) -> None:
         """Set device operation mode."""
         _mode = OperationMode(mode)
@@ -288,6 +320,10 @@ class Device(Entity):
         ws_connected = parse_bool(data.get(API_WS_CONNECTED))
         if ws_connected is not None:
             self.ws_connected = ws_connected
+
+        aq_active = parse_bool(data.get(API_AQ_ACTIVE))
+        if aq_active is not None:
+            self.aq_active = aq_active
 
         aq_pm_1 = parse_int(data.get(API_AQ_PM_1))
         if aq_pm_1 is not None:

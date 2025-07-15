@@ -17,7 +17,6 @@ from .common import (
 from .const import (
     API_ACTIVE,
     API_AIR_ACTIVE,
-    API_AQ_ACTIVE,
     API_AQ_MODE_CONF,
     API_AQ_MODE_VALUES,
     API_CELSIUS,
@@ -68,7 +67,6 @@ from .const import (
     API_WORK_TEMP,
     AZD_ACTION,
     AZD_ACTIVE,
-    AZD_AQ_ACTIVE,
     AZD_AQ_MODE_CONF,
     AZD_AQ_MODE_VALUES,
     AZD_HUMIDITY,
@@ -129,7 +127,6 @@ class HVAC(Device):
 
         self.active: bool | None = None
         self.air_demand: bool | None = None
-        self.aq_active: bool | None = None
         self.aq_mode_conf: AirQualityMode | None = None
         self.aq_mode_values: list[AirQualityMode] | None = None
         self.floor_demand: bool | None = None
@@ -186,10 +183,6 @@ class HVAC(Device):
         data[AZD_POWER] = self.get_power()
         data[AZD_TEMP] = self.get_temperature()
         data[AZD_TEMP_STEP] = self.get_temp_step()
-
-        aq_active = self.get_aq_active()
-        if aq_active is not None:
-            data[AZD_AQ_ACTIVE] = aq_active
 
         aq_mode_conf = self.get_aq_mode_conf()
         if aq_mode_conf is not None:
@@ -393,10 +386,6 @@ class HVAC(Device):
     def get_air_demand(self) -> bool | None:
         """Return HVAC device air_demand status."""
         return self.air_demand
-
-    def get_aq_active(self) -> bool | None:
-        """Return HVAC device Air Quality active status."""
-        return self.aq_active
 
     def get_aq_mode_conf(self) -> AirQualityMode | None:
         """Return HVAC device Air Quality mode conf."""
@@ -794,10 +783,6 @@ class HVAC(Device):
         else:
             if update.get_type() != UpdateType.WS_PARTIAL:
                 self.floor_demand = None
-
-        aq_active = parse_bool(data.get(API_AQ_ACTIVE))
-        if aq_active is not None:
-            self.aq_active = aq_active
 
         aq_mode_conf = data.get(API_AQ_MODE_CONF)
         if aq_mode_conf is not None:

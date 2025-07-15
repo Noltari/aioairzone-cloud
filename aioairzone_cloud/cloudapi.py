@@ -706,6 +706,34 @@ class AirzoneCloudApi:
             if self.get_webserver_id(ws_id) is None:
                 self.webservers[ws_id] = WebServer(inst_id, ws_id)
 
+    def set_air_quality_system_zones_data(self, air_quality: AirQuality) -> None:
+        """Set Air Quality system and zones data."""
+        air_quality_ws = air_quality.get_webserver()
+        installation_id = air_quality.get_installation()
+        system_num = air_quality.get_system_num()
+        zone_num = air_quality.get_zone_num()
+        for system in self.systems.values():
+            if (
+                system.get_installation() != installation_id
+                or system.get_system_num() != system_num
+                or system.get_webserver() != air_quality_ws
+            ):
+                continue
+
+            air_quality.add_system(system)
+            system.set_air_quality(air_quality)
+        for zone in self.zones.values():
+            if (
+                zone.get_installation() != installation_id
+                or zone.get_system_num() != system_num
+                or zone.get_webserver() != air_quality_ws
+                or zone.get_zone() != zone_num
+            ):
+                continue
+
+            air_quality.add_zone(zone)
+            zone.set_air_quality(air_quality)
+
     def set_system_zones_data(self, system: System) -> None:
         """Set slave zones modes from master zone."""
         modes = system.get_modes()
@@ -1039,6 +1067,8 @@ class AirzoneCloudApi:
 
         await asyncio.gather(*tasks)
 
+        for air_quality in self.air_quality.values():
+            self.set_air_quality_system_zones_data(air_quality)
         for system in self.systems.values():
             self.set_system_zones_data(system)
 

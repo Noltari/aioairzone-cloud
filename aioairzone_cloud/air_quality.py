@@ -3,12 +3,24 @@
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from .common import parse_str
-from .const import API_NAME, API_SYSTEM_NUMBER, API_ZONE_NUMBER, AZD_SYSTEM, AZD_ZONE
+from .const import (
+    API_AQ_SENSOR_FW,
+    API_NAME,
+    API_SYSTEM_NUMBER,
+    API_ZONE_NUMBER,
+    AZD_FIRMWARE,
+    AZD_SYSTEM,
+    AZD_ZONE,
+)
 from .device import Device
 from .entity import EntityUpdate
+
+if TYPE_CHECKING:
+    from .system import System
+    from .zone import Zone
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -19,6 +31,10 @@ class AirQuality(Device):
     def __init__(self, inst_id: str, ws_id: str, device_data: dict[str, Any]):
         """Airzone Cloud Air Quality device init."""
         super().__init__(inst_id, ws_id, device_data)
+
+        self.aq_sensor_fw: str | None = None
+        self.systems: dict[str, System] = {}
+        self.zones: dict[str, Zone] = {}
 
         sub_data = self.sub_data(device_data)
         self.system_number = int(sub_data[API_SYSTEM_NUMBER])
@@ -37,7 +53,27 @@ class AirQuality(Device):
         data[AZD_SYSTEM] = self.get_system_num()
         data[AZD_ZONE] = self.get_zone_num()
 
+        aq_sensor_fw = self.get_aq_sensor_fw()
+        if aq_sensor_fw is not None:
+            data[AZD_FIRMWARE] = aq_sensor_fw
+
         return data
+
+    def add_system(self, system: System) -> None:
+        """Add Air Quality system."""
+        system_id = system.get_id()
+        if system_id not in self.systems:
+            self.systems[system_id] = system
+
+    def add_zone(self, zone: Zone) -> None:
+        """Add Air Quality zone."""
+        zone_id = zone.get_id()
+        if zone_id not in self.zones:
+            self.zones[zone_id] = zone
+
+    def get_aq_sensor_fw(self) -> str | None:
+        """Return Zone Air Quality sensor FW."""
+        return self.aq_sensor_fw
 
     def get_system_num(self) -> int:
         """Return System number."""
@@ -56,4 +92,6 @@ class AirQuality(Device):
 
         data = update.get_data()
 
-        _LOGGER.warning("air_quality: %s", data)
+        aq_sensor_fw = parse_str(data.get(API_AQ_SENSOR_FW))
+        if aq_sensor_fw is not None:
+            self.aq_sensor_fw = aq_sensor_fw

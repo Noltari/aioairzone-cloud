@@ -25,6 +25,7 @@ from .const import (
     API_VALUE,
     API_ZONE_NUMBER,
     AZD_AIR_DEMAND,
+    AZD_AIR_QUALITY_ID,
     AZD_FLOOR_DEMAND,
     AZD_MASTER,
     AZD_SYSTEM,
@@ -68,11 +69,21 @@ class Zone(HVAC):
         data[AZD_SYSTEM] = self.get_system_num()
         data[AZD_ZONE] = self.get_zone()
 
+        air_quality_id = self.get_air_quality_id()
+        if air_quality_id is not None:
+            data[AZD_AIR_QUALITY_ID] = air_quality_id
+
         system_id = self.get_system_id()
         if system_id is not None:
             data[AZD_SYSTEM_ID] = system_id
 
         return data
+
+    def get_air_quality_id(self) -> str | None:
+        """Return Zone device Air Quality ID."""
+        if self.air_quality is not None:
+            return self.air_quality.get_id()
+        return None
 
     def get_master(self) -> bool:
         """Return Zone device master/slave."""
