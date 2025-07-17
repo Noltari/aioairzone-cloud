@@ -961,6 +961,7 @@ class AirzoneCloudApi:
 
     async def update_systems_zones(self) -> None:
         """Update all Airzone Cloud Systems/Zones."""
+        await self.update_air_qualitys()
         await self.update_systems()
         await self.update_zones()
 
@@ -1084,7 +1085,6 @@ class AirzoneCloudApi:
             asyncio.create_task(self.update_systems_zones()),
             asyncio.create_task(self.update_aidoos()),
             asyncio.create_task(self.update_dhws()),
-            asyncio.create_task(self.update_air_qualitys()),
             asyncio.create_task(self.update_outputs()),
         ]
 
