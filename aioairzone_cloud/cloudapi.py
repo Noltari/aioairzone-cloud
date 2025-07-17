@@ -63,6 +63,7 @@ from .const import (
     AZD_SYSTEMS,
     AZD_WEBSERVERS,
     AZD_ZONES,
+    DEV_REQ_LIMIT,
     HTTP_CALL_TIMEOUT,
     HTTP_MAX_REQUESTS,
     RAW_DEVICES_CONFIG,
@@ -883,6 +884,10 @@ class AirzoneCloudApi:
                     )
 
         self.connect_installation_websockets(inst_id)
+
+        if len(self.devices) >= DEV_REQ_LIMIT:
+            # API will complain with HTTP 429
+            self._api_init_done = True
 
     async def update_installations(self) -> None:
         """Update Airzone Cloud installations from API."""
