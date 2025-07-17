@@ -39,13 +39,21 @@ class EntityUpdate:
 
     def get_data(self) -> dict[str, Any]:
         """Get Entity Update data."""
-        if self.type == UpdateType.WS_PARTIAL:
-            change: dict[str, Any] = self.data.get(WS_CHANGE, {})
-            adv_conf: dict[str, Any] = change.get(WS_ADV_CONF, {})
-            status: dict[str, Any] = change.get(WS_STATUS, {})
-            return adv_conf | status
+        adv_conf: dict[str, Any]
+        change: dict[str, Any]
+        data: dict[str, Any] = self.data
+        status: dict[str, Any]
 
-        return self.data
+        if self.type == UpdateType.WS_PARTIAL:
+            change = data.get(WS_CHANGE, {})
+            adv_conf = change.get(WS_ADV_CONF, {})
+            status = change.get(WS_STATUS, {})
+            data = adv_conf | status
+        elif self.type == UpdateType.WS_FULL:
+            status = self.data.get(WS_STATUS, {})
+            data = self.data | status
+
+        return data
 
     def get_datetime(self) -> datetime:
         """Get Entity Update datetime."""
