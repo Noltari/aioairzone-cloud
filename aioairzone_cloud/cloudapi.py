@@ -1105,6 +1105,13 @@ class AirzoneCloudApi:
                 await asyncio.wait_for(websocket.state_end.wait(), WS_INIT_TIMEOUT)
             except asyncio.TimeoutError:
                 ws_updated = False
+
+        if ws_updated:
+            for air_quality in self.air_quality.values():
+                self.set_air_quality_system_zones_data(air_quality)
+            for system in self.systems.values():
+                self.set_system_zones_data(system)
+
         return ws_updated
 
     async def _update(self) -> None:
