@@ -266,7 +266,7 @@ AZD_WS_CONNECTED: Final[str] = "ws-connected"
 AZD_ZONE: Final[str] = "zone"
 AZD_ZONES: Final[str] = "zones"
 
-DEV_REQ_LIMIT: Final[int] = 25
+DEV_REQ_LIMIT: Final[int] = 10
 
 HEADER_AUTHORIZATION: Final[str] = "Authorization"
 HEADER_BEARER: Final[str] = "Bearer"
