@@ -820,6 +820,23 @@ class AirzoneCloudApi:
 
         await asyncio.gather(*tasks)
 
+    async def update_installation_websockets(self, inst_ws: AirzoneCloudIWS) -> None:
+        """Connect installation WebSockets."""
+        if len(self.devices) < DEV_REQ_LIMIT:
+            return
+
+        tasks = [
+            asyncio.create_task(inst_ws.wait()),
+        ]
+
+        if len(self.webservers) < DEV_REQ_LIMIT:
+            tasks += [asyncio.create_task(self.update_webservers(False))]
+
+        await asyncio.gather(*tasks)
+
+        # API will complain with HTTP 429
+        self._api_init_done = True
+
     async def connect_installation_websockets(self, inst_id: str) -> None:
         """Connect installation WebSockets."""
         if not self.options.websockets:
@@ -829,11 +846,7 @@ class AirzoneCloudApi:
         if inst_ws is not None:
             inst_ws.connect()
 
-            if len(self.devices) >= DEV_REQ_LIMIT:
-                await inst_ws.state_end.wait()
-
-                # API will complain with HTTP 429
-                self._api_init_done = True
+            await self.update_installation_websockets(inst_ws)
 
     async def update_installation(self, inst: Installation) -> None:
         """Update Airzone Cloud installation from API."""

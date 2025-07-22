@@ -261,3 +261,7 @@ class AirzoneCloudIWS:
 
         self.alive_dt = None
         self.state_end.clear()
+
+    async def wait(self) -> None:
+        """WebSockets state end wait."""
+        await self.state_end.wait()
