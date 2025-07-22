@@ -815,7 +815,7 @@ class AirzoneCloudApi:
 
         await asyncio.gather(*tasks)
 
-    def connect_installation_websockets(self, inst_id: str) -> None:
+    async def connect_installation_websockets(self, inst_id: str) -> None:
         """Connect installation WebSockets."""
         if not self.options.websockets:
             return
@@ -823,6 +823,12 @@ class AirzoneCloudApi:
         inst_ws = self.websockets.get(inst_id)
         if inst_ws is not None:
             inst_ws.connect()
+
+            if len(self.devices) >= DEV_REQ_LIMIT:
+                await inst_ws.state_end.wait()
+
+                # API will complain with HTTP 429
+                self._api_init_done = True
 
     async def update_installation(self, inst: Installation) -> None:
         """Update Airzone Cloud installation from API."""
@@ -883,11 +889,7 @@ class AirzoneCloudApi:
                         "unsupported device_type=%s %s", device_type, device_data
                     )
 
-        self.connect_installation_websockets(inst_id)
-
-        if len(self.devices) >= DEV_REQ_LIMIT:
-            # API will complain with HTTP 429
-            self._api_init_done = True
+        await self.connect_installation_websockets(inst_id)
 
     async def update_installations(self) -> None:
         """Update Airzone Cloud installations from API."""
