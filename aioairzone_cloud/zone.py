@@ -32,7 +32,7 @@ from .const import (
     AZD_SYSTEM_ID,
     AZD_ZONE,
 )
-from .entity import EntityUpdate, UpdateType
+from .entity import EntityUpdate
 from .hvac import HVAC
 
 if TYPE_CHECKING:
@@ -150,7 +150,7 @@ class Zone(HVAC):
         """Update Zone data."""
         super().update_data(update)
 
-        if update.get_type() == UpdateType.API_FULL:
+        if update.is_full():
             data = update.get_data()
 
             if API_MODE_AVAIL in data:

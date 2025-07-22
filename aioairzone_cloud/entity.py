@@ -63,6 +63,10 @@ class EntityUpdate:
         """Get Entity Update type."""
         return self.type
 
+    def is_full(self) -> bool:
+        """Check if Entity Update is full."""
+        return self.type in [UpdateType.API_FULL, UpdateType.WS_FULL]
+
     def set_data(self, data: dict[str, Any]) -> None:
         """Set Entity Update data."""
         self.data = data
