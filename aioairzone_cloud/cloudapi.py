@@ -72,6 +72,7 @@ from .const import (
     RAW_INSTALLATIONS_LIST,
     RAW_USER,
     RAW_WEBSERVERS,
+    RAW_WEBSOCKETS,
     WS_INIT_TIMEOUT,
 )
 from .device import Device
@@ -534,7 +535,11 @@ class AirzoneCloudApi:
 
     def raw_data(self) -> dict[str, Any]:
         """Return raw Airzone Cloud API data."""
-        return self._api_raw_data
+        raw_data = self._api_raw_data
+        raw_data[RAW_WEBSOCKETS] = {}
+        for ws_id, ws in self.websockets.items():
+            raw_data[RAW_WEBSOCKETS][ws_id] = ws.device_data
+        return raw_data
 
     def data(self) -> dict[str, Any]:
         """Return Airzone Cloud data."""

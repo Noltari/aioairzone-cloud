@@ -280,6 +280,7 @@ RAW_INSTALLATIONS: Final[str] = "installations"
 RAW_INSTALLATIONS_LIST: Final[str] = "installations-list"
 RAW_USER: Final[str] = "user"
 RAW_WEBSERVERS: Final[str] = "webservers"
+RAW_WEBSOCKETS: Final[str] = "websockets"
 
 TOKEN_REFRESH_PERIOD: Final[timedelta] = timedelta(hours=12)
 
