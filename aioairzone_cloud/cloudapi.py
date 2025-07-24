@@ -1191,8 +1191,9 @@ class AirzoneCloudApi:
         if dev_cnt >= DEV_REQ_LIMIT:
             _LOGGER.debug("websockets should be used for %s devices", dev_cnt)
 
+        await self.update_webservers(False)
+
         tasks = [
-            asyncio.create_task(self.update_webservers(False)),
             asyncio.create_task(self.update_systems_zones()),
             asyncio.create_task(self.update_aidoos()),
             asyncio.create_task(self.update_dhws()),
@@ -1203,27 +1204,23 @@ class AirzoneCloudApi:
 
     async def first_update_websockets(self) -> None:
         """Perform the first websockets update of Airzone Cloud data."""
-        tasks = []
-
+        # Prevent HTTP 429 errors
         if len(self.devices) < DEV_REQ_LIMIT:
-            tasks += [
-                asyncio.create_task(self.update_webservers(False)),
+            await self.update_webservers(False)
+
+            tasks = [
                 asyncio.create_task(self.ws_poll_aidoos()),
                 asyncio.create_task(self.ws_poll_air_qualitys()),
                 asyncio.create_task(self.ws_poll_outputs()),
                 asyncio.create_task(self.ws_poll_systems()),
                 asyncio.create_task(self.ws_poll_zones()),
             ]
-        elif len(self.webservers) < DEV_REQ_LIMIT:
-            _LOGGER.debug("websockets: only webserver polling")
-            tasks += [
-                asyncio.create_task(self.update_webservers(False)),
-            ]
-        else:
-            # Prevent HTTP 429 errors
-            _LOGGER.debug("websockets: avoid API polling")
 
-        await asyncio.gather(*tasks)
+            await asyncio.gather(*tasks)
+        elif len(self.webservers) < DEV_REQ_LIMIT:
+            await self.update_webservers(False)
+        else:
+            _LOGGER.debug("websockets: avoid API polling")
 
     async def update_websockets(self) -> None:
         """Perform a websockets update of Airzone Cloud data."""
