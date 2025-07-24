@@ -109,7 +109,6 @@ class AirzoneCloudApi:
         options: ConnectionOptions,
     ):
         """Airzone Cloud API init."""
-        self._api_init_done: bool = False
         self._api_raw_data: dict[str, Any] = {
             RAW_DEVICES_CONFIG: {},
             RAW_DEVICES_STATUS: {},
@@ -135,6 +134,7 @@ class AirzoneCloudApi:
         self.token: AirzoneCloudToken = AirzoneCloudToken()
         self.webservers: dict[str, WebServer] = {}
         self.websockets: dict[str, AirzoneCloudIWS] = {}
+        self.websockets_first: bool = True
         self.zones: dict[str, Zone] = {}
 
     async def set_api_raw_data(
@@ -819,33 +819,17 @@ class AirzoneCloudApi:
 
         await asyncio.gather(*tasks)
 
-    async def update_installation_websockets(self, inst_ws: AirzoneCloudIWS) -> None:
-        """Connect installation WebSockets."""
-        if len(self.devices) < DEV_REQ_LIMIT:
-            return
-
-        tasks = [
-            asyncio.create_task(inst_ws.state_wait()),
-        ]
-
-        if len(self.webservers) < DEV_REQ_LIMIT:
-            tasks += [asyncio.create_task(self.update_webservers(False))]
-
-        await asyncio.gather(*tasks)
-
-        # API will complain with HTTP 429
-        self._api_init_done = True
-
     async def connect_installation_websockets(self, inst_id: str) -> None:
         """Connect installation WebSockets."""
         if not self.options.websockets:
             return
 
+        self.websockets_first = True
+
         inst_ws = self.websockets.get(inst_id)
         if inst_ws is not None:
             inst_ws.connect()
-
-            await self.update_installation_websockets(inst_ws)
+            await inst_ws.state_wait()
 
     async def update_installation(self, inst: Installation) -> None:
         """Update Airzone Cloud installation from API."""
@@ -1103,6 +1087,10 @@ class AirzoneCloudApi:
 
     async def update_polling(self) -> None:
         """Perform a polling update of Airzone Cloud data."""
+        dev_cnt = len(self.devices)
+        if dev_cnt >= DEV_REQ_LIMIT:
+            _LOGGER.debug("websockets should be used for %s devices", dev_cnt)
+
         tasks = [
             asyncio.create_task(self.update_webservers(False)),
             asyncio.create_task(self.update_systems_zones()),
@@ -1113,12 +1101,22 @@ class AirzoneCloudApi:
 
         await asyncio.gather(*tasks)
 
-        self._api_init_done = True
+    async def first_update_websockets(self) -> None:
+        """Perform the first websockets update of Airzone Cloud data."""
+        if len(self.devices) < DEV_REQ_LIMIT:
+            await self.update_polling()
+        elif len(self.webservers) < DEV_REQ_LIMIT:
+            _LOGGER.debug("websockets: only webserver polling")
+            await self.update_webservers(False)
+        else:
+            # Prevent HTTP 429 errors
+            _LOGGER.debug("websockets: avoid API polling")
 
-    async def update_websockets(self) -> bool:
+    async def update_websockets(self) -> None:
         """Perform a websockets update of Airzone Cloud data."""
-        if not self.options.websockets:
-            return False
+        if self.websockets_first:
+            await self.first_update_websockets()
+            self.websockets_first = False
 
         ws_updated = True
         for inst_ws in self.websockets.values():
@@ -1135,11 +1133,11 @@ class AirzoneCloudApi:
             for system in self.systems.values():
                 self.set_system_zones_data(system)
 
-        return ws_updated
-
     async def _update(self) -> None:
         """Update Airzone Cloud data using websockets and fall back to polling."""
-        if not self._api_init_done or not await self.update_websockets():
+        if self.options.websockets:
+            await self.update_websockets()
+        else:
             await self.update_polling()
 
     async def update(self) -> None:
