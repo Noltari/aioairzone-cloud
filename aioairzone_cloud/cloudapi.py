@@ -1218,6 +1218,7 @@ class AirzoneCloudApi:
 
             await asyncio.gather(*tasks)
         elif len(self.webservers) < DEV_REQ_LIMIT:
+            _LOGGER.debug("websockets: only webserver polling")
             await self.update_webservers(False)
         else:
             _LOGGER.debug("websockets: avoid API polling")
