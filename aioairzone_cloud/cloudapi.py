@@ -1097,7 +1097,7 @@ class AirzoneCloudApi:
         for system in self.systems.values():
             self.set_system_zones_data(system)
 
-    async def _update_polling(self) -> None:
+    async def update_polling(self) -> None:
         """Perform a polling update of Airzone Cloud data."""
         tasks = [
             asyncio.create_task(self.update_webservers(False)),
@@ -1111,7 +1111,7 @@ class AirzoneCloudApi:
 
         self._api_init_done = True
 
-    async def _update_websockets(self) -> bool:
+    async def update_websockets(self) -> bool:
         """Perform a websockets update of Airzone Cloud data."""
         if not self.options.websockets:
             return False
@@ -1135,8 +1135,8 @@ class AirzoneCloudApi:
 
     async def _update(self) -> None:
         """Update Airzone Cloud data using websockets and fall back to polling."""
-        if not self._api_init_done or not await self._update_websockets():
-            await self._update_polling()
+        if not self._api_init_done or not await self.update_websockets():
+            await self.update_polling()
 
     async def update(self) -> None:
         """Update all Airzone Cloud data."""
