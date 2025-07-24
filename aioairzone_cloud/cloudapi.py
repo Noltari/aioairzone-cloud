@@ -980,9 +980,18 @@ class AirzoneCloudApi:
 
     async def update_systems_zones(self) -> None:
         """Update all Airzone Cloud Systems/Zones."""
-        await self.update_air_qualitys()
-        await self.update_systems()
-        await self.update_zones()
+        tasks = [
+            asyncio.create_task(self.update_air_qualitys()),
+            asyncio.create_task(self.update_systems()),
+            asyncio.create_task(self.update_zones()),
+        ]
+
+        await asyncio.gather(*tasks)
+
+        for air_quality in self.air_quality.values():
+            self.set_air_quality_system_zones_data(air_quality)
+        for system in self.systems.values():
+            self.set_system_zones_data(system)
 
     async def update_webserver(self, ws: WebServer, devices: bool) -> None:
         """Update Airzone Cloud WebServer from API."""
@@ -1091,11 +1100,6 @@ class AirzoneCloudApi:
             tasks += [asyncio.create_task(self.update_zone(zone))]
 
         await asyncio.gather(*tasks)
-
-        for air_quality in self.air_quality.values():
-            self.set_air_quality_system_zones_data(air_quality)
-        for system in self.systems.values():
-            self.set_system_zones_data(system)
 
     async def update_polling(self) -> None:
         """Perform a polling update of Airzone Cloud data."""
