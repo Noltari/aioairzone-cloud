@@ -1085,6 +1085,101 @@ class AirzoneCloudApi:
 
         await asyncio.gather(*tasks)
 
+    async def ws_poll_aidoo(self, aidoo: Aidoo) -> None:
+        """Poll Airzone Cloud Aidoo config from API."""
+        config_task = asyncio.create_task(self.api_get_device_config(aidoo))
+
+        config_data = await config_task
+
+        update = EntityUpdate(UpdateType.API_PARTIAL, config_data)
+
+        await aidoo.update(update)
+
+    async def ws_poll_aidoos(self) -> None:
+        """Poll all Airzone Cloud Aidoos config."""
+        tasks = []
+
+        for aidoo in self.aidoos.values():
+            tasks += [asyncio.create_task(self.ws_poll_aidoo(aidoo))]
+
+        await asyncio.gather(*tasks)
+
+    async def ws_poll_air_quality(self, air_quality: AirQuality) -> None:
+        """Poll Airzone Cloud Air Quality config from API."""
+        config_task = asyncio.create_task(self.api_get_device_config(air_quality))
+
+        config_data = await config_task
+
+        update = EntityUpdate(UpdateType.API_PARTIAL, config_data)
+
+        await air_quality.update(update)
+
+    async def ws_poll_air_qualitys(self) -> None:
+        """Poll all Airzone Cloud Air Qualitys config."""
+        tasks = []
+
+        for aidoo in self.air_quality.values():
+            tasks += [asyncio.create_task(self.ws_poll_air_quality(aidoo))]
+
+        await asyncio.gather(*tasks)
+
+    async def ws_poll_output(self, output: Output) -> None:
+        """Poll Airzone Cloud Output config from API."""
+        config_task = asyncio.create_task(self.api_get_device_config(output))
+
+        config_data = await config_task
+
+        update = EntityUpdate(UpdateType.API_PARTIAL, config_data)
+
+        await output.update(update)
+
+    async def ws_poll_outputs(self) -> None:
+        """Poll all Airzone Cloud Outputs config."""
+        tasks = []
+
+        for aidoo in self.outputs.values():
+            tasks += [asyncio.create_task(self.update_output(aidoo))]
+
+        await asyncio.gather(*tasks)
+
+    async def ws_poll_system(self, system: System) -> None:
+        """Poll Airzone Cloud System config from API."""
+        config_task = asyncio.create_task(self.api_get_device_config(system))
+
+        config_data = await config_task
+
+        update = EntityUpdate(UpdateType.API_PARTIAL, config_data)
+
+        await system.update(update)
+
+    async def ws_poll_systems(self) -> None:
+        """Poll all Airzone Cloud Systems config."""
+        tasks = []
+
+        for system in self.systems.values():
+            tasks += [asyncio.create_task(self.ws_poll_system(system))]
+
+        await asyncio.gather(*tasks)
+
+    async def ws_poll_zone(self, zone: Zone) -> None:
+        """Poll Airzone Cloud Zone config from API."""
+        config_task = asyncio.create_task(self.api_get_device_config(zone))
+
+        config_data = await config_task
+
+        update = EntityUpdate(UpdateType.API_PARTIAL, config_data)
+
+        await zone.update(update)
+
+    async def ws_poll_zones(self) -> None:
+        """WS poll all Airzone Cloud Zones config."""
+        tasks = []
+
+        for zone in self.zones.values():
+            tasks += [asyncio.create_task(self.ws_poll_zone(zone))]
+
+        await asyncio.gather(*tasks)
+
     async def update_polling(self) -> None:
         """Perform a polling update of Airzone Cloud data."""
         dev_cnt = len(self.devices)
@@ -1103,14 +1198,27 @@ class AirzoneCloudApi:
 
     async def first_update_websockets(self) -> None:
         """Perform the first websockets update of Airzone Cloud data."""
+        tasks = []
+
         if len(self.devices) < DEV_REQ_LIMIT:
-            await self.update_polling()
+            tasks += [
+                asyncio.create_task(self.update_webservers(False)),
+                asyncio.create_task(self.ws_poll_aidoos()),
+                asyncio.create_task(self.ws_poll_air_qualitys()),
+                asyncio.create_task(self.ws_poll_outputs()),
+                asyncio.create_task(self.ws_poll_systems()),
+                asyncio.create_task(self.ws_poll_zones()),
+            ]
         elif len(self.webservers) < DEV_REQ_LIMIT:
             _LOGGER.debug("websockets: only webserver polling")
-            await self.update_webservers(False)
+            tasks += [
+                asyncio.create_task(self.update_webservers(False)),
+            ]
         else:
             # Prevent HTTP 429 errors
             _LOGGER.debug("websockets: avoid API polling")
+
+        await asyncio.gather(*tasks)
 
     async def update_websockets(self) -> None:
         """Perform a websockets update of Airzone Cloud data."""

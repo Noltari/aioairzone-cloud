@@ -18,8 +18,9 @@ class UpdateType(IntEnum):
     """Airzone Cloud Update type."""
 
     API_FULL = 1
-    WS_FULL = 2
-    WS_PARTIAL = 3
+    API_PARTIAL = 2
+    WS_FULL = 3
+    WS_PARTIAL = 4
 
 
 class EntityUpdate:
