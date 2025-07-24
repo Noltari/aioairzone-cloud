@@ -758,6 +758,14 @@ class AirzoneCloudApi:
             if zone.get_master() is False and modes:
                 zone.set_modes(modes)
 
+    def link_devices(self) -> None:
+        """Process and link Airzone Cloud devices."""
+        for air_quality in self.air_quality.values():
+            self.set_air_quality_system_zones_data(air_quality)
+
+        for system in self.systems.values():
+            self.set_system_zones_data(system)
+
     async def update_aidoo(self, aidoo: Aidoo) -> None:
         """Update Airzone Cloud Aidoo from API."""
         config_task = asyncio.create_task(self.api_get_device_config(aidoo))
@@ -972,10 +980,7 @@ class AirzoneCloudApi:
 
         await asyncio.gather(*tasks)
 
-        for air_quality in self.air_quality.values():
-            self.set_air_quality_system_zones_data(air_quality)
-        for system in self.systems.values():
-            self.set_system_zones_data(system)
+        self.link_devices()
 
     async def update_webserver(self, ws: WebServer, devices: bool) -> None:
         """Update Airzone Cloud WebServer from API."""
@@ -1226,20 +1231,13 @@ class AirzoneCloudApi:
             await self.first_update_websockets()
             self.websockets_first = False
 
-        ws_updated = True
         for inst_ws in self.websockets.values():
             if not inst_ws.is_alive():
                 inst_ws.reconnect()
-            try:
-                await inst_ws.state_wait()
-            except asyncio.TimeoutError:
-                ws_updated = False
 
-        if ws_updated:
-            for air_quality in self.air_quality.values():
-                self.set_air_quality_system_zones_data(air_quality)
-            for system in self.systems.values():
-                self.set_system_zones_data(system)
+            await inst_ws.state_wait()
+
+        self.link_devices()
 
     async def _update(self) -> None:
         """Update Airzone Cloud data using websockets and fall back to polling."""
