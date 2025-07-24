@@ -266,8 +266,6 @@ AZD_WS_CONNECTED: Final[str] = "ws-connected"
 AZD_ZONE: Final[str] = "zone"
 AZD_ZONES: Final[str] = "zones"
 
-DEV_REQ_LIMIT: Final[int] = 10
-
 HEADER_AUTHORIZATION: Final[str] = "Authorization"
 HEADER_BEARER: Final[str] = "Bearer"
 
@@ -281,6 +279,8 @@ RAW_INSTALLATIONS_LIST: Final[str] = "installations-list"
 RAW_USER: Final[str] = "user"
 RAW_WEBSERVERS: Final[str] = "webservers"
 RAW_WEBSOCKETS: Final[str] = "websockets"
+
+REQUESTS_LIMIT: Final[int] = 16
 
 TOKEN_REFRESH_PERIOD: Final[timedelta] = timedelta(hours=12)
 

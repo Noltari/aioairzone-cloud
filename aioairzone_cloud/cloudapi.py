@@ -63,7 +63,6 @@ from .const import (
     AZD_SYSTEMS,
     AZD_WEBSERVERS,
     AZD_ZONES,
-    DEV_REQ_LIMIT,
     HTTP_CALL_TIMEOUT,
     HTTP_MAX_REQUESTS,
     RAW_DEVICES_CONFIG,
@@ -73,6 +72,7 @@ from .const import (
     RAW_USER,
     RAW_WEBSERVERS,
     RAW_WEBSOCKETS,
+    REQUESTS_LIMIT,
 )
 from .device import Device
 from .entity import EntityUpdate, UpdateType
@@ -490,6 +490,47 @@ class AirzoneCloudApi:
         zone = self.get_zone_id(zone_id)
         if zone is not None:
             await self.api_set_device_params(zone, params)
+
+    def count_api_poll_requests_devices(self) -> int:
+        """Count number of WS poll devices requests."""
+        num_aidoos = len(self.aidoos)
+        num_air_quality = len(self.air_quality)
+        num_dhws = len(self.dhws)
+        num_outputs = len(self.outputs)
+        num_systems = len(self.systems)
+        num_zones = len(self.zones)
+
+        conf_req = num_aidoos + num_air_quality + num_outputs + num_systems + num_zones
+        stat_req = (
+            num_aidoos
+            + num_air_quality
+            + num_dhws
+            + num_outputs
+            + num_systems
+            + num_zones
+        )
+        ws_req = self.count_poll_requests_webservers()
+
+        return conf_req + stat_req + ws_req
+
+    def count_poll_requests_webservers(self) -> int:
+        """Count number of WS poll WebServer requests."""
+        stat_req = len(self.webservers)
+
+        return stat_req
+
+    def count_ws_poll_requests_devices(self) -> int:
+        """Count number of WS poll devices requests."""
+        num_aidoos = len(self.aidoos)
+        num_air_quality = len(self.air_quality)
+        num_outputs = len(self.outputs)
+        num_systems = len(self.systems)
+        num_zones = len(self.zones)
+
+        conf_req = num_aidoos + num_air_quality + num_outputs + num_systems + num_zones
+        ws_req = self.count_poll_requests_webservers()
+
+        return conf_req + ws_req
 
     async def login(self) -> None:
         """Perform Airzone Cloud API login."""
@@ -1187,9 +1228,9 @@ class AirzoneCloudApi:
 
     async def update_polling(self) -> None:
         """Perform a polling update of Airzone Cloud data."""
-        dev_cnt = len(self.devices)
-        if dev_cnt >= DEV_REQ_LIMIT:
-            _LOGGER.debug("websockets should be used for %s devices", dev_cnt)
+        req_cnt = self.count_api_poll_requests_devices()
+        if req_cnt > REQUESTS_LIMIT:
+            _LOGGER.debug("websockets should be used for %s requests", req_cnt)
 
         await self.update_webservers(False)
 
@@ -1205,7 +1246,7 @@ class AirzoneCloudApi:
     async def first_update_websockets(self) -> None:
         """Perform the first websockets update of Airzone Cloud data."""
         # Prevent HTTP 429 errors
-        if len(self.devices) < DEV_REQ_LIMIT:
+        if self.count_ws_poll_requests_devices() <= REQUESTS_LIMIT:
             await self.update_webservers(False)
 
             tasks = [
@@ -1217,7 +1258,7 @@ class AirzoneCloudApi:
             ]
 
             await asyncio.gather(*tasks)
-        elif len(self.webservers) < DEV_REQ_LIMIT:
+        elif self.count_poll_requests_webservers() <= REQUESTS_LIMIT:
             _LOGGER.debug("websockets: only webserver polling")
             await self.update_webservers(False)
         else:
