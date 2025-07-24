@@ -73,7 +73,6 @@ from .const import (
     RAW_USER,
     RAW_WEBSERVERS,
     RAW_WEBSOCKETS,
-    WS_INIT_TIMEOUT,
 )
 from .device import Device
 from .entity import EntityUpdate, UpdateType
@@ -826,7 +825,7 @@ class AirzoneCloudApi:
             return
 
         tasks = [
-            asyncio.create_task(inst_ws.wait()),
+            asyncio.create_task(inst_ws.state_wait()),
         ]
 
         if len(self.webservers) < DEV_REQ_LIMIT:
@@ -1122,7 +1121,7 @@ class AirzoneCloudApi:
             if not websocket.is_alive():
                 websocket.reconnect()
             try:
-                await asyncio.wait_for(websocket.state_end.wait(), WS_INIT_TIMEOUT)
+                await websocket.state_wait()
             except asyncio.TimeoutError:
                 ws_updated = False
 

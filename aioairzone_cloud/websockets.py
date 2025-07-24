@@ -24,6 +24,7 @@ from .const import (
     WS_DEVICE_STATE_END,
     WS_DEVICES_UPDATES,
     WS_EVENT,
+    WS_INIT_TIMEOUT,
     WS_INSTALLATION,
     WS_INSTALLATION_ID,
     WS_URL,
@@ -262,6 +263,6 @@ class AirzoneCloudIWS:
         self.alive_dt = None
         self.state_end.clear()
 
-    async def wait(self) -> None:
+    async def state_wait(self) -> None:
         """WebSockets state end wait."""
-        await self.state_end.wait()
+        await asyncio.wait_for(self.state_end.wait(), WS_INIT_TIMEOUT)
