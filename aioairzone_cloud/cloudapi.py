@@ -1117,11 +1117,11 @@ class AirzoneCloudApi:
             return False
 
         ws_updated = True
-        for websocket in self.websockets.values():
-            if not websocket.is_alive():
-                websocket.reconnect()
+        for inst_ws in self.websockets.values():
+            if not inst_ws.is_alive():
+                inst_ws.reconnect()
             try:
-                await websocket.state_wait()
+                await inst_ws.state_wait()
             except asyncio.TimeoutError:
                 ws_updated = False
 
