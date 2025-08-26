@@ -798,21 +798,23 @@ class HVAC(Device):
         if humidity is not None:
             self.humidity = humidity
 
-        local_temp = parse_float(data.get(API_LOCAL_TEMP, {}).get(API_CELSIUS))
+        api_local_temp = data.get(API_LOCAL_TEMP) or {}
+        local_temp = parse_float(api_local_temp.get(API_CELSIUS))
         if local_temp is not None:
             self.temp = local_temp
 
-        indoor_return_temp = parse_float(data.get(API_RETURN_TEMP, {}).get(API_CELSIUS))
+        api_return_temp = data.get(API_RETURN_TEMP) or {}
+        indoor_return_temp = parse_float(api_return_temp.get(API_CELSIUS))
         if indoor_return_temp is not None:
             self.indoor_return_temp = indoor_return_temp
 
-        indoor_exchanger_temp = parse_float(
-            data.get(API_EXCH_HEAT_TEMP_IU, {}).get(API_CELSIUS)
-        )
+        api_exch_heat_temp_iu = data.get(API_EXCH_HEAT_TEMP_IU) or {}
+        indoor_exchanger_temp = parse_float(api_exch_heat_temp_iu.get(API_CELSIUS))
         if indoor_exchanger_temp is not None:
             self.indoor_exchanger_temp = indoor_exchanger_temp
 
-        indoor_work_temp = parse_float(data.get(API_WORK_TEMP, {}).get(API_CELSIUS))
+        api_work_temp = data.get(API_WORK_TEMP) or {}
+        indoor_work_temp = parse_float(api_work_temp.get(API_CELSIUS))
         if indoor_work_temp is not None:
             self.indoor_work_temp = indoor_work_temp
 
@@ -824,9 +826,8 @@ class HVAC(Device):
         if outdoor_condenser_press is not None:
             self.outdoor_condenser_press = outdoor_condenser_press
 
-        outdoor_discharge_temp = parse_float(
-            data.get(API_DISCH_COMP_TEMP_UE, {}).get(API_CELSIUS)
-        )
+        api_disch_comp_temp_ue = data.get(API_DISCH_COMP_TEMP_UE) or {}
+        outdoor_discharge_temp = parse_float(api_disch_comp_temp_ue.get(API_CELSIUS))
         if outdoor_discharge_temp is not None:
             self.outdoor_discharge_temp = outdoor_discharge_temp
 
@@ -834,13 +835,13 @@ class HVAC(Device):
         if outdoor_evaporator_press is not None:
             self.outdoor_evaporator_press = outdoor_evaporator_press
 
-        outdoor_exchanger_temp = parse_float(
-            data.get(API_EXCH_HEAT_TEMP_UE, {}).get(API_CELSIUS)
-        )
+        api_exch_heat_temp_ue = data.get(API_EXCH_HEAT_TEMP_UE) or {}
+        outdoor_exchanger_temp = parse_float(api_exch_heat_temp_ue.get(API_CELSIUS))
         if outdoor_exchanger_temp is not None:
             self.outdoor_exchanger_temp = outdoor_exchanger_temp
 
-        outdoor_temp = parse_float(data.get(API_EXT_TEMP, {}).get(API_CELSIUS))
+        api_ext_temp = data.get(API_EXT_TEMP) or {}
+        outdoor_temp = parse_float(api_ext_temp.get(API_CELSIUS))
         if outdoor_temp is not None:
             self.outdoor_temp = outdoor_temp
 
@@ -848,81 +849,73 @@ class HVAC(Device):
         if power is not None:
             self.power = power
 
-        range_max_air = parse_float(data.get(API_RANGE_MAX_AIR, {}).get(API_CELSIUS))
+        api_range_max_air = data.get(API_RANGE_MAX_AIR) or {}
+        range_max_air = parse_float(api_range_max_air.get(API_CELSIUS))
         if range_max_air is not None:
             self.temp_set_max = range_max_air
-        range_sp_max_auto_air = parse_float(
-            data.get(API_RANGE_SP_MAX_AUTO_AIR, {}).get(API_CELSIUS)
-        )
+        api_range_sp_max_auto_air = data.get(API_RANGE_SP_MAX_AUTO_AIR) or {}
+        range_sp_max_auto_air = parse_float(api_range_sp_max_auto_air.get(API_CELSIUS))
         if range_sp_max_auto_air is not None:
             self.temp_set_max_auto_air = range_sp_max_auto_air
-        range_sp_max_cool_air = parse_float(
-            data.get(API_RANGE_SP_MAX_COOL_AIR, {}).get(API_CELSIUS)
-        )
+        api_range_sp_max_cool_air = data.get(API_RANGE_SP_MAX_COOL_AIR) or {}
+        range_sp_max_cool_air = parse_float(api_range_sp_max_cool_air.get(API_CELSIUS))
         if range_sp_max_cool_air is not None:
             self.temp_set_max_cool_air = range_sp_max_cool_air
-        range_sp_max_dry_air = parse_float(
-            data.get(API_RANGE_SP_MAX_DRY_AIR, {}).get(API_CELSIUS)
-        )
+        api_range_sp_max_dry_air = data.get(API_RANGE_SP_MAX_DRY_AIR) or {}
+        range_sp_max_dry_air = parse_float(api_range_sp_max_dry_air.get(API_CELSIUS))
         if range_sp_max_dry_air is not None:
             self.temp_set_max_dry_air = range_sp_max_dry_air
+        api_range_sp_max_emerheat_air = data.get(API_RANGE_SP_MAX_EMERHEAT_AIR) or {}
         range_sp_max_emerheat_air = parse_float(
-            data.get(API_RANGE_SP_MAX_EMERHEAT_AIR, {}).get(API_CELSIUS)
+            api_range_sp_max_emerheat_air.get(API_CELSIUS)
         )
         if range_sp_max_emerheat_air is not None:
             self.temp_set_max_emerheat_air = range_sp_max_emerheat_air
-        range_sp_max_hot_air = parse_float(
-            data.get(API_RANGE_SP_MAX_HOT_AIR, {}).get(API_CELSIUS)
-        )
+        api_range_sp_max_hot_air = data.get(API_RANGE_SP_MAX_HOT_AIR) or {}
+        range_sp_max_hot_air = parse_float(api_range_sp_max_hot_air.get(API_CELSIUS))
         if range_sp_max_hot_air is not None:
             self.temp_set_max_hot_air = range_sp_max_hot_air
-        range_sp_max_stop_air = parse_float(
-            data.get(API_RANGE_SP_MAX_STOP_AIR, {}).get(API_CELSIUS)
-        )
+        api_range_sp_max_stop_air = data.get(API_RANGE_SP_MAX_STOP_AIR) or {}
+        range_sp_max_stop_air = parse_float(api_range_sp_max_stop_air.get(API_CELSIUS))
         if range_sp_max_stop_air is not None:
             self.temp_set_max_stop_air = range_sp_max_stop_air
-        range_sp_max_vent_air = parse_float(
-            data.get(API_RANGE_SP_MAX_VENT_AIR, {}).get(API_CELSIUS)
-        )
+        api_range_sp_max_vent_air = data.get(API_RANGE_SP_MAX_VENT_AIR) or {}
+        range_sp_max_vent_air = parse_float(api_range_sp_max_vent_air.get(API_CELSIUS))
         if range_sp_max_vent_air is not None:
             self.temp_set_max_vent_air = range_sp_max_vent_air
 
-        range_min_air = parse_float(data.get(API_RANGE_MIN_AIR, {}).get(API_CELSIUS))
+        api_range_min_air = data.get(API_RANGE_MIN_AIR) or {}
+        range_min_air = parse_float(api_range_min_air.get(API_CELSIUS))
         if range_min_air is not None:
             self.temp_set_min = range_min_air
-        range_sp_min_auto_air = parse_float(
-            data.get(API_RANGE_SP_MIN_AUTO_AIR, {}).get(API_CELSIUS)
-        )
+        api_range_sp_min_auto_air = data.get(API_RANGE_SP_MIN_AUTO_AIR) or {}
+        range_sp_min_auto_air = parse_float(api_range_sp_min_auto_air.get(API_CELSIUS))
         if range_sp_min_auto_air is not None:
             self.temp_set_min_auto_air = range_sp_min_auto_air
-        range_sp_min_cool_air = parse_float(
-            data.get(API_RANGE_SP_MIN_COOL_AIR, {}).get(API_CELSIUS)
-        )
+        api_range_sp_min_cool_air = data.get(API_RANGE_SP_MIN_COOL_AIR) or {}
+        range_sp_min_cool_air = parse_float(api_range_sp_min_cool_air.get(API_CELSIUS))
         if range_sp_min_cool_air is not None:
             self.temp_set_min_cool_air = range_sp_min_cool_air
-        range_sp_min_dry_air = parse_float(
-            data.get(API_RANGE_SP_MIN_DRY_AIR, {}).get(API_CELSIUS)
-        )
+        api_range_sp_min_dry_air = data.get(API_RANGE_SP_MIN_DRY_AIR) or {}
+        range_sp_min_dry_air = parse_float(api_range_sp_min_dry_air.get(API_CELSIUS))
         if range_sp_min_dry_air is not None:
             self.temp_set_min_dry_air = range_sp_min_dry_air
+        api_range_sp_min_emerheat_air = data.get(API_RANGE_SP_MIN_EMERHEAT_AIR) or {}
         range_sp_min_emerheat_air = parse_float(
-            data.get(API_RANGE_SP_MIN_EMERHEAT_AIR, {}).get(API_CELSIUS)
+            api_range_sp_min_emerheat_air.get(API_CELSIUS)
         )
         if range_sp_min_emerheat_air is not None:
             self.temp_set_min_emerheat_air = range_sp_min_emerheat_air
-        range_sp_min_hot_air = parse_float(
-            data.get(API_RANGE_SP_MIN_HOT_AIR, {}).get(API_CELSIUS)
-        )
+        api_range_sp_min_hot_air = data.get(API_RANGE_SP_MIN_HOT_AIR) or {}
+        range_sp_min_hot_air = parse_float(api_range_sp_min_hot_air.get(API_CELSIUS))
         if range_sp_min_hot_air is not None:
             self.temp_set_min_hot_air = range_sp_min_hot_air
-        range_sp_min_stop_air = parse_float(
-            data.get(API_RANGE_SP_MIN_STOP_AIR, {}).get(API_CELSIUS)
-        )
+        api_range_sp_min_stop_air = data.get(API_RANGE_SP_MIN_STOP_AIR) or {}
+        range_sp_min_stop_air = parse_float(api_range_sp_min_stop_air.get(API_CELSIUS))
         if range_sp_min_stop_air is not None:
             self.temp_set_min_stop_air = range_sp_min_stop_air
-        range_sp_min_vent_air = parse_float(
-            data.get(API_RANGE_SP_MIN_VENT_AIR, {}).get(API_CELSIUS)
-        )
+        api_range_sp_min_vent_air = data.get(API_RANGE_SP_MIN_VENT_AIR) or {}
+        range_sp_min_vent_air = parse_float(api_range_sp_min_vent_air.get(API_CELSIUS))
         if range_sp_min_vent_air is not None:
             self.temp_set_min_vent_air = range_sp_min_vent_air
 
@@ -950,26 +943,33 @@ class HVAC(Device):
 
             self.speeds = speeds
 
-        sp_air_auto = parse_float(data.get(API_SP_AIR_AUTO, {}).get(API_CELSIUS))
+        api_sp_air_auto = data.get(API_SP_AIR_AUTO) or {}
+        sp_air_auto = parse_float(api_sp_air_auto.get(API_CELSIUS))
         if sp_air_auto is not None:
             self.temp_set_auto_air = sp_air_auto
-        sp_air_cool = parse_float(data.get(API_SP_AIR_COOL, {}).get(API_CELSIUS))
+        api_sp_air_cool = data.get(API_SP_AIR_COOL) or {}
+        sp_air_cool = parse_float(api_sp_air_cool.get(API_CELSIUS))
         if sp_air_cool is not None:
             self.temp_set_cool_air = sp_air_cool
-        sp_air_dry = parse_float(data.get(API_SP_AIR_DRY, {}).get(API_CELSIUS))
+        api_sp_air_dry = data.get(API_SP_AIR_DRY) or {}
+        sp_air_dry = parse_float(api_sp_air_dry.get(API_CELSIUS))
         if sp_air_dry is not None:
             self.temp_set_dry_air = sp_air_dry
-        sp_air_heat = parse_float(data.get(API_SP_AIR_HEAT, {}).get(API_CELSIUS))
+        api_sp_air_heat = data.get(API_SP_AIR_HEAT) or {}
+        sp_air_heat = parse_float(api_sp_air_heat.get(API_CELSIUS))
         if sp_air_heat is not None:
             self.temp_set_hot_air = sp_air_heat
-        sp_air_stop = parse_float(data.get(API_SP_AIR_STOP, {}).get(API_CELSIUS))
+        api_sp_air_stop = data.get(API_SP_AIR_STOP) or {}
+        sp_air_stop = parse_float(api_sp_air_stop.get(API_CELSIUS))
         if sp_air_stop is not None:
             self.temp_set_stop_air = sp_air_stop
-        sp_air_vent = parse_float(data.get(API_SP_AIR_VENT, {}).get(API_CELSIUS))
+        api_sp_air_vent = data.get(API_SP_AIR_VENT) or {}
+        sp_air_vent = parse_float(api_sp_air_vent.get(API_CELSIUS))
         if sp_air_vent is not None:
             self.temp_set_vent_air = sp_air_vent
 
-        step = parse_float(data.get(API_STEP, {}).get(API_CELSIUS))
+        api_step = data.get(API_STEP) or {}
+        step = parse_float(api_step.get(API_CELSIUS))
         if step is not None:
             self.temp_step = step
 

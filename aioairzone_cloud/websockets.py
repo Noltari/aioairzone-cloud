@@ -135,7 +135,7 @@ class AirzoneCloudIWS:
 
     async def handler_device_state(self, data: dict[str, Any]) -> None:
         """WebSockets DEVICE_STATE handler."""
-        body: dict[str, Any] = data.get(WS_BODY, {})
+        body: dict[str, Any] = data.get(WS_BODY) or {}
         update = EntityUpdate(UpdateType.WS_FULL, body)
         dev_id: str | None = body.get(API_DEVICE_ID)
 
@@ -160,7 +160,7 @@ class AirzoneCloudIWS:
 
     async def handler_devices_update(self, data: dict[str, Any]) -> None:
         """WebSockets DEVICES_UPDATES handler."""
-        body: dict[str, Any] = data.get(WS_BODY, {})
+        body: dict[str, Any] = data.get(WS_BODY) or {}
         update = EntityUpdate(UpdateType.WS_PARTIAL, body)
         dev_id: str | None = body.get(API_DEVICE_ID)
 
@@ -201,7 +201,7 @@ class AirzoneCloudIWS:
 
     async def handler_webserver_updates(self, data: dict[str, Any]) -> None:
         """WebSockets WEBSERVER_UPDATES handler."""
-        body: dict[str, Any] = data.get(WS_BODY, {})
+        body: dict[str, Any] = data.get(WS_BODY) or {}
         update = EntityUpdate(UpdateType.WS_PARTIAL, body)
         ws_id: str | None = body.get(API_WS_ID)
 

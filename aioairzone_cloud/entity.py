@@ -46,12 +46,12 @@ class EntityUpdate:
         status: dict[str, Any]
 
         if self.type == UpdateType.WS_PARTIAL:
-            change = data.get(WS_CHANGE, {})
-            adv_conf = change.get(WS_ADV_CONF, {})
-            status = change.get(WS_STATUS, {})
+            change = data.get(WS_CHANGE) or {}
+            adv_conf = change.get(WS_ADV_CONF) or {}
+            status = change.get(WS_STATUS) or {}
             data = adv_conf | status
         elif self.type == UpdateType.WS_FULL:
-            status = self.data.get(WS_STATUS, {})
+            status = self.data.get(WS_STATUS) or {}
             data = self.data | status
 
         return data

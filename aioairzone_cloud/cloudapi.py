@@ -409,7 +409,8 @@ class AirzoneCloudApi:
 
     async def api_set_group_params(self, group: Group, params: dict[str, Any]) -> None:
         """Set group parameters."""
-        for key, value in params.get(API_PARAMS, {}).items():
+        api_params = params.get(API_PARAMS) or {}
+        for key, value in api_params.items():
             if key == API_MODE:
                 modes = group.get_modes() or []
                 if value not in modes:
@@ -425,7 +426,8 @@ class AirzoneCloudApi:
         self, inst: Installation, params: dict[str, Any]
     ) -> None:
         """Set installation parameters."""
-        for key, value in params.get(API_PARAMS, {}).items():
+        api_params = params.get(API_PARAMS) or {}
+        for key, value in api_params.items():
             if key == API_MODE:
                 modes = inst.get_modes() or []
                 if value not in modes:

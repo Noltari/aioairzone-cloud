@@ -107,7 +107,8 @@ class WebServer(Entity):
             connection_date = parse_str(ws_status.get(API_CONNECTION_DATE))
             if connection_date is not None:
                 self.connection_date = connection_date
-            cpu_usage = parse_int(ws_status.get(API_CPU_WS, {}).get(API_GENERAL))
+            api_cpu_ws = ws_status.get(API_CPU_WS) or {}
+            cpu_usage = parse_int(api_cpu_ws.get(API_GENERAL))
             if cpu_usage is not None:
                 self.cpu_usage = cpu_usage
             disconnection_date = parse_str(ws_status.get(API_DISCONNECTION_DATE))
@@ -116,7 +117,8 @@ class WebServer(Entity):
             is_connected = parse_bool(ws_status.get(API_IS_CONNECTED))
             if is_connected is not None:
                 self.is_connected = is_connected
-            memory_free = parse_int(ws_status.get(API_FREE_MEM, {}).get(API_FREE))
+            api_free_mem = ws_status.get(API_FREE_MEM) or {}
+            memory_free = parse_int(api_free_mem.get(API_FREE))
             if memory_free is not None:
                 self.memory_free = memory_free
             stat_quality = parse_int(ws_status.get(API_STAT_QUALITY))

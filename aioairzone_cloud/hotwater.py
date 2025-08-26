@@ -170,26 +170,27 @@ class HotWater(Device):
         if powerful_mode is not None:
             self.power_mode = powerful_mode
 
-        range_sp_max_acs = parse_int(
-            data.get(API_RANGE_SP_MAX_ACS, {}).get(API_CELSIUS)
-        )
+        api_range_sp_max_acs = data.get(API_RANGE_SP_MAX_ACS) or {}
+        range_sp_max_acs = parse_int(api_range_sp_max_acs.get(API_CELSIUS))
         if range_sp_max_acs is not None:
             self.temp_set_max = range_sp_max_acs
 
-        range_sp_min_acs = parse_int(
-            data.get(API_RANGE_SP_MIN_ACS, {}).get(API_CELSIUS)
-        )
+        api_range_sp_min_acs = data.get(API_RANGE_SP_MIN_ACS) or {}
+        range_sp_min_acs = parse_int(api_range_sp_min_acs.get(API_CELSIUS))
         if range_sp_min_acs is not None:
             self.temp_set_min = range_sp_min_acs
 
-        setpoint = parse_int(data.get(API_SETPOINT, {}).get(API_CELSIUS))
+        api_setpoint = data.get(API_SETPOINT) or {}
+        setpoint = parse_int(api_setpoint.get(API_CELSIUS))
         if setpoint is not None:
             self.temp_set = setpoint
 
-        step = parse_int(data.get(API_STEP, {}).get(API_CELSIUS))
+        api_step = data.get(API_STEP) or {}
+        step = parse_int(api_step.get(API_CELSIUS))
         if step is not None:
             self.temp_step = step
 
-        tank_temp = parse_float(data.get(API_TANK_TEMP, {}).get(API_CELSIUS))
+        api_tank_temp = data.get(API_TANK_TEMP) or {}
+        tank_temp = parse_float(api_tank_temp.get(API_CELSIUS))
         if tank_temp is not None:
             self.temp = tank_temp

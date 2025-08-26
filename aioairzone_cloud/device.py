@@ -98,12 +98,12 @@ class Device(Entity):
     def sub_data(self, device_data: dict[str, Any]) -> dict[str, Any]:
         """Get Device sub data."""
         if API_META in device_data:
-            meta: dict[str, Any] = device_data.get(API_META, {})
+            meta: dict[str, Any] = device_data.get(API_META) or {}
             if API_SYSTEM_NUMBER in meta:
                 return meta
 
         if API_CONFIG in device_data:
-            config: dict[str, Any] = device_data.get(API_CONFIG, {})
+            config: dict[str, Any] = device_data.get(API_CONFIG) or {}
             if API_SYSTEM_NUMBER in config:
                 return config
 
