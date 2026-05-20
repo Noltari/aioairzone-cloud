@@ -27,6 +27,7 @@ from .const import (
     API_AZ_AIDOO_ACS,
     API_AZ_AIDOO_PRO,
     API_AZ_AIRQSENSOR,
+    API_AZ_ENERGY_CLAMP,
     API_AZ_OUTPUTS,
     API_AZ_SYSTEM,
     API_AZ_ZONE,
@@ -56,6 +57,7 @@ from .const import (
     API_WS_ID,
     AZD_AIDOOS,
     AZD_AIR_QUALITY,
+    AZD_ENERGY_CLAMPS,
     AZD_GROUPS,
     AZD_HOT_WATERS,
     AZD_INSTALLATIONS,
@@ -75,6 +77,7 @@ from .const import (
     REQUESTS_LIMIT,
 )
 from .device import Device
+from .energy_clamp import EnergyClamp
 from .entity import EntityUpdate, UpdateType
 from .exceptions import (
     AirzoneCloudError,
@@ -125,6 +128,7 @@ class AirzoneCloudApi:
         self.callback_lock: Lock = Lock()
         self.devices: dict[str, Device] = {}
         self.dhws: dict[str, HotWater] = {}
+        self.energy_clamps: dict[str, EnergyClamp] = {}
         self.groups: dict[str, Group] = {}
         self.installations: dict[str, Installation] = {}
         self.loop = asyncio.get_running_loop()
@@ -238,8 +242,15 @@ class AirzoneCloudApi:
         inst_id = device.get_installation()
         url_id = urllib.parse.quote(dev_id)
 
+        inst = self.get_installation_id(inst_id)
+        if inst is not None:
+            request_type = inst.get_request_type()
+        else:
+            request_type = API_TYPE_USER
+
         params = {
             API_INSTALLATION_ID: inst_id,
+            API_TYPE: request_type,
         }
         dev_params = urllib.parse.urlencode(params)
 
@@ -501,6 +512,7 @@ class AirzoneCloudApi:
         num_aidoos = len(self.aidoos)
         num_air_quality = len(self.air_quality)
         num_dhws = len(self.dhws)
+        num_energy_clamps = len(self.energy_clamps)
         num_outputs = len(self.outputs)
         num_systems = len(self.systems)
         num_zones = len(self.zones)
@@ -510,6 +522,7 @@ class AirzoneCloudApi:
             num_aidoos
             + num_air_quality
             + num_dhws
+            + num_energy_clamps
             + num_outputs
             + num_systems
             + num_zones
@@ -608,6 +621,12 @@ class AirzoneCloudApi:
                 dhws[key] = dhw.data()
             data[AZD_HOT_WATERS] = dhws
 
+        if len(self.energy_clamps) > 0:
+            energy_clamps: dict[str, Any] = {}
+            for key, energy_clamp in self.energy_clamps.items():
+                energy_clamps[key] = energy_clamp.data()
+            data[AZD_ENERGY_CLAMPS] = energy_clamps
+
         if len(self.groups) > 0:
             groups: dict[str, Any] = {}
             for key, group in self.groups.items():
@@ -667,6 +686,11 @@ class AirzoneCloudApi:
         self.dhws[dhw.get_id()] = dhw
         self.add_device(dhw)
 
+    def add_energy_clamp(self, energy_clamp: EnergyClamp) -> None:
+        """Add Airzone Cloud Energy Clamp."""
+        self.energy_clamps[energy_clamp.get_id()] = energy_clamp
+        self.add_device(energy_clamp)
+
     def add_output(self, output: Output) -> None:
         """Add Airzone Cloud Output."""
         self.outputs[output.get_id()] = output
@@ -699,6 +723,10 @@ class AirzoneCloudApi:
     def get_dhw_id(self, dhw_id: str) -> HotWater | None:
         """Return Airzone Cloud DHW by ID."""
         return self.dhws.get(dhw_id)
+
+    def get_energy_clamp_id(self, clamp_id: str) -> EnergyClamp | None:
+        """Return Airzone Cloud Energy Clamp by ID."""
+        return self.energy_clamps.get(clamp_id)
 
     def get_group_id(self, group_id: str) -> Group | None:
         """Return Airzone Cloud Group by ID."""
@@ -854,6 +882,25 @@ class AirzoneCloudApi:
 
         await asyncio.gather(*tasks)
 
+    async def update_energy_clamp(self, energy_clamp: EnergyClamp) -> None:
+        """Update Airzone Cloud Energy Clamp from API."""
+        try:
+            status_data = await self.api_get_device_status(energy_clamp)
+        except AirzoneCloudError:
+            return
+
+        update = EntityUpdate(UpdateType.API_FULL, status_data)
+        await energy_clamp.update(update)
+
+    async def update_energy_clamps(self) -> None:
+        """Update all Airzone Cloud Energy Clamps."""
+        tasks = []
+
+        for energy_clamp in self.energy_clamps.values():
+            tasks += [asyncio.create_task(self.update_energy_clamp(energy_clamp))]
+
+        await asyncio.gather(*tasks)
+
     async def update_dhw(self, dhw: HotWater) -> None:
         """Update Airzone Cloud DHW from API."""
         status_task = asyncio.create_task(self.api_get_device_status(dhw))
@@ -944,6 +991,7 @@ class AirzoneCloudApi:
                         "unsupported device_type=%s %s", device_type, device_data
                     )
 
+        await self.update_webservers(True)
         await self.connect_installation_websockets(inst_id)
 
     async def update_installations(self) -> None:
@@ -1020,6 +1068,7 @@ class AirzoneCloudApi:
         """Update all Airzone Cloud Systems/Zones."""
         tasks = [
             asyncio.create_task(self.update_air_qualitys()),
+            asyncio.create_task(self.update_energy_clamps()),
             asyncio.create_task(self.update_systems()),
             asyncio.create_task(self.update_zones()),
         ]
@@ -1082,6 +1131,11 @@ class AirzoneCloudApi:
                             self.add_air_quality(air_quality)
                             if inst is not None:
                                 inst.add_air_quality(air_quality)
+                elif device_type == API_AZ_ENERGY_CLAMP:
+                    if self.get_energy_clamp_id(device_id) is None:
+                        energy_clamp = EnergyClamp(inst_id, ws_id, device_data)
+                        if energy_clamp is not None:
+                            self.add_energy_clamp(energy_clamp)
                 elif device_type == API_AZ_OUTPUTS:
                     if self.get_output_id(device_id) is None:
                         output = Output(inst_id, ws_id, device_data)
