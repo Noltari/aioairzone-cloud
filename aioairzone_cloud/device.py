@@ -30,16 +30,23 @@ from .const import (
     API_WARNINGS,
     API_WS_CONNECTED,
     AZD_AQ_ACTIVE,
+    AZD_AQ_CO2,
     AZD_AQ_INDEX,
     AZD_AQ_PM_1,
     AZD_AQ_PM_2P5,
     AZD_AQ_PM_10,
     AZD_AQ_PRESENT,
+    AZD_AQ_PRESSURE,
+    AZD_AQ_SCORE,
     AZD_AQ_STATUS,
+    AZD_AQ_TEMP,
+    AZD_AQ_TVOC,
+    AZD_AQ_VENT_ACTIVE,
     AZD_AVAILABLE,
     AZD_DOUBLE_SET_POINT,
     AZD_DUAL_SP_CONF,
     AZD_ERRORS,
+    AZD_HUMIDITY,
     AZD_ID,
     AZD_INSTALLATION,
     AZD_IS_CONNECTED,
@@ -151,6 +158,34 @@ class Device(Entity):
         if aq_status is not None:
             data[AZD_AQ_STATUS] = aq_status
 
+        aq_co2 = self.get_aq_co2()
+        if aq_co2 is not None:
+            data[AZD_AQ_CO2] = aq_co2
+
+        aq_pressure = self.get_aq_pressure()
+        if aq_pressure is not None:
+            data[AZD_AQ_PRESSURE] = aq_pressure
+
+        aq_score = self.get_aq_score()
+        if aq_score is not None:
+            data[AZD_AQ_SCORE] = aq_score
+
+        aq_temp = self.get_aq_temp()
+        if aq_temp is not None:
+            data[AZD_AQ_TEMP] = aq_temp
+
+        aq_tvoc = self.get_aq_tvoc()
+        if aq_tvoc is not None:
+            data[AZD_AQ_TVOC] = aq_tvoc
+
+        aq_vent_active = self.get_aq_vent_active()
+        if aq_vent_active is not None:
+            data[AZD_AQ_VENT_ACTIVE] = aq_vent_active
+
+        humidity = self.get_aq_humidity()
+        if humidity is not None:
+            data[AZD_HUMIDITY] = humidity
+
         dual_sp_conf = self.get_dual_sp_conf()
         if dual_sp_conf is not None:
             data[AZD_DUAL_SP_CONF] = dual_sp_conf
@@ -225,6 +260,48 @@ class Device(Entity):
         if self.air_quality is not None:
             return self.air_quality.aq_status
         return self.aq_status
+
+    def get_aq_co2(self) -> int | None:
+        """Return Air Quality CO2 level (ppm)."""
+        if self.air_quality is not None:
+            return self.air_quality.aq_co2
+        return None
+
+    def get_aq_humidity(self) -> int | None:
+        """Return Air Quality sensor humidity (%)."""
+        if self.air_quality is not None:
+            return self.air_quality.humidity
+        return None
+
+    def get_aq_pressure(self) -> float | None:
+        """Return Air Quality atmospheric pressure (hPa)."""
+        if self.air_quality is not None:
+            return self.air_quality.aq_pressure
+        return None
+
+    def get_aq_score(self) -> int | None:
+        """Return Air Quality overall score."""
+        if self.air_quality is not None:
+            return self.air_quality.aq_score
+        return None
+
+    def get_aq_temp(self) -> float | None:
+        """Return Air Quality sensor temperature (°C)."""
+        if self.air_quality is not None:
+            return self.air_quality.aq_temp
+        return None
+
+    def get_aq_tvoc(self) -> int | None:
+        """Return Air Quality TVOC level (ppb)."""
+        if self.air_quality is not None:
+            return self.air_quality.aq_tvoc
+        return None
+
+    def get_aq_vent_active(self) -> bool | None:
+        """Return Air Quality ventilation active status."""
+        if self.air_quality is not None:
+            return self.air_quality.aq_vent_active
+        return None
 
     def get_available(self) -> bool:
         """Return availability status."""
