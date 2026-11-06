@@ -81,6 +81,7 @@ from .exceptions import (
     APIError,
     AuthError,
     LoginError,
+    PaymentError,
     TokenRefreshError,
     TooManyRequests,
     UnprocessableEntity,
@@ -177,6 +178,8 @@ class AirzoneCloudApi:
                     raise APIError(err) from err
                 if err.status == 401:
                     raise AuthError(err) from err
+                if err.status == 402:
+                    raise PaymentError(err) from err
                 if err.status == 422:
                     raise UnprocessableEntity(err) from err
                 if err.status == 429:
@@ -222,7 +225,7 @@ class AirzoneCloudApi:
                 "GET",
                 f"{API_V1}/{API_DEVICES}/{url_id}/{API_CONFIG}?{dev_params}",
             )
-        except UnprocessableEntity:
+        except (PaymentError, UnprocessableEntity):
             res = {}
 
         await self.set_api_raw_data(RAW_DEVICES_CONFIG, dev_id, res)
