@@ -475,6 +475,9 @@ class HVAC(Device):
         """Return HVAC speed type."""
         return self.speed_type
 
+    def set_param(self, param: str, data: dict[str, Any]) -> None:
+        """Update HVAC parameter from API request."""
+
     def set_speed(self, speed: int) -> None:
         """Set HVAC speed."""
         if self.speed is not None:
