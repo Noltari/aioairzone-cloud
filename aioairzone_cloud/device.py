@@ -6,15 +6,9 @@ from abc import abstractmethod
 import logging
 from typing import TYPE_CHECKING, Any
 
-from .common import OperationMode, parse_bool, parse_int, parse_str
+from .common import OperationMode, parse_bool, parse_int, parse_str, parse_float
 from .const import (
     API_AQ_ACTIVE,
-    API_AQ_PM_1,
-    API_AQ_PM_2P5,
-    API_AQ_PM_10,
-    API_AQ_PRESENT,
-    API_AQ_QUALITY,
-    API_AQ_STATUS,
     API_AUTO_MODE,
     API_CONFIG,
     API_DEVICE_ID,
@@ -30,12 +24,6 @@ from .const import (
     API_WARNINGS,
     API_WS_CONNECTED,
     AZD_AQ_ACTIVE,
-    AZD_AQ_INDEX,
-    AZD_AQ_PM_1,
-    AZD_AQ_PM_2P5,
-    AZD_AQ_PM_10,
-    AZD_AQ_PRESENT,
-    AZD_AQ_STATUS,
     AZD_AVAILABLE,
     AZD_DOUBLE_SET_POINT,
     AZD_DUAL_SP_CONF,
@@ -69,13 +57,8 @@ class Device(Entity):
         super().__init__()
 
         self.air_quality: AirQuality | None = None
-        self.auto_mode: OperationMode | None = None
         self.aq_active: bool | None = None
-        self.aq_pm_1: int | None = None
-        self.aq_pm_2p5: int | None = None
-        self.aq_pm_10: int | None = None
-        self.aq_present: bool | None = None
-        self.aq_status: str | None = None
+        self.auto_mode: OperationMode | None = None
         self.double_set_point: bool | None = None
         self.dual_sp_conf: bool | None = None
         self.errors: list[str] = []
@@ -127,30 +110,6 @@ class Device(Entity):
         if aq_active is not None:
             data[AZD_AQ_ACTIVE] = aq_active
 
-        aq_index = self.get_aq_index()
-        if aq_index is not None:
-            data[AZD_AQ_INDEX] = aq_index
-
-        aq_pm_1 = self.get_aq_pm_1()
-        if aq_pm_1 is not None:
-            data[AZD_AQ_PM_1] = aq_pm_1
-
-        aq_pm_2p5 = self.get_aq_pm_2p5()
-        if aq_pm_2p5 is not None:
-            data[AZD_AQ_PM_2P5] = aq_pm_2p5
-
-        aq_pm_10 = self.get_aq_pm_10()
-        if aq_pm_10 is not None:
-            data[AZD_AQ_PM_10] = aq_pm_10
-
-        aq_present = self.get_aq_present()
-        if aq_present is not None:
-            data[AZD_AQ_PRESENT] = aq_present
-
-        aq_status = self.get_aq_status()
-        if aq_status is not None:
-            data[AZD_AQ_STATUS] = aq_status
-
         dual_sp_conf = self.get_dual_sp_conf()
         if dual_sp_conf is not None:
             data[AZD_DUAL_SP_CONF] = dual_sp_conf
@@ -186,45 +145,6 @@ class Device(Entity):
         if self.air_quality is not None:
             return self.air_quality.aq_active
         return self.aq_active
-
-    def get_aq_index(self) -> int | None:
-        """Return HVAC device Air Quality index."""
-        aq_status = self.get_aq_status()
-        if aq_status is not None:
-            for key, value in API_AQ_STATUS.items():
-                if aq_status == key:
-                    return value
-        return None
-
-    def get_aq_pm_1(self) -> int | None:
-        """Return HVAC device Air Quality PM 1."""
-        if self.air_quality is not None:
-            return self.air_quality.aq_pm_1
-        return self.aq_pm_1
-
-    def get_aq_pm_2p5(self) -> int | None:
-        """Return HVAC device Air Quality PM 2.5."""
-        if self.air_quality is not None:
-            return self.air_quality.aq_pm_2p5
-        return self.aq_pm_2p5
-
-    def get_aq_pm_10(self) -> int | None:
-        """Return HVAC device Air Quality PM 10."""
-        if self.air_quality is not None:
-            return self.air_quality.aq_pm_10
-        return self.aq_pm_10
-
-    def get_aq_present(self) -> bool | None:
-        """Return HVAC device Air Quality present."""
-        if self.air_quality is not None:
-            return self.air_quality.aq_present
-        return self.aq_present
-
-    def get_aq_status(self) -> str | None:
-        """Return HVAC device Air Quality status."""
-        if self.air_quality is not None:
-            return self.air_quality.aq_status
-        return self.aq_status
 
     def get_available(self) -> bool:
         """Return availability status."""
@@ -314,36 +234,16 @@ class Device(Entity):
         """Update Device data."""
         data = update.get_data()
 
+        aq_active = parse_bool(data.get(API_AQ_ACTIVE))
+        if aq_active is not None:
+            self.aq_active = aq_active
+
         is_connected = parse_bool(data.get(API_IS_CONNECTED))
         if is_connected is not None:
             self.is_connected = is_connected
         ws_connected = parse_bool(data.get(API_WS_CONNECTED))
         if ws_connected is not None:
             self.ws_connected = ws_connected
-
-        aq_active = parse_bool(data.get(API_AQ_ACTIVE))
-        if aq_active is not None:
-            self.aq_active = aq_active
-
-        aq_pm_1 = parse_int(data.get(API_AQ_PM_1))
-        if aq_pm_1 is not None:
-            self.aq_pm_1 = aq_pm_1
-
-        aq_pm_2p5 = parse_int(data.get(API_AQ_PM_2P5))
-        if aq_pm_2p5 is not None:
-            self.aq_pm_2p5 = aq_pm_2p5
-
-        aq_pm_10 = parse_int(data.get(API_AQ_PM_10))
-        if aq_pm_10 is not None:
-            self.aq_pm_10 = aq_pm_10
-
-        aq_present = parse_bool(data.get(API_AQ_PRESENT))
-        if aq_present is not None:
-            self.aq_present = aq_present
-
-        aq_status = parse_str(data.get(API_AQ_QUALITY))
-        if aq_status is not None:
-            self.aq_status = aq_status
 
         auto_mode = data.get(API_AUTO_MODE)
         if auto_mode is not None:
