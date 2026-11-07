@@ -991,7 +991,6 @@ class AirzoneCloudApi:
                         "unsupported device_type=%s %s", device_type, device_data
                     )
 
-        await self.update_webservers(True)
         await self.connect_installation_websockets(inst_id)
 
     async def update_installations(self) -> None:
