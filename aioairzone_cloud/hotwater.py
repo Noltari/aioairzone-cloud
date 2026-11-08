@@ -29,7 +29,7 @@ from .const import (
     AZD_TEMP_STEP,
 )
 from .device import Device
-from .entity import EntityUpdate, UpdateType
+from .entity import EntityUpdate
 
 
 class HotWater(Device):
@@ -159,7 +159,7 @@ class HotWater(Device):
                 # API sends active as null instead of False
                 self.active = False
         else:
-            if update.get_type() != UpdateType.WS_PARTIAL:
+            if update.is_full():
                 self.active = None
 
         power = parse_bool(data.get(API_POWER))
