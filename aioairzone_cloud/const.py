@@ -144,6 +144,9 @@ API_V1: Final[str] = "api/v1"
 API_VALUE: Final[str] = "value"
 API_VOLTAGE_TOTAL: Final[str] = "voltage_total"
 API_WARNINGS: Final[str] = "warnings"
+API_WARNINGS_IGNORE: Final[list[str]] = [
+    "standby_mode_active",
+]
 API_WORK_TEMP: Final[str] = "work_temp"
 API_WS: Final[str] = "ws"
 API_WS_CONNECTED: Final[str] = "ws_connected"

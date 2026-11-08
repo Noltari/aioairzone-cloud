@@ -25,9 +25,11 @@ from .const import (
     API_META,
     API_MODE,
     API_MODE_AVAIL,
+    API_OLD_ID,
     API_SIMULATOR_MODE,
     API_SYSTEM_NUMBER,
     API_WARNINGS,
+    API_WARNINGS_IGNORE,
     API_WS_CONNECTED,
     AZD_AQ_ACTIVE,
     AZD_AQ_CO2,
@@ -85,14 +87,14 @@ class Device(Entity):
         self.aq_status: str | None = None
         self.double_set_point: bool | None = None
         self.dual_sp_conf: bool | None = None
-        self.errors: list[str] = []
+        self.errors: list[dict[str, Any]] = []
         self.id = str(device_data[API_DEVICE_ID])
         self.installation_id = inst_id
         self.mode: OperationMode | None = None
         self.modes: list[OperationMode] = []
         self.name: str = "Device"
         self.simulator_mode: bool | None = None
-        self.warnings: list[str] = []
+        self.warnings: list[dict[str, Any]] = []
         self.webserver_id = ws_id
         self.ws_connected: bool = True
 
@@ -317,7 +319,7 @@ class Device(Entity):
         """Return Device dual set point config."""
         return self.dual_sp_conf
 
-    def get_errors(self) -> list[str]:
+    def get_errors(self) -> list[dict[str, Any]]:
         """Return Device errors."""
         return self.errors
 
@@ -353,13 +355,20 @@ class Device(Entity):
 
     def get_problems(self) -> bool:
         """Return Device problems."""
-        return bool(self.errors) or bool(self.warnings)
+        problems = bool(self.errors)
+        if not problems:
+            for warning in self.warnings:
+                warning_id = warning.get(API_OLD_ID)
+                if warning_id not in API_WARNINGS_IGNORE:
+                    problems = True
+                    break
+        return problems
 
     def get_simulator_mode(self) -> bool | None:
         """Return Device simulator mode."""
         return self.simulator_mode
 
-    def get_warnings(self) -> list[str]:
+    def get_warnings(self) -> list[dict[str, Any]]:
         """Return Device warnings."""
         return self.warnings
 
