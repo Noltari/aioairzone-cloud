@@ -115,7 +115,7 @@ from .const import (
     AZD_THERMOSTAT_MODEL,
 )
 from .device import Device
-from .entity import EntityUpdate, UpdateType
+from .entity import EntityUpdate
 
 
 class HVAC(Device):
@@ -762,7 +762,7 @@ class HVAC(Device):
                 # API sends active as null instead of False
                 self.active = False
         else:
-            if update.get_type() != UpdateType.WS_PARTIAL:
+            if update.is_full():
                 self.active = None
 
         if API_AIR_ACTIVE in data:
@@ -773,7 +773,7 @@ class HVAC(Device):
                 # API sends API_AIR_ACTIVE as null instead of False
                 self.air_demand = False
         else:
-            if update.get_type() != UpdateType.WS_PARTIAL:
+            if update.is_full():
                 self.air_demand = None
 
         if API_RAD_ACTIVE in data:
@@ -784,7 +784,7 @@ class HVAC(Device):
                 # API sends API_RAD_ACTIVE as null instead of False
                 self.floor_demand = False
         else:
-            if update.get_type() != UpdateType.WS_PARTIAL:
+            if update.is_full():
                 self.floor_demand = None
 
         aq_mode_conf = data.get(API_AQ_MODE_CONF)
