@@ -229,7 +229,7 @@ class AirzoneCloudApi:
                 "GET",
                 f"{API_V1}/{API_DEVICES}/{url_id}/{API_CONFIG}?{dev_params}",
             )
-        except (PaymentError, UnprocessableEntity):
+        except PaymentError, UnprocessableEntity:
             res = {}
 
         await self.set_api_raw_data(RAW_DEVICES_CONFIG, dev_id, res)
