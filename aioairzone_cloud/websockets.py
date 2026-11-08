@@ -27,6 +27,7 @@ from .const import (
     WS_INIT_TIMEOUT,
     WS_INSTALLATION,
     WS_INSTALLATION_ID,
+    WS_READY,
     WS_URL,
     WS_WEBSERVER_UPDATES,
     WS_WEBSOCKETS,
@@ -190,6 +191,8 @@ class AirzoneCloudIWS:
             await self.handler_device_state(data)
         elif event == WS_DEVICE_STATE_END:
             self.handler_device_state_end(data)
+        elif event == WS_READY:
+            pass
         elif event.startswith(WS_DEVICES_UPDATES):
             await self.handler_devices_update(data)
             self.cloudapi.update_callback()

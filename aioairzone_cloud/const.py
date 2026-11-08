@@ -326,6 +326,7 @@ WS_INIT_TIMEOUT: Final[int] = 15
 WS_INSTALLATION: Final[str] = "installation"
 WS_INSTALLATION_ID: Final[str] = "installationId"
 WS_JWT: Final[str] = "jwt"
+WS_READY: Final[str] = "ready"
 WS_STATUS: Final[str] = "status"
 WS_URL: Final[str] = f"wss://{AIRZONE_SERVER}"
 WS_WEBSERVER_UPDATES: Final[str] = "WEBSERVER_UPDATES"
